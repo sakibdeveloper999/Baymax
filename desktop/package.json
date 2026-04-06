@@ -1,0 +1,58 @@
+{
+    "name": "baymax-desktop",
+    "version": "1.0.0",
+    "description": "Baymax OmniPOS Desktop App - React + Electron",
+    "main": "public/electron.js",
+    "homepage": "./",
+    "scripts": {
+        "start": "concurrently \"npm run react-start\" \"npm run electron-start\"",
+        "react-start": "react-scripts start",
+        "react-build": "react-scripts build",
+        "electron-start": "wait-on http://localhost:3000 && electron .",
+        "electron-build": "npm run react-build && electron-builder",
+        "eject": "react-scripts eject"
+    },
+    "dependencies": {
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0",
+        "zustand": "^4.3.8",
+        "i18next": "^23.5.0",
+        "react-i18next": "^13.2.3",
+        "axios": "^1.4.0",
+        "better-sqlite3": "^9.0.0"
+    },
+    "devDependencies": {
+        "react-scripts": "5.0.1",
+        "concurrently": "^8.2.1",
+        "electron": "^26.0.0",
+        "electron-builder": "^24.6.3",
+        "wait-on": "^7.0.1"
+    },
+    "build": {
+        "appId": "com.baymax.pos",
+        "productName": "Baymax OmniPOS",
+        "files": [
+            "build/**/*",
+            "public/electron.js"
+        ],
+        "win": {
+            "target": [
+                "portable",
+                "installer"
+            ],
+            "icon": "build/logo.ico"
+        }
+    },
+    "browserslist": {
+        "production": [
+            ">0.2%",
+            "not dead",
+            "not op_mini all"
+        ],
+        "development": [
+            "last 1 chrome version",
+            "last 1 firefox version",
+            "last 1 safari version"
+        ]
+    }
+}
