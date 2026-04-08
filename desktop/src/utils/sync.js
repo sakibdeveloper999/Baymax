@@ -7,16 +7,16 @@ class SyncService {
     }
 
     setupListeners() {
-        window.addEventListener('online', () => ({
-            this.isOnline = true,
-            console.log('🟢 Online'),
-            this.syncPendingOrders(),
-        }));
+        window.addEventListener('online', () => {
+            this.isOnline = true;
+            console.log('🟢 Online');
+            this.syncPendingOrders();
+        });
 
-        window.addEventListener('offline', () => ({
-            this.isOnline = false,
-            console.log('🔴 Offline'),
-        }));
+        window.addEventListener('offline', () => {
+            this.isOnline = false;
+            console.log('🔴 Offline');
+        });
     }
 
     async syncPendingOrders() {
