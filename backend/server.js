@@ -1,17 +1,17 @@
 require('dotenv').config();
-import express, { json, urlencoded } from 'express';
-import { connect } from 'mongoose';
-import cors from 'cors';
+const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
 
 const app = express();
 
 // Middleware
 app.use(cors());
-app.use(json());
-app.use(urlencoded({ extended: true }));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // MongoDB Connection
-connect(process.env.MONGO_URI)
+mongoose.connect(process.env.MONGO_URI)
     .then(() => console.log('✅ MongoDB Connected'))
     .catch((err) => {
         console.error('❌ MongoDB Connection Error:', err);

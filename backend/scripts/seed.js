@@ -4,8 +4,8 @@
  */
 
 require('dotenv').config();
-import { connect, connection } from 'mongoose';
-import Product from '../models/Product';
+const mongoose = require('mongoose');
+const Product = require('../models/Product');
 
 const SAMPLE_PRODUCTS = [
     {
@@ -92,7 +92,7 @@ const SAMPLE_PRODUCTS = [
 
 async function seedProducts() {
     try {
-        await connect(process.env.MONGO_URI);
+        await mongoose.connect(process.env.MONGO_URI);
         console.log('✅ MongoDB Connected');
 
         // Clear existing products
@@ -110,7 +110,7 @@ async function seedProducts() {
             console.log(`${i + 1}. ${p.name} (Barcode: ${p.barcode}) - ৳${p.sellingPrice}`);
         });
 
-        await connection.close();
+        await mongoose.connection.close();
         console.log('\n✅ Seed complete!');
         process.exit(0);
     } catch (error) {
