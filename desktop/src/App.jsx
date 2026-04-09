@@ -4,6 +4,10 @@ import { useTranslation } from 'react-i18next';
 import ScanInput from './components/ScanInput';
 import Cart from './components/Cart';
 import StatusIndicator from './components/StatusIndicator';
+import DiscountInput from './components/DiscountInput';
+import TaxSelector from './components/TaxSelector';
+import PaymentMethodSelector from './components/PaymentMethodSelector';
+import HoldOrderButton from './components/HoldOrderButton';
 import useCartStore from './store/cartSlice';
 import localDB from './db/localdb';
 import syncService from './utils/sync';
@@ -95,9 +99,32 @@ function App() {
         initApp();
     }, []);
 
+    // Keyboard shortcuts
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            // F1 = Checkout
+            if (e.key === 'F1') {
+                e.preventDefault();
+                if (itemCount > 0) {
+                    alert(`Checkout: ${itemCount} items - Total: ৳${total.toFixed(2)}`);
+                }
+            }
+            // ESC = Clear Cart
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                if (itemCount > 0 && window.confirm(t('confirm_clear_cart'))) {
+                    clearCart();
+                }
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [itemCount, total, clearCart, t]);
+
     const handleCheckout = () => {
         if (itemCount === 0) {
-            alert('Cart is empty!');
+            alert(t('cart_empty_message'));
             return;
         }
         // TODO: Implement checkout (Phase 4)
@@ -128,9 +155,30 @@ function App() {
                     <div className="col-span-2">
                         <Cart />
 
-                        {/* Checkout Section */}
+                        {/* Phase 3: Payment & Discount Controls */}
+                        <div className="card mt-6 bg-gray-50">
+                            <h3 className="font-bold mb-4 text-lg">{t('payment_settings')}</h3>
+
+                            {/* Tax & Discount Row */}
+                            <div className="flex gap-4 mb-4">
+                                <div className="flex-1">
+                                    <TaxSelector />
+                                </div>
+                                <div className="flex-1">
+                                    <DiscountInput />
+                                </div>
+                            </div>
+
+                            {/* Payment Method Selection */}
+                            <div className="mb-4">
+                                <label className="block text-sm font-semibold mb-2">{t('payment_method')}:</label>
+                                <PaymentMethodSelector />
+                            </div>
+                        </div>
+
+                        {/* Checkout & Action Buttons */}
                         <div className="card mt-6 bg-gradient-to-r from-primary to-secondary text-white">
-                            <div className="flex items-center justify-between">
+                            <div className="flex items-center justify-between mb-4">
                                 <div>
                                     <p className="text-sm opacity-90">{t('items_in_cart')}</p>
                                     <p className="text-3xl font-bold">{itemCount}</p>
@@ -139,22 +187,36 @@ function App() {
                                     <p className="text-sm opacity-90">{t('total')}</p>
                                     <p className="text-3xl font-bold">৳{total.toFixed(2)}</p>
                                 </div>
+                            </div>
+
+                            {/* Buttons */}
+                            <div className="space-y-2">
                                 <div className="flex gap-3">
                                     {itemCount > 0 && (
                                         <button
                                             onClick={clearCart}
+                                            title="ESC"
                                             className="px-4 py-2 bg-white text-red-500 rounded-lg font-semibold hover:bg-gray-100 transition"
                                         >
-                                            {t('clear_cart')}
+                                            ✕ {t('clear_cart')}
                                         </button>
                                     )}
                                     <button
                                         onClick={handleCheckout}
                                         disabled={itemCount === 0}
-                                        className="btn-primary px-6 py-2 bg-white text-primary font-bold rounded-lg hover:bg-gray-100 transition disabled:opacity-50"
+                                        title="F1"
+                                        className="btn-primary flex-1 px-6 py-3 bg-white text-primary font-bold rounded-lg hover:bg-gray-100 transition disabled:opacity-50"
                                     >
                                         {t('checkout')} →
                                     </button>
+                                </div>
+
+                                {/* Hold Button */}
+                                <HoldOrderButton />
+
+                                {/* Keyboard Shortcuts */}
+                                <div className="text-xs opacity-75 mt-3 bg-white bg-opacity-10 p-2 rounded">
+                                    <p>⌨️ {t('keyboard_shortcuts')}: F1 = {t('checkout')} | ESC = {t('clear_cart')}</p>
                                 </div>
                             </div>
                         </div>

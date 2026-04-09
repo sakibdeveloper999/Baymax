@@ -2,6 +2,12 @@ import { create } from 'zustand';
 
 const useCartStore = create((set, get) => ({
     items: [],
+    discount: 0,
+    discountType: 'percentage', // 'percentage' or 'fixed'
+    taxRate: 0,
+    paymentMethod: 'cash', // 'cash', 'card', 'mobile'
+    isHeld: false,
+    holdNotes: '',
 
     addItem: (product) =>
         set((state) => {
@@ -49,9 +55,35 @@ const useCartStore = create((set, get) => ({
 
     clearCart: () => set({ items: [] }),
 
+    setDiscount: (amount, type = 'percentage') =>
+        set({ discount: amount, discountType: type }),
+
+    setTaxRate: (rate) =>
+        set({ taxRate: rate }),
+
+    setPaymentMethod: (method) =>
+        set({ paymentMethod: method }),
+
+    holdOrder: (notes = '') =>
+        set({ isHeld: true, holdNotes: notes }),
+
+    releaseHold: () =>
+        set({ isHeld: false, holdNotes: '' }),
+
     getTotal: () => {
         const state = get();
-        return state.items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
+        const subtotal = state.items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
+
+        // Calculate discount
+        const discountAmount = state.discountType === 'percentage'
+            ? (subtotal * state.discount) / 100
+            : state.discount;
+
+        // Calculate tax on discounted amount
+        const taxableAmount = subtotal - discountAmount;
+        const taxAmount = (taxableAmount * state.taxRate) / 100;
+
+        return Math.round((taxableAmount + taxAmount) * 100) / 100;
     },
 
     getItemCount: () => {
@@ -60,5 +92,5 @@ const useCartStore = create((set, get) => ({
 
     },
 }));
-    
-        export default useCartStore;
+
+export default useCartStore;
