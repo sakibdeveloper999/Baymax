@@ -10,11 +10,14 @@ export default function DiscountInput() {
     const [selectedType, setSelectedType] = useState(discountType);
 
     const handleApply = () => {
-        const amount = parseFloat(inputValue) || 0;
-        setDiscount(Math.max(0, amount), selectedType);
+        let amount = parseFloat(inputValue) || 0;
+        amount = Math.max(0, amount);
+        if (selectedType === 'percentage') {
+            amount = Math.min(100, amount);
+        }
+        setDiscount(amount, selectedType);
         setIsOpen(false);
     };
-
     const handleClear = () => {
         setDiscount(0, selectedType);
         setInputValue('');
@@ -27,7 +30,7 @@ export default function DiscountInput() {
                 onClick={() => setIsOpen(!isOpen)}
                 className="w-full bg-gradient-to-r from-green-500 to-green-600 text-white py-3 px-4 rounded-lg font-bold hover:from-green-600 hover:to-green-700 transition transform hover:scale-105 active:scale-95 shadow-md"
             >
-                🏷️ {discount > 0 ? `${discount}${selectedType === 'percentage' ? '%' : '৳'}` : t('discount')}
+                🏷️ {discount > 0 ? `${discount}${discountType === 'percentage' ? '%' : '৳'}` : t('discount')}
             </button>
 
             {isOpen && (
@@ -47,8 +50,8 @@ export default function DiscountInput() {
                         <button
                             onClick={() => setSelectedType('percentage')}
                             className={`flex-1 py-2 px-3 rounded-lg text-sm font-black transition transform ${selectedType === 'percentage'
-                                    ? 'bg-blue-500 text-white shadow-lg scale-105'
-                                    : 'bg-transparent text-gray-700 hover:bg-gray-200'
+                                ? 'bg-blue-500 text-white shadow-lg scale-105'
+                                : 'bg-transparent text-gray-700 hover:bg-gray-200'
                                 }`}
                         >
                             % {t('percent')}
@@ -56,8 +59,8 @@ export default function DiscountInput() {
                         <button
                             onClick={() => setSelectedType('fixed')}
                             className={`flex-1 py-2 px-3 rounded-lg text-sm font-black transition transform ${selectedType === 'fixed'
-                                    ? 'bg-blue-500 text-white shadow-lg scale-105'
-                                    : 'bg-transparent text-gray-700 hover:bg-gray-200'
+                                ? 'bg-blue-500 text-white shadow-lg scale-105'
+                                : 'bg-transparent text-gray-700 hover:bg-gray-200'
                                 }`}
                         >
                             ৳ {t('fixed')}

@@ -74,13 +74,19 @@ const useCartStore = create((set, get) => ({
         const state = get();
         const subtotal = state.items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
 
-        // Calculate discount
-        const discountAmount = state.discountType === 'percentage'
-            ? (subtotal * state.discount) / 100
-            : state.discount;
+        // Calculate discount with clamping to prevent negative totals
+        let discountAmount;
+        if (state.discountType === 'percentage') {
+            // Clamp percentage to 0-100
+            const clampedPercentage = Math.max(0, Math.min(100, state.discount));
+            discountAmount = (subtotal * clampedPercentage) / 100;
+        } else {
+            // Clamp fixed discount to 0-subtotal range
+            discountAmount = Math.max(0, Math.min(state.discount, subtotal));
+        }
 
-        // Calculate tax on discounted amount
-        const taxableAmount = subtotal - discountAmount;
+        // Calculate tax on discounted amount (ensure taxableAmount never goes negative)
+        const taxableAmount = Math.max(0, subtotal - discountAmount);
         const taxAmount = (taxableAmount * state.taxRate) / 100;
 
         return Math.round((taxableAmount + taxAmount) * 100) / 100;

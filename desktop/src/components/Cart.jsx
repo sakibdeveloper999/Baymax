@@ -13,14 +13,13 @@ function Cart() {
     const updateQuantity = useCartStore((state) => state.updateQuantity);
     const total = useCartStore((state) => state.getTotal());
 
-    // Calculate breakdown
+    // Calculate breakdown (using exact same formula as store's getTotal())
     const subtotal = calculateSubtotal(items);
     const discountAmount = discountType === 'percentage'
         ? (subtotal * discount) / 100
         : discount;
     const taxableAmount = subtotal - discountAmount;
     const taxAmount = calculateTax(taxableAmount, taxRate);
-
     if (items.length === 0) {
         return (
             <div className="card text-center py-16 bg-gradient-to-b from-gray-50 to-gray-100">

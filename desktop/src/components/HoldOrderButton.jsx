@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import useCartStore from '../store/cartSlice';
 import { useTranslation } from 'react-i18next';
 
@@ -7,6 +7,54 @@ export default function HoldOrderButton() {
     const { isHeld, holdNotes, holdOrder, releaseHold, items } = useCartStore();
     const [showDialog, setShowDialog] = useState(false);
     const [notes, setNotes] = useState(holdNotes);
+
+    const textareaRef = useRef(null);
+    const previousFocusRef = useRef(null);
+    const dialogRef = useRef(null);
+    const backdropRef = useRef(null);
+
+    // Focus management: move focus to textarea when dialog opens, restore when closes
+    useEffect(() => {
+        if (showDialog) {
+            // Save current focused element to restore later
+            previousFocusRef.current = document.activeElement;
+            // Focus textarea after render
+            setTimeout(() => {
+                if (textareaRef.current) {
+                    textareaRef.current.focus();
+                }
+            }, 0);
+        } else {
+            // Restore focus to previous element when dialog closes
+            if (previousFocusRef.current && previousFocusRef.current.focus) {
+                previousFocusRef.current.focus();
+            }
+        }
+    }, [showDialog]);
+
+    // Escape key handler
+    useEffect(() => {
+        const handleEscapeKey = (e) => {
+            if (e.key === 'Escape' && showDialog) {
+                setShowDialog(false);
+            }
+        };
+
+        if (showDialog) {
+            window.addEventListener('keydown', handleEscapeKey);
+            return () => window.removeEventListener('keydown', handleEscapeKey);
+        }
+    }, [showDialog]);
+
+    // Backdrop click handler
+    const handleBackdropClick = () => {
+        setShowDialog(false);
+    };
+
+    // Stop propagation when clicking inside dialog
+    const handleDialogClick = (e) => {
+        e.stopPropagation();
+    };
 
     const handleHold = () => {
         if (items.length === 0) {
@@ -44,21 +92,32 @@ export default function HoldOrderButton() {
             </button>
 
             {showDialog && (
-                <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 backdrop-blur-sm">
-                    <div className="bg-white rounded-xl p-8 w-96 shadow-2xl border-4 border-blue-500 transform transition animate-bounce">
+                <div
+                    ref={backdropRef}
+                    onClick={handleBackdropClick}
+                    className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 backdrop-blur-sm"
+                >
+                    <div
+                        ref={dialogRef}
+                        onClick={handleDialogClick}
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="hold-order-heading"
+                        className="bg-white rounded-xl p-8 w-96 shadow-2xl border-4 border-blue-500 transform transition animate-bounce"
+                    >
                         <div className="text-center mb-6">
                             <div className="text-5xl mb-2">⏸️</div>
-                            <h2 className="text-2xl font-black text-gray-800">{t('hold_order')}</h2>
+                            <h2 id="hold-order-heading" className="text-2xl font-black text-gray-800">{t('hold_order')}</h2>
                         </div>
 
                         <p className="text-gray-600 mb-4 text-center">{t('add_notes_optional')}</p>
 
                         <textarea
+                            ref={textareaRef}
                             value={notes}
                             onChange={(e) => setNotes(e.target.value)}
                             placeholder={t('order_notes_placeholder')}
                             className="input-field w-full h-24 resize-none mb-6 border-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-lg"
-                            autoFocus
                         />
 
                         <div className="flex gap-3">

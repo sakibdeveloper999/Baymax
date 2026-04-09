@@ -107,13 +107,13 @@ function App() {
             if (e.key === 'F1') {
                 e.preventDefault();
                 if (itemCount > 0) {
-                    alert(`Checkout: ${itemCount} items - Total: ৳${total.toFixed(2)}`);
-                }
+                    alert(t('checkout_summary', { count: itemCount, total: total.toFixed(2) }));
+                } alert(`Checkout: ${itemCount} items - Total: ৳${total.toFixed(2)}`);
             }
             // ESC = Clear Cart
             if (e.key === 'Escape') {
-                e.preventDefault();
                 if (itemCount > 0 && window.confirm(t('confirm_clear_cart'))) {
+                    e.preventDefault();
                     clearCart();
                 }
             }
@@ -206,13 +206,14 @@ function App() {
                             </div>
 
                             {/* Action Buttons */}
-                            <div className="space-y-3">
+                            <div className="space-y-4">
+                                {/* Primary Action Buttons */}
                                 <div className="grid grid-cols-3 gap-3">
                                     {itemCount > 0 && (
                                         <button
                                             onClick={clearCart}
                                             title="ESC"
-                                            className="col-span-1 px-4 py-3 bg-red-500 text-white rounded-lg font-bold hover:bg-red-600 transition transform hover:scale-105 active:scale-95 flex items-center justify-center gap-2"
+                                            className="col-span-1 px-4 py-4 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl font-bold hover:from-red-600 hover:to-red-700 transition-all duration-200 transform hover:scale-105 hover:shadow-lg active:scale-95 flex items-center justify-center gap-2 shadow-md"
                                         >
                                             ✕ {t('clear_cart')}
                                         </button>
@@ -221,7 +222,7 @@ function App() {
                                         onClick={handleCheckout}
                                         disabled={itemCount === 0}
                                         title="F1"
-                                        className={`${itemCount > 0 ? 'col-span-2' : 'col-span-3'} px-6 py-4 bg-white text-primary font-black text-lg rounded-lg hover:bg-gray-100 transition transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed`}
+                                        className={`${itemCount > 0 ? 'col-span-2' : 'col-span-3'} px-6 py-4 bg-white text-primary font-black text-lg rounded-xl hover:bg-gray-50 transition-all duration-200 transform hover:scale-105 hover:shadow-lg active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 shadow-md`}
                                     >
                                         💳 {t('checkout')} →
                                     </button>
@@ -230,12 +231,17 @@ function App() {
                                 {/* Hold Button - Full Width */}
                                 <HoldOrderButton />
 
-                                {/* Keyboard Shortcuts */}
-                                <div className="text-xs opacity-80 bg-white bg-opacity-10 backdrop-blur p-3 rounded-lg border border-white border-opacity-20 flex items-center justify-between">
-                                    <span>⌨️ {t('keyboard_shortcuts')}</span>
-                                    <div className="text-right text-xs opacity-90">
-                                        <div>F1 = {t('checkout')}</div>
-                                        <div>ESC = {t('clear_cart')}</div>
+                                {/* Keyboard Shortcuts Info */}
+                                <div className="text-xs opacity-90 bg-white bg-opacity-15 backdrop-blur-md p-4 rounded-xl border border-white border-opacity-30 flex items-center justify-between hover:bg-opacity-20 transition-all duration-200 shadow-sm">
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-lg">⌨️</span>
+                                        <span className="font-semibold">{t('keyboard_shortcuts')}</span>
+                                    </div>
+                                    <div className="text-right text-xs font-medium opacity-95 space-y-1">
+                                        <div className="flex gap-6 justify-end">
+                                            <span className="flex items-center gap-1"><kbd className="bg-white bg-opacity-20 px-2 py-1 rounded-md">F1</kbd> = {t('checkout')}</span>
+                                            <span className="flex items-center gap-1"><kbd className="bg-white bg-opacity-20 px-2 py-1 rounded-md">ESC</kbd> = {t('clear_cart')}</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

@@ -17,16 +17,17 @@ export default function PaymentMethodSelector() {
             {PAYMENT_METHODS.map((method) => (
                 <button
                     key={method.id}
+                    type="button"
+                    aria-pressed={paymentMethod === method.id}
                     onClick={() => setPaymentMethod(method.id)}
-                    className={`flex-1 py-4 px-4 rounded-xl border-3 transition font-black text-sm transform ${paymentMethod === method.id
-                            ? `bg-gradient-to-b ${method.gradientFrom} ${method.gradientTo} text-white border-white shadow-2xl scale-105 ring-4 ring-offset-2`
-                            : 'bg-white border-gray-300 text-gray-800 hover:border-gray-400 hover:shadow-lg hover:scale-102'
+                    className={`flex-1 py-3 px-4 rounded border-2 transition font-medium text-sm ${paymentMethod === method.id
+                        ? `${method.color} border-2 ring-2 ring-offset-1`
+                        : 'bg-gray-50 border-gray-300 hover:bg-gray-100'
                         }`}
                 >
-                    <div className="text-3xl mb-2">{method.icon}</div>
-                    <div className="text-xs uppercase tracking-wide">{method.label}</div>
-                </button>
-            ))}
+                    <div className="text-xl mb-1" aria-hidden="true">{method.icon}</div>
+                    {method.label}
+                </button>))}
         </div>
     );
 }
