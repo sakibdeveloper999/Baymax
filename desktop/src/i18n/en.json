@@ -3,7 +3,7 @@
     "scan_product": "Scan Product",
     "enter_barcode": "Enter or scan barcode...",
     "scan_or_type_barcode": "Scan a barcode or type manually",
-    "cart": "Cart",
+    "cart": "Shopping Cart",
     "product_name": "Product Name",
     "quantity": "Quantity",
     "price": "Price",
@@ -22,9 +22,14 @@
     "product_not_found": "Product not found",
     "success": "Success",
     "error": "Error",
-    "offline_mode": "Offline Mode - Changes will sync when online",
+    "offline_mode": "Offline Mode - Orders will sync when online",
     "online_mode": "Online",
     "clear_cart": "Clear Cart",
     "hold_order": "Hold Order",
-    "load_order": "Load Order"
+    "load_order": "Load Order",
+    "status": "Status",
+    "synced": "Synced",
+    "pending": "Pending Sync",
+    "items_in_cart": "Items in cart",
+    "cart_empty": "Cart is empty. Scan products to add them."
 }
