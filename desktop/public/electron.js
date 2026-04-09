@@ -1,6 +1,6 @@
-const { app, BrowserWindow, Menu, ipcMain } = require('electron');
-const path = require('path');
-const isDev = require('electron-is-dev');
+import { app, BrowserWindow, Menu, ipcMain } from 'electron';
+import { join } from 'path';
+import isDev from 'electron-is-dev';
 
 let mainWindow;
 
@@ -12,13 +12,13 @@ function createWindow() {
             nodeIntegration: false,
             contextIsolation: true,
             enableRemoteModule: false,
-            preload: path.join(__dirname, 'preload.js'),
+            preload: join(__dirname, 'preload.js'),
         },
     });
 
     const startUrl = isDev
         ? 'http://localhost:3000'
-        : `file://${path.join(__dirname, '../build/index.html')}`;
+        : `file://${join(__dirname, '../build/index.html')}`;
 
     mainWindow.loadURL(startUrl);
 

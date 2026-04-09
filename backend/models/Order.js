@@ -1,8 +1,8 @@
-const mongoose = require('mongoose');
+import { Schema, model } from 'mongoose';
 
-const orderItemSchema = new mongoose.Schema({
+const orderItemSchema = new Schema({
     productId: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'Product',
         required: true,
     },
@@ -21,7 +21,7 @@ const orderItemSchema = new mongoose.Schema({
     },
 }, { _id: false });
 
-const orderSchema = new mongoose.Schema(
+const orderSchema = new Schema(
     {
         orderNumber: {
             type: String,
@@ -51,7 +51,7 @@ const orderSchema = new mongoose.Schema(
             default: 'cash',
         },
         cashier: {
-            type: mongoose.Schema.Types.ObjectId,
+            type: Schema.Types.ObjectId,
             ref: 'User',
         },
         status: {
@@ -79,4 +79,4 @@ orderSchema.pre('save', async function (next) {
     next();
 });
 
-module.exports = mongoose.model('Order', orderSchema);
+export default model('Order', orderSchema);

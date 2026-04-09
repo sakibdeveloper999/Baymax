@@ -1,6 +1,6 @@
-const mongoose = require('mongoose');
+import { Schema, model } from 'mongoose';
 
-const productSchema = new mongoose.Schema(
+const productSchema = new Schema(
     {
         barcode: {
             type: String,
@@ -52,4 +52,4 @@ productSchema.virtual('profit').get(function () {
     return this.sellingPrice - this.costPrice;
 });
 
-module.exports = mongoose.model('Product', productSchema);
+export default model('Product', productSchema);
