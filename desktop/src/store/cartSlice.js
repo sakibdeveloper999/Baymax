@@ -88,8 +88,12 @@ const useCartStore = create((set, get) => ({
 
     getItemCount: () => {
         const state = get();
-        return state.items.reduce((sum, item) => sum + item.quantity, 0)
+        return state.items.reduce((sum, item) => sum + item.quantity, 0);
+    },
 
+    getItems: () => {
+        const state = get();
+        return state.items;
     },
 }));
 

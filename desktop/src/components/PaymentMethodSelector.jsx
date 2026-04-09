@@ -7,24 +7,24 @@ export default function PaymentMethodSelector() {
     const { paymentMethod, setPaymentMethod } = useCartStore();
 
     const PAYMENT_METHODS = [
-        { id: 'cash', label: t('cash'), icon: '💵', color: 'bg-green-100 border-green-400' },
-        { id: 'card', label: t('card'), icon: '💳', color: 'bg-blue-100 border-blue-400' },
-        { id: 'mobile', label: t('mobile'), icon: '📱', color: 'bg-purple-100 border-purple-400' },
+        { id: 'cash', label: t('cash'), icon: '💵', gradientFrom: 'from-green-400', gradientTo: 'to-green-600' },
+        { id: 'card', label: t('card'), icon: '💳', gradientFrom: 'from-blue-400', gradientTo: 'to-blue-600' },
+        { id: 'mobile', label: t('mobile'), icon: '📱', gradientFrom: 'from-purple-400', gradientTo: 'to-purple-600' },
     ];
 
     return (
-        <div className="flex gap-2">
+        <div className="flex gap-3">
             {PAYMENT_METHODS.map((method) => (
                 <button
                     key={method.id}
                     onClick={() => setPaymentMethod(method.id)}
-                    className={`flex-1 py-3 px-4 rounded border-2 transition font-medium text-sm ${paymentMethod === method.id
-                            ? `${method.color} border-2 ring-2 ring-offset-1`
-                            : 'bg-gray-50 border-gray-300 hover:bg-gray-100'
+                    className={`flex-1 py-4 px-4 rounded-xl border-3 transition font-black text-sm transform ${paymentMethod === method.id
+                            ? `bg-gradient-to-b ${method.gradientFrom} ${method.gradientTo} text-white border-white shadow-2xl scale-105 ring-4 ring-offset-2`
+                            : 'bg-white border-gray-300 text-gray-800 hover:border-gray-400 hover:shadow-lg hover:scale-102'
                         }`}
                 >
-                    <div className="text-xl mb-1">{method.icon}</div>
-                    {method.label}
+                    <div className="text-3xl mb-2">{method.icon}</div>
+                    <div className="text-xs uppercase tracking-wide">{method.label}</div>
                 </button>
             ))}
         </div>

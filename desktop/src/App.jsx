@@ -15,6 +15,7 @@ import syncService from './utils/sync';
 function App() {
     const { t } = useTranslation();
     const itemCount = useCartStore((state) => state.getItemCount());
+    const items = useCartStore((state) => state.getItems());
     const clearCart = useCartStore((state) => state.clearCart);
     const total = useCartStore((state) => state.getTotal());
 
@@ -156,47 +157,62 @@ function App() {
                         <Cart />
 
                         {/* Phase 3: Payment & Discount Controls */}
-                        <div className="card mt-6 bg-gray-50">
-                            <h3 className="font-bold mb-4 text-lg">{t('payment_settings')}</h3>
+                        <div className="card mt-6 bg-gradient-to-br from-gray-50 via-white to-gray-50 border-l-4 border-blue-500">
+                            <div className="flex items-center gap-3 mb-5">
+                                <span className="text-2xl">⚙️</span>
+                                <h3 className="font-bold text-xl text-gray-800">{t('payment_settings')}</h3>
+                            </div>
 
                             {/* Tax & Discount Row */}
-                            <div className="flex gap-4 mb-4">
-                                <div className="flex-1">
+                            <div className="grid grid-cols-2 gap-4 mb-5 pb-5 border-b-2 border-gray-200">
+                                <div className="bg-white p-4 rounded-lg border-2 border-gray-200 hover:border-blue-400 transition">
+                                    <label className="block text-xs font-bold text-gray-600 mb-2 uppercase tracking-wide">💰 {t('tax')}</label>
                                     <TaxSelector />
                                 </div>
-                                <div className="flex-1">
+                                <div className="bg-white p-4 rounded-lg border-2 border-gray-200 hover:border-green-400 transition">
+                                    <label className="block text-xs font-bold text-gray-600 mb-2 uppercase tracking-wide">🏷️ {t('discount')}</label>
                                     <DiscountInput />
                                 </div>
                             </div>
 
                             {/* Payment Method Selection */}
-                            <div className="mb-4">
-                                <label className="block text-sm font-semibold mb-2">{t('payment_method')}:</label>
+                            <div className="bg-white p-4 rounded-lg border-2 border-gray-200">
+                                <label className="block text-xs font-bold text-gray-600 mb-3 uppercase tracking-wide">💳 {t('payment_method')}</label>
                                 <PaymentMethodSelector />
                             </div>
                         </div>
 
                         {/* Checkout & Action Buttons */}
-                        <div className="card mt-6 bg-gradient-to-r from-primary to-secondary text-white">
-                            <div className="flex items-center justify-between mb-4">
-                                <div>
-                                    <p className="text-sm opacity-90">{t('items_in_cart')}</p>
-                                    <p className="text-3xl font-bold">{itemCount}</p>
+                        <div className="card mt-6 bg-gradient-to-r from-primary via-blue-600 to-secondary text-white shadow-2xl overflow-hidden">
+                            {/* Summary row */}
+                            <div className="flex items-center justify-between mb-6 pb-6 border-b-2 border-white border-opacity-30">
+                                <div className="flex items-center gap-3">
+                                    <div className="bg-white bg-opacity-20 backdrop-blur rounded-lg p-3 min-w-max">
+                                        <p className="text-sm opacity-80">{t('items_in_cart')}</p>
+                                        <p className="text-4xl font-black">{itemCount}</p>
+                                    </div>
+                                    <div className="hidden sm:block text-opacity-80 text-sm">
+                                        {itemCount > 0 && (
+                                            <p className="opacity-75">
+                                                🛒 {itemCount} {t('items')} • {items.reduce((sum, item) => sum + item.quantity, 0)} {t('units')}
+                                            </p>
+                                        )}
+                                    </div>
                                 </div>
-                                <div>
-                                    <p className="text-sm opacity-90">{t('total')}</p>
-                                    <p className="text-3xl font-bold">৳{total.toFixed(2)}</p>
+                                <div className="bg-white bg-opacity-20 backdrop-blur rounded-lg p-3 min-w-max text-right">
+                                    <p className="text-sm opacity-80">{t('total')}</p>
+                                    <p className="text-4xl font-black">৳{total.toFixed(2)}</p>
                                 </div>
                             </div>
 
-                            {/* Buttons */}
-                            <div className="space-y-2">
-                                <div className="flex gap-3">
+                            {/* Action Buttons */}
+                            <div className="space-y-3">
+                                <div className="grid grid-cols-3 gap-3">
                                     {itemCount > 0 && (
                                         <button
                                             onClick={clearCart}
                                             title="ESC"
-                                            className="px-4 py-2 bg-white text-red-500 rounded-lg font-semibold hover:bg-gray-100 transition"
+                                            className="col-span-1 px-4 py-3 bg-red-500 text-white rounded-lg font-bold hover:bg-red-600 transition transform hover:scale-105 active:scale-95 flex items-center justify-center gap-2"
                                         >
                                             ✕ {t('clear_cart')}
                                         </button>
@@ -205,18 +221,22 @@ function App() {
                                         onClick={handleCheckout}
                                         disabled={itemCount === 0}
                                         title="F1"
-                                        className="btn-primary flex-1 px-6 py-3 bg-white text-primary font-bold rounded-lg hover:bg-gray-100 transition disabled:opacity-50"
+                                        className={`${itemCount > 0 ? 'col-span-2' : 'col-span-3'} px-6 py-4 bg-white text-primary font-black text-lg rounded-lg hover:bg-gray-100 transition transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed`}
                                     >
-                                        {t('checkout')} →
+                                        💳 {t('checkout')} →
                                     </button>
                                 </div>
 
-                                {/* Hold Button */}
+                                {/* Hold Button - Full Width */}
                                 <HoldOrderButton />
 
                                 {/* Keyboard Shortcuts */}
-                                <div className="text-xs opacity-75 mt-3 bg-white bg-opacity-10 p-2 rounded">
-                                    <p>⌨️ {t('keyboard_shortcuts')}: F1 = {t('checkout')} | ESC = {t('clear_cart')}</p>
+                                <div className="text-xs opacity-80 bg-white bg-opacity-10 backdrop-blur p-3 rounded-lg border border-white border-opacity-20 flex items-center justify-between">
+                                    <span>⌨️ {t('keyboard_shortcuts')}</span>
+                                    <div className="text-right text-xs opacity-90">
+                                        <div>F1 = {t('checkout')}</div>
+                                        <div>ESC = {t('clear_cart')}</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
