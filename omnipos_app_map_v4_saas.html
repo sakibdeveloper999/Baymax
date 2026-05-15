@@ -1,0 +1,2967 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OmniPOS — Full System App Map v3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════════════
+   TOKENS
+══════════════════════════════════════════════ */
+:root {
+  --white:    #FFFFFF;
+  --bg:       #F7F5F2;
+  --bg2:      #F0EDE8;
+  --ink:      #1A1A18;
+  --ink2:     #3D3D3A;
+  --ink3:     #6B6B67;
+  --ink4:     #9B9B97;
+  --border:   #E2DED8;
+  --border2:  #CCC8C0;
+  --navy:     #1B3A6B;
+  --navy2:    #2A5299;
+  --navy-lt:  #EBF0F8;
+  --navy-lt2: #D4E0F2;
+  --teal:     #0F766E;
+  --teal-lt:  #CCFBF1;
+  --amber:    #B45309;
+  --amber-lt: #FEF3C7;
+  --rose:     #B91C1C;
+  --rose-lt:  #FEE2E2;
+  --green:    #15803D;
+  --green-lt: #DCFCE7;
+  --purple:   #7C3AED;
+  --purple-lt:#EDE9FE;
+  --coral:    #C2410C;
+  --coral-lt: #FFEDD5;
+  --r: 10px;
+  --display: 'Instrument Serif', serif;
+  --body:    'Plus Jakarta Sans', sans-serif;
+  --mono:    'JetBrains Mono', monospace;
+}
+
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+
+body {
+  font-family: var(--body);
+  background: var(--bg);
+  color: var(--ink);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ══════════════════════════════════════════════
+   HEADER
+══════════════════════════════════════════════ */
+.header {
+  background: var(--white);
+  border-bottom: 1.5px solid var(--border);
+  padding: 0 2.5rem;
+}
+.header-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 0 0;
+}
+.logo-wrap { display: flex; align-items: baseline; gap: 12px; }
+.logo {
+  font-family: var(--display);
+  font-size: 32px;
+  font-style: italic;
+  color: var(--ink);
+  letter-spacing: -0.5px;
+}
+.logo strong { font-style: normal; color: var(--navy); }
+.version {
+  font-family: var(--mono);
+  font-size: 10px;
+  background: var(--navy);
+  color: white;
+  padding: 3px 10px;
+  border-radius: 20px;
+  letter-spacing: 0.5px;
+}
+.developer {
+  font-size: 14px;
+  color: var(--ink3);
+  margin-bottom: 8px;
+}
+.developer a {
+  color: var(--navy);
+  text-decoration: none;
+  font-weight: 500;
+}
+.header-kpis {
+  display: flex;
+  gap: 2px;
+}
+.kpi {
+  text-align: center;
+  padding: 8px 20px;
+  border-left: 1px solid var(--border);
+}
+.kpi:first-child { border: none; }
+.kpi-n {
+  font-family: var(--display);
+  font-size: 24px;
+  color: var(--navy);
+  line-height: 1;
+}
+.kpi-l { font-size: 11px; color: var(--ink3); margin-top: 3px; }
+.header-tagline {
+  font-size: 12px;
+  color: var(--ink3);
+  padding: 8px 0 14px;
+  font-family: var(--mono);
+  letter-spacing: 0.3px;
+}
+
+/* ══════════════════════════════════════════════
+   TABS
+══════════════════════════════════════════════ */
+.tabs {
+  background: var(--white);
+  border-bottom: 1.5px solid var(--border);
+  padding: 0 2.5rem;
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.tabs::-webkit-scrollbar { display: none; }
+.tab {
+  font-family: var(--body);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink3);
+  padding: 13px 20px;
+  border: none;
+  background: none;
+  border-bottom: 2.5px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color .15s;
+  position: relative;
+}
+.tab:hover { color: var(--ink); }
+.tab.active { color: var(--navy); border-bottom-color: var(--navy); }
+
+/* ══════════════════════════════════════════════
+   PANELS
+══════════════════════════════════════════════ */
+.panel { display: none; padding: 2rem 2.5rem 4rem; animation: up .25s ease; }
+.panel.active { display: block; }
+@keyframes up { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+
+/* ══════════════════════════════════════════════
+   TYPOGRAPHY UTILS
+══════════════════════════════════════════════ */
+.sec-head {
+  font-family: var(--display);
+  font-size: 20px;
+  font-style: italic;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+.sec-sub { font-size: 12px; color: var(--ink3); margin-bottom: 18px; line-height: 1.6; }
+.sec-divider {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--ink4);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 28px 0 16px;
+}
+.sec-divider::after { content:''; flex:1; height:1px; background:var(--border); }
+
+/* ══════════════════════════════════════════════
+   LAYOUT GRIDS
+══════════════════════════════════════════════ */
+.g2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.g3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; }
+.g4 { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+.g-auto { display:grid; grid-template-columns:repeat(auto-fill,minmax(185px,1fr)); gap:10px; }
+
+/* ══════════════════════════════════════════════
+   CARDS
+══════════════════════════════════════════════ */
+.card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 20px;
+}
+.card-sm { padding: 14px 16px; }
+.card-title {
+  font-family: var(--body);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.card-title-icon {
+  width: 28px; height: 28px;
+  border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+/* ══════════════════════════════════════════════
+   CHIPS / TAGS / BADGES
+══════════════════════════════════════════════ */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  padding: 5px 11px;
+  border-radius: 6px;
+  border: 1px solid;
+  font-weight: 400;
+}
+.badge {
+  font-family: var(--mono);
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-weight: 500;
+  display: inline-block;
+}
+.tag {
+  font-family: var(--mono);
+  font-size: 9px;
+  padding: 2px 7px;
+  border-radius: 4px;
+  border: 1px solid;
+  display: inline-block;
+  letter-spacing: 0.3px;
+}
+
+/* chip colors */
+.c-navy   { background:var(--navy-lt); color:var(--navy2); border-color:var(--navy-lt2); }
+.c-teal   { background:var(--teal-lt); color:var(--teal); border-color:#A7F3D0; }
+.c-amber  { background:var(--amber-lt); color:var(--amber); border-color:#FDE68A; }
+.c-rose   { background:var(--rose-lt); color:var(--rose); border-color:#FECACA; }
+.c-green  { background:var(--green-lt); color:var(--green); border-color:#BBF7D0; }
+.c-purple { background:var(--purple-lt); color:var(--purple); border-color:#DDD6FE; }
+.c-coral  { background:var(--coral-lt); color:var(--coral); border-color:#FED7AA; }
+.c-ink    { background:var(--bg2); color:var(--ink2); border-color:var(--border2); }
+
+/* method pills */
+.m-get    { background:#ECFDF5; color:#065F46; border-color:#A7F3D0; }
+.m-post   { background:var(--navy-lt); color:var(--navy); border-color:var(--navy-lt2); }
+.m-put    { background:var(--amber-lt); color:var(--amber); border-color:#FDE68A; }
+.m-delete { background:var(--rose-lt); color:var(--rose); border-color:#FECACA; }
+.m-sys    { background:var(--bg2); color:var(--ink3); border-color:var(--border2); }
+.m-socket { background:var(--green-lt); color:var(--green); border-color:#BBF7D0; }
+.m-ipc    { background:var(--purple-lt); color:var(--purple); border-color:#DDD6FE; }
+
+/* role tags */
+.r-all     { background:var(--bg); color:var(--ink3); border-color:var(--border2); }
+.r-manager { background:var(--amber-lt); color:var(--amber); border-color:#FDE68A; }
+.r-admin   { background:var(--rose-lt); color:var(--rose); border-color:#FECACA; }
+
+/* ══════════════════════════════════════════════
+   ── TAB 1: ARCHITECTURE ──
+══════════════════════════════════════════════ */
+.arch-layer {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 22px 24px;
+  margin-bottom: 4px;
+  position: relative;
+}
+.arch-layer-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 14px;
+}
+.arch-layer-name {
+  font-family: var(--display);
+  font-size: 17px;
+  font-style: italic;
+  color: var(--ink);
+}
+.arch-layer-desc {
+  font-size: 12px;
+  color: var(--ink3);
+  max-width: 400px;
+  text-align: right;
+  line-height: 1.6;
+}
+.arch-chips { display: flex; flex-wrap: wrap; gap: 7px; }
+.arch-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 0;
+  color: var(--ink4);
+  font-size: 18px;
+  font-family: var(--mono);
+}
+
+.tech-table { width: 100%; border-collapse: collapse; margin-top: 14px; }
+.tech-table th {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--ink4);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 6px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+.tech-table td {
+  font-size: 12px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--ink2);
+  vertical-align: top;
+}
+.tech-table tr:last-child td { border: none; }
+.tech-table tr:hover td { background: var(--bg); }
+
+.socket-events {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 8px;
+  margin-top: 14px;
+}
+.socket-event {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+}
+.socket-event-name {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--navy);
+  font-weight: 500;
+  margin-bottom: 3px;
+}
+.socket-event-desc { font-size: 11px; color: var(--ink3); line-height: 1.5; }
+
+/* ══════════════════════════════════════════════
+   ── TAB 2: MODULES ──
+══════════════════════════════════════════════ */
+.filter-bar { display: flex; gap: 6px; margin-bottom: 18px; flex-wrap: wrap; align-items: center; }
+.filter-label { font-size: 11px; color: var(--ink3); margin-right: 4px; font-family: var(--mono); }
+.filter-btn {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 5px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--border2);
+  background: var(--white);
+  color: var(--ink3);
+  cursor: pointer;
+  transition: all .15s;
+}
+.filter-btn:hover { border-color: var(--navy); color: var(--navy); }
+.filter-btn.active { background: var(--navy); border-color: var(--navy); color: white; }
+
+.mod-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(168px, 1fr)); gap: 9px; }
+
+.mod-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 15px;
+  cursor: pointer;
+  transition: all .15s;
+  position: relative;
+  overflow: hidden;
+}
+.mod-card::before {
+  content:'';
+  position: absolute;
+  top:0; left:0; right:0;
+  height: 3px;
+  background: var(--accent-color, transparent);
+}
+.mod-card:hover { border-color: var(--border2); box-shadow: 0 2px 12px rgba(0,0,0,.06); }
+.mod-card.sel { border-color: var(--navy); box-shadow: 0 0 0 3px var(--navy-lt); }
+.mod-card.sel::before { background: var(--navy); }
+
+.mod-icon-wrap {
+  width: 38px; height: 38px;
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+.mod-name { font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 3px; }
+.mod-cat  { font-size: 10px; color: var(--ink4); font-family: var(--mono); letter-spacing: 0.5px; text-transform: uppercase; }
+.mod-foot { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; }
+.mod-eps  { font-family: var(--mono); font-size: 10px; color: var(--ink4); }
+.status-pill {
+  font-family: var(--mono);
+  font-size: 9px;
+  padding: 2px 7px;
+  border-radius: 20px;
+  font-weight: 500;
+}
+.sp-done { background: var(--teal-lt); color: var(--teal); }
+.sp-new  { background: var(--navy-lt); color: var(--navy2); }
+
+/* module detail panel */
+.mod-detail {
+  background: var(--white);
+  border: 1px solid var(--navy-lt2);
+  border-radius: var(--r);
+  padding: 26px;
+  margin-top: 14px;
+  display: none;
+  animation: up .2s ease;
+}
+.mod-detail.show { display: block; }
+.mod-detail-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 22px;
+}
+.mod-detail-icon { font-size: 32px; }
+.mod-detail-title { font-family: var(--display); font-size: 22px; font-style: italic; margin-bottom: 6px; }
+.mod-detail-meta { display: flex; gap: 6px; flex-wrap: wrap; }
+.mod-detail-body { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+.detail-col-title {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--ink4);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.feature-item {
+  display: flex;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--ink2);
+  line-height: 1.55;
+  padding: 5px 0;
+  border-bottom: 1px solid var(--bg2);
+}
+.feature-item:last-child { border: none; }
+.feature-item::before { content: '→'; color: var(--navy); font-size: 11px; margin-top: 1px; flex-shrink: 0; }
+.ep-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--bg2);
+  font-size: 12px;
+}
+.ep-row:last-child { border: none; }
+.ep-path { font-family: var(--mono); font-size: 11px; color: var(--ink3); }
+.ep-desc { font-size: 11px; color: var(--ink4); margin-top: 2px; }
+.code-box {
+  background: var(--ink);
+  border-radius: 8px;
+  padding: 16px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: #A8C8F0;
+  line-height: 1.8;
+  white-space: pre;
+  overflow-x: auto;
+}
+.code-box .kw  { color: #F4A0B0; }
+.code-box .str { color: #A0E8C8; }
+.code-box .num { color: #FFD080; }
+.code-box .cm  { color: #607080; }
+
+/* ══════════════════════════════════════════════
+   ── TAB 3: API FLOW ──
+══════════════════════════════════════════════ */
+.flow-tabs { display: flex; gap: 6px; margin-bottom: 18px; flex-wrap: wrap; }
+.flow-tab {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 7px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--border2);
+  background: var(--white);
+  color: var(--ink3);
+  cursor: pointer;
+  transition: all .15s;
+}
+.flow-tab:hover { border-color: var(--navy); color: var(--navy); }
+.flow-tab.active { background: var(--navy); border-color: var(--navy); color: white; }
+
+.flow-main { display: grid; grid-template-columns: 280px 1fr; gap: 14px; }
+
+.flow-steps-panel {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+}
+.flow-step {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background .12s;
+}
+.flow-step:last-child { border: none; }
+.flow-step:hover { background: var(--bg); }
+.flow-step.active-step { background: var(--navy-lt); }
+
+.fstep-num-col {
+  width: 46px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 8px;
+  border-right: 1px solid var(--border);
+}
+.fstep-num {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border2);
+  background: var(--bg);
+  color: var(--ink3);
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.fstep-num.api-n { background: var(--navy-lt); border-color: var(--navy-lt2); color: var(--navy); }
+.fstep-num.key-n { background: var(--navy); border-color: var(--navy); color: white; }
+.fstep-body { flex:1; padding: 12px 14px; }
+.fstep-title { font-size: 12px; font-weight: 600; color: var(--ink); margin-bottom: 2px; }
+.fstep-sub   { font-size: 11px; color: var(--ink3); line-height: 1.4; }
+
+.flow-detail-panel {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 22px;
+}
+.fdp-title { font-family: var(--display); font-size: 18px; font-style: italic; margin-bottom: 4px; }
+.fdp-sub   { font-size: 12px; color: var(--ink3); margin-bottom: 18px; line-height: 1.6; }
+.fdp-method { margin-bottom: 18px; padding-bottom: 18px; border-bottom: 1px solid var(--border); }
+.fdp-section-head {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--ink4);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.fdp-body-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+.req-box, .res-box {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink2);
+  line-height: 1.8;
+  white-space: pre;
+  overflow-x: auto;
+}
+.notes-list { display: flex; flex-direction: column; gap: 6px; margin-top: 14px; }
+.note-item {
+  display: flex;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--ink2);
+  line-height: 1.5;
+  padding: 7px 10px;
+  background: var(--bg);
+  border-radius: 6px;
+  border-left: 3px solid var(--navy-lt2);
+}
+.note-item::before { content:'◆'; color:var(--navy); font-size:8px; flex-shrink:0; margin-top:3px; }
+
+/* Endpoint table */
+.ep-table { width: 100%; border-collapse: collapse; }
+.ep-table th {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--ink4);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  padding: 8px 12px;
+  text-align: left;
+  border-bottom: 1.5px solid var(--border);
+  background: var(--bg);
+}
+.ep-table td {
+  padding: 9px 12px;
+  font-size: 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--ink2);
+  vertical-align: middle;
+}
+.ep-table tr:last-child td { border: none; }
+.ep-table tr:hover td { background: var(--bg); }
+.ep-table .mono { font-family: var(--mono); font-size: 11px; color: var(--ink3); }
+
+/* ══════════════════════════════════════════════
+   ── TAB 4: ROLES ──
+══════════════════════════════════════════════ */
+.roles-layout { display: grid; grid-template-columns: 2fr 1fr; gap: 14px; }
+
+.perm-table { width:100%; border-collapse:collapse; }
+.perm-table thead tr th {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--ink4);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 10px 14px;
+  text-align: center;
+  border-bottom: 2px solid var(--border);
+  background: var(--bg);
+}
+.perm-table thead tr th:first-child { text-align:left; }
+.perm-table tbody tr:nth-child(even) td { background: var(--bg); }
+.perm-table tbody tr:hover td { background: var(--navy-lt); }
+.perm-table td {
+  padding: 9px 14px;
+  font-size: 12px;
+  border-bottom: 1px solid var(--border);
+  text-align: center;
+  color: var(--ink2);
+}
+.perm-table td:first-child { text-align: left; font-weight: 500; color: var(--ink); }
+.perm-cat { padding: 10px 14px; font-family:var(--mono); font-size:9px; color:var(--ink4); letter-spacing:1.5px; text-transform:uppercase; background:var(--bg2); border-bottom:1px solid var(--border); text-align:left !important; font-weight:400 !important; color:var(--ink3) !important; }
+
+.yes-mark { color: var(--green); font-size: 14px; font-weight: 700; }
+.no-mark  { color: var(--border2); font-size: 14px; }
+.partial  { font-size: 10px; color: var(--amber); font-weight: 600; font-family: var(--mono); }
+
+.sec-stack { display: flex; flex-direction: column; gap: 8px; }
+.sec-item {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 14px;
+}
+.sec-item-head { font-size: 12px; font-weight: 700; color: var(--ink); margin-bottom: 3px; display:flex; align-items:center; gap:7px; }
+.sec-item-body { font-size: 11px; color: var(--ink3); line-height: 1.6; }
+
+/* ══════════════════════════════════════════════
+   ── TAB 5: DEPLOY ──
+══════════════════════════════════════════════ */
+.deploy-targets { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:20px; }
+.dt-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+}
+.dt-header {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.dt-icon { font-size: 22px; }
+.dt-name { font-size: 13px; font-weight: 700; color: var(--ink); }
+.dt-sub  { font-size: 11px; color: var(--ink3); }
+.dt-body { padding: 14px 16px; }
+.dt-item {
+  display: flex;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--ink2);
+  padding: 5px 0;
+  border-bottom: 1px solid var(--bg2);
+  line-height: 1.4;
+}
+.dt-item:last-child { border: none; }
+.dt-item-icon { color: var(--navy); flex-shrink:0; }
+
+.env-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:20px; }
+.env-card { background:var(--white); border:1px solid var(--border); border-radius:var(--r); padding:16px; }
+.env-table { width:100%; border-collapse:collapse; }
+.env-table td { padding:6px 8px; font-size:11px; border-bottom:1px solid var(--bg2); vertical-align:top; }
+.env-table td:first-child { font-family:var(--mono); color:var(--navy); font-weight:500; white-space:nowrap; width:45%; }
+.env-table td:last-child { color:var(--ink3); }
+.env-table tr:last-child td { border:none; }
+
+.timeline {
+  background:var(--white);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  overflow:hidden;
+}
+.tl-row {
+  display:grid;
+  grid-template-columns:90px 36px 1fr;
+  min-height:80px;
+  border-bottom:1px solid var(--border);
+}
+.tl-row:last-child { border:none; }
+.tl-left {
+  padding:16px 12px 16px 16px;
+  border-right:1px solid var(--border);
+  background:var(--bg);
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+.tl-wk { font-family:var(--mono); font-size:11px; font-weight:500; color:var(--navy); }
+.tl-dt { font-size:10px; color:var(--ink4); margin-top:2px; line-height:1.4; }
+.tl-mid {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding-top:20px;
+}
+.tl-dot {
+  width:12px; height:12px;
+  border-radius:50%;
+  border:2px solid var(--navy-lt2);
+  background:var(--white);
+  flex-shrink:0;
+  z-index:1;
+}
+.tl-dot.done { background:var(--navy); border-color:var(--navy); }
+.tl-line { flex:1; width:1px; background:var(--border); margin:4px 0 0; }
+.tl-right { padding:16px 20px; }
+.tl-phase { font-family:var(--mono); font-size:9px; color:var(--navy); letter-spacing:1.5px; text-transform:uppercase; margin-bottom:3px; }
+.tl-task { font-size:13px; font-weight:700; color:var(--ink); margin-bottom:4px; }
+.tl-desc { font-size:11px; color:var(--ink3); line-height:1.6; }
+.tl-chips { display:flex; gap:5px; flex-wrap:wrap; margin-top:7px; }
+
+/* ══════════════════════════════════════════════
+   ── TAB 6: PRO FEATURES ──
+══════════════════════════════════════════════ */
+.pro-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+.pro-card {
+  background:var(--white);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  padding:20px;
+  transition:all .15s;
+  position:relative;
+  overflow:hidden;
+}
+.pro-card:hover { box-shadow:0 4px 20px rgba(0,0,0,.07); transform:translateY(-2px); border-color:var(--border2); }
+.pro-card::before {
+  content:'';
+  position:absolute;
+  top:0; left:0; right:0;
+  height:3px;
+  background:var(--strip, transparent);
+}
+.pro-icon { font-size:26px; margin-bottom:12px; }
+.pro-title { font-size:14px; font-weight:700; color:var(--ink); margin-bottom:5px; }
+.pro-desc { font-size:12px; color:var(--ink3); line-height:1.65; margin-bottom:12px; }
+.pro-detail {
+  background:var(--bg);
+  border-radius:6px;
+  padding:10px 12px;
+  font-size:11px;
+  color:var(--ink2);
+  line-height:1.6;
+  margin-bottom:10px;
+}
+.pro-tags { display:flex; gap:5px; flex-wrap:wrap; }
+.pro-status {
+  position:absolute;
+  top:14px; right:14px;
+  font-family:var(--mono);
+  font-size:9px;
+  padding:2px 8px;
+  border-radius:20px;
+  font-weight:500;
+}
+.ps-planned { background:var(--bg2); color:var(--ink4); border:1px solid var(--border); }
+.ps-ready   { background:var(--teal-lt); color:var(--teal); border:1px solid #A7F3D0; }
+.ps-addon   { background:var(--amber-lt); color:var(--amber); border:1px solid #FDE68A; }
+
+/* ══════════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════════ */
+@media(max-width:1024px){
+  .g4,.deploy-targets{grid-template-columns:repeat(2,1fr);}
+  .pro-grid,.g3{grid-template-columns:1fr 1fr;}
+  .flow-main{grid-template-columns:1fr;}
+  .roles-layout{grid-template-columns:1fr;}
+  .mod-detail-body{grid-template-columns:1fr 1fr;}
+  .env-grid{grid-template-columns:1fr;}
+}
+@media(max-width:700px){
+  .header-inner{flex-direction:column;gap:12px;}
+  .header,body .tabs,.panel{padding-left:1.25rem;padding-right:1.25rem;}
+  .g2,.g3,.g4,.pro-grid,.deploy-targets,.fdp-body-grid,.mod-detail-body{grid-template-columns:1fr;}
+  .kpi{display:none;}
+}
+
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+
+/* ═══════════════════════════════════ SAAS TAB STYLES */
+
+/* Pillar cards */
+.saas-pillars { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:28px; }
+.pillar-card { background:var(--white); border:1px solid var(--line); border-radius:var(--r); padding:20px 16px; text-align:center; box-shadow:var(--sh); }
+.pillar-icon { font-size:26px; margin-bottom:8px; }
+.pillar-title { font-family:var(--serif); font-size:14px; font-weight:700; color:var(--ink); margin-bottom:6px; }
+.pillar-desc { font-size:12px; color:var(--ink3); line-height:1.6; }
+
+/* Model cards */
+.saas-models-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:28px; }
+.saas-model-card { background:var(--white); border:1px solid var(--line); border-radius:var(--r); overflow:hidden; box-shadow:var(--sh); }
+.saas-model-head { padding:12px 14px; background:var(--bg); border-bottom:1px solid var(--line); display:flex; align-items:center; gap:8px; }
+.saas-model-icon { font-size:18px; }
+.saas-model-name { font-family:var(--serif); font-size:13px; font-weight:700; color:var(--ink); }
+.saas-model-sub { font-size:10px; color:var(--ink3); margin-left:auto; font-family:var(--mono); }
+.saas-model-body { padding:8px 0; }
+.schema-row { display:flex; justify-content:space-between; align-items:baseline; padding:4px 14px; border-bottom:1px solid var(--line); font-size:11.5px; }
+.schema-row:last-child { border:none; }
+.sr-key { font-family:var(--mono); color:var(--ink); font-size:11px; }
+.sr-val { color:var(--ink3); font-size:11px; text-align:right; }
+.highlight-row { background:#FFFBEB; }
+.highlight-row .sr-key { color:#B45309; }
+
+/* Plan cards */
+.saas-plan-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:28px; }
+.plan-card { background:var(--white); border:1.5px solid var(--line); border-radius:var(--r); padding:22px 20px; box-shadow:var(--sh); }
+.plan-card.plan-featured { border-color:#B45309; box-shadow:0 0 0 3px rgba(180,83,9,.08); }
+.plan-name { font-family:var(--serif); font-size:18px; font-weight:700; color:var(--ink); margin-bottom:4px; }
+.plan-price { font-family:var(--serif); font-size:32px; font-weight:700; color:var(--navy); margin-bottom:8px; }
+.plan-price span { font-size:14px; color:var(--ink3); font-weight:400; }
+.plan-tag { font-family:var(--mono); font-size:10px; padding:3px 10px; border-radius:20px; border:1px solid; display:inline-block; margin-bottom:14px; font-weight:500; }
+.plan-features { display:flex; flex-direction:column; gap:5px; }
+.pf { font-size:12.5px; padding:4px 0; border-bottom:1px solid var(--line); }
+.pf:last-child { border:none; }
+.pf.yes { color:var(--ink); }
+.pf.no { color:var(--ink3); text-decoration:line-through; }
+
+/* Flow tabs */
+.saas-flows-tabs { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:16px; }
+.saas-ftab { font-family:var(--sans); font-size:12px; padding:6px 16px; border-radius:8px; border:1.5px solid var(--line); background:var(--white); color:var(--ink3); cursor:pointer; transition:all .15s; font-weight:400; }
+.saas-ftab:hover { border-color:var(--navy); color:var(--navy); }
+.saas-ftab.active { background:var(--navy); border-color:var(--navy); color:#fff; font-weight:500; }
+
+/* Saas flow steps */
+.saas-flow-steps { background:var(--white); border:1px solid var(--line); border-radius:var(--r); overflow:hidden; box-shadow:var(--sh); margin-bottom:28px; }
+.sfs-step { display:flex; border-bottom:1px solid var(--line); }
+.sfs-step:last-child { border:none; }
+.sfs-step:hover { background:var(--bg); }
+.sfs-step.sfs-key { background:#FFFBEB; }
+.sfs-left { width:56px; flex-shrink:0; display:flex; align-items:center; justify-content:center; border-right:1px solid var(--line); padding:14px 0; }
+.sfs-num { width:26px; height:26px; border-radius:50%; font-family:var(--mono); font-size:11px; font-weight:600; display:flex; align-items:center; justify-content:center; }
+.sfs-n-key { background:#B45309; color:#fff; }
+.sfs-n-api { background:#EFF6FF; color:#1D4ED8; border:1.5px solid #BFDBFE; }
+.sfs-n-sys { background:#F5F5F4; color:#78716C; border:1px solid #D6D0C4; }
+.sfs-body { flex:1; padding:12px 18px; }
+.sfs-title { font-weight:600; font-size:13px; color:var(--ink); margin-bottom:4px; display:flex; align-items:center; gap:8px; }
+.sfs-desc { font-size:12px; color:var(--ink3); line-height:1.5; }
+.sfs-code { font-family:var(--mono); font-size:11px; color:#78716C; margin-top:4px; background:#F5F5F4; padding:4px 8px; border-radius:4px; display:inline-block; }
+
+/* Subscription states */
+.sub-states-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:28px; }
+.sub-state-card { background:var(--white); border:1px solid var(--line); border-radius:var(--r); padding:16px 18px; box-shadow:var(--sh); }
+.ss-label { font-family:var(--serif); font-size:14px; font-weight:700; margin-bottom:8px; }
+.ss-desc { font-size:12.5px; color:var(--ink3); line-height:1.6; margin-bottom:10px; }
+.ss-code { font-family:var(--mono); font-size:10.5px; background:#F5F5F4; padding:6px 10px; border-radius:5px; color:#78716C; line-height:1.7; }
+
+/* Pipeline */
+.pipeline-container { background:var(--white); border:1px solid var(--line); border-radius:var(--r); overflow:hidden; box-shadow:var(--sh); margin-bottom:28px; }
+.pipe-step { display:flex; align-items:flex-start; gap:0; border-bottom:1px solid var(--line); }
+.pipe-step:last-child { border:none; }
+.pipe-step:hover { background:var(--bg); }
+.pipe-step.pipe-step-key { background:#FFFBEB; }
+.pipe-n { width:56px; flex-shrink:0; display:flex; align-items:center; justify-content:center; padding:16px 0; border-right:1px solid var(--line); font-family:var(--mono); font-size:13px; font-weight:700; color:var(--navy); }
+.pipe-step-key .pipe-n { color:#B45309; }
+.pipe-body { flex:1; padding:12px 20px; }
+.pipe-title { font-weight:600; font-size:13.5px; color:var(--ink); margin-bottom:4px; }
+.pipe-desc { font-size:12px; color:var(--ink3); line-height:1.5; margin-bottom:6px; }
+.pipe-code { font-family:var(--mono); font-size:11px; color:#1D4ED8; background:#EFF6FF; padding:5px 10px; border-radius:4px; display:inline-block; border:1px solid #BFDBFE; }
+.pipe-step-key .pipe-code { background:#FFFBEB; color:#B45309; border-color:#FDE68A; }
+.pipe-arrow { text-align:center; padding:4px 0; font-size:16px; color:#D6D0C4; background:var(--bg); border-bottom:1px solid var(--line); }
+
+/* Admin grid */
+.admin-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:28px; }
+.admin-card { background:var(--white); border:1px solid var(--line); border-radius:var(--r); padding:18px; box-shadow:var(--sh); transition:all .18s; }
+.admin-card:hover { box-shadow:0 4px 16px rgba(0,0,0,.08); transform:translateY(-1px); }
+.admin-card-icon { font-size:22px; margin-bottom:8px; }
+.admin-card-title { font-family:var(--serif); font-size:13px; font-weight:700; color:var(--ink); margin-bottom:6px; }
+.admin-card-desc { font-size:12px; color:var(--ink3); line-height:1.6; margin-bottom:10px; }
+.admin-endpoint { display:flex; align-items:center; gap:6px; }
+.pill-get-sm   { font-family:var(--mono); font-size:9px; padding:2px 7px; border-radius:4px; background:#F0FDF9; color:#0F766E; border:1px solid #99F6E4; }
+.pill-patch-sm { font-family:var(--mono); font-size:9px; padding:2px 7px; border-radius:4px; background:#FFFBEB; color:#B45309; border:1px solid #FDE68A; }
+.pill-post-sm  { font-family:var(--mono); font-size:9px; padding:2px 7px; border-radius:4px; background:#EFF6FF; color:#1D4ED8; border:1px solid #BFDBFE; }
+.admin-endpoint span + span { font-family:var(--mono); font-size:10.5px; color:#78716C; }
+
+/* Security rules */
+.security-rules-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.sr-card { background:var(--white); border:1px solid var(--line); border-radius:var(--r); padding:18px; box-shadow:var(--sh); }
+.sr-card.must { border-left:4px solid #15803D; }
+.sr-card.never { border-left:4px solid #BE185D; }
+.sr-head { font-family:var(--serif); font-size:13px; font-weight:700; color:var(--ink); margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid var(--line); }
+.sr-item { font-size:12.5px; color:var(--ink3); padding:5px 0; border-bottom:1px solid var(--line); }
+.sr-item:last-child { border:none; }
+
+@media (max-width:900px) {
+  .saas-pillars, .saas-models-grid, .admin-grid { grid-template-columns:repeat(2,1fr); }
+  .saas-plan-grid, .sub-states-grid, .security-rules-grid { grid-template-columns:1fr; }
+}
+@media (max-width:600px) {
+  .saas-pillars, .saas-models-grid, .admin-grid { grid-template-columns:1fr; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- ═══════════ HEADER ═══════════ -->
+<div class="header">
+  <div class="header-inner">
+    <div>
+      <div class="logo-wrap">
+        <div class="logo">Omni<strong>POS</strong></div>
+        <span class="version">v4.0(Final) · Enterprise with SaaS</span>
+      </div>
+      <div class="developer">This SaaS implementation is developed by <a href="https://mdsakib.info">Md. Sakib</a> and with her team</div>
+    </div>
+    <div class="header-kpis">
+      <div class="kpi"><div class="kpi-n">20</div><div class="kpi-l">DB Models</div></div>
+      <div class="kpi"><div class="kpi-n">23</div><div class="kpi-l">Route Groups</div></div>
+      <div class="kpi"><div class="kpi-n">82</div><div class="kpi-l">API Endpoints</div></div>
+      <div class="kpi"><div class="kpi-n">31</div><div class="kpi-l">Feature Modules</div></div>
+      <div class="kpi"><div class="kpi-n">3</div><div class="kpi-l">User Roles</div></div>
+      <div class="kpi"><div class="kpi-n">4</div><div class="kpi-l">Platforms</div></div>
+    </div>
+  </div>
+  <div class="header-tagline">MERN Stack · Electron Desktop · React Native Mobile · Socket.io · MongoDB Transactions</div>
+</div>
+
+<!-- ═══════════ TABS ═══════════ -->
+<div class="tabs">
+  <button class="tab active" onclick="showTab('arch')">Architecture</button>
+  <button class="tab" onclick="showTab('modules')">Modules (31)</button>
+  <button class="tab" onclick="showTab('flow')">API Flow</button>
+  <button class="tab" onclick="showTab('roles')">Roles &amp; Security</button>
+  <button class="tab" onclick="showTab('deploy')">Deployment</button>
+  <button class="tab" onclick="showTab('pro')">Pro Features</button>
+  <button class="tab" onclick="showTab('saas')">⚡ SaaS System</button>
+</div>
+
+<!-- ════════════════════════════════════════════
+     TAB 1 — ARCHITECTURE
+════════════════════════════════════════════ -->
+<div class="panel active" id="tab-arch">
+  <div class="sec-head">System Architecture</div>
+  <div class="sec-sub">Three-layer MERN stack with Electron desktop app, React Native mobile, and a web-based QR receipt viewer. All communication goes through the REST API with Socket.io for real-time events.</div>
+
+  <div class="arch-layer" style="border-top:3px solid #1B3A6B;">
+    <div class="arch-layer-top">
+      <div>
+        <div class="arch-layer-name">① Frontend Layer</div>
+        <div style="font-size:11px;color:var(--ink3);margin-top:4px">4 platforms — all communicate via REST API + Socket.io</div>
+      </div>
+      <div class="arch-layer-desc">User-facing interfaces. Desktop runs via Electron (offline-first with SQLite). Mobile via Expo APK. Web receipt viewer is publicly accessible with no auth.</div>
+    </div>
+    <div class="arch-chips">
+      <span class="chip c-navy">⚡ React + Electron — Desktop POS (.exe)</span>
+      <span class="chip c-navy">📱 React Native + Expo — Mobile APK</span>
+      <span class="chip c-navy">🌐 Web — QR Receipt Viewer (public)</span>
+      <span class="chip c-navy">📊 Web — Admin Dashboard</span>
+    </div>
+  </div>
+
+  <div class="arch-divider">↕ REST API + Socket.io</div>
+
+  <div class="arch-layer" style="border-top:3px solid #0F766E;">
+    <div class="arch-layer-top">
+      <div>
+        <div class="arch-layer-name">② Backend Layer — Node.js + Express</div>
+        <div style="font-size:11px;color:var(--ink3);margin-top:4px">23 route groups · 82 endpoints · 2 core services</div>
+      </div>
+      <div class="arch-layer-desc">Stateless REST API. JWT tokens authenticate every request. All business logic lives here — no logic in controllers beyond routing.</div>
+    </div>
+    <div class="arch-chips">
+      <span class="chip c-teal">🔐 JWT Auth (access 8h + refresh 30d)</span>
+      <span class="chip c-teal">🛡️ RBAC Middleware (3 roles)</span>
+      <span class="chip c-teal">✅ Joi Validation (all inputs)</span>
+      <span class="chip c-teal">🚦 Rate Limiting (auth: 20/15min, api: 300/min)</span>
+      <span class="chip c-teal">🪖 Helmet.js Security Headers</span>
+      <span class="chip c-teal">📡 Socket.io Real-Time Events</span>
+      <span class="chip c-teal">⚙️ stockService — only stock mutator</span>
+      <span class="chip c-teal">🔑 qrService — HMAC-SHA256 signed receipts</span>
+    </div>
+    <table class="tech-table">
+      <thead><tr><th>Service / Middleware</th><th>Purpose</th><th>Key Config</th></tr></thead>
+      <tbody>
+        <tr><td><span class="badge c-teal">stockService.js</span></td><td>Single function that handles ALL stock mutations. Writes StockLog on every call. Used by: orders, purchases, returns, transfers, manual adjust.</td><td>adjustStock(productId, delta, reason, userId, orderId, note, session)</td></tr>
+        <tr><td><span class="badge c-navy">qrService.js</span></td><td>Generates and verifies HMAC-SHA256 signed QR tokens. 30-day TTL. Timing-safe comparison prevents timing attacks.</td><td>generateQrToken(orderId) / verifyQrToken(token)</td></tr>
+        <tr><td><span class="badge c-amber">auth.js middleware</span></td><td>Verifies JWT, loads user from DB, attaches to req.user. Rejects expired/invalid/deactivated accounts.</td><td>Bearer token in Authorization header</td></tr>
+        <tr><td><span class="badge c-rose">role.js middleware</span></td><td>allow('admin','manager') — checks req.user.role against allowed roles. Returns 403 with clear message on failure.</td><td>Chained after auth middleware</td></tr>
+        <tr><td><span class="badge c-purple">rateLimiter.js</span></td><td>Auth endpoints: 20 requests/15 min. API endpoints: 300 req/min. Returns standard headers.</td><td>express-rate-limit package</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="arch-divider">↕ Mongoose ODM + MongoDB Driver</div>
+
+  <div class="arch-layer" style="border-top:3px solid #B45309;">
+    <div class="arch-layer-top">
+      <div>
+        <div class="arch-layer-name">③ Data Layer — MongoDB Atlas</div>
+        <div style="font-size:11px;color:var(--ink3);margin-top:4px">20 collections · Replica set required for transactions · Text search indexes · SQLite offline fallback</div>
+      </div>
+      <div class="arch-layer-desc">Cloud-hosted on MongoDB Atlas. Replica set enables multi-document transactions. Offline-first: desktop caches to SQLite, mobile to AsyncStorage, syncs on reconnect.</div>
+    </div>
+    <div class="arch-chips">
+      <span class="chip c-amber">🍃 MongoDB Atlas (cloud cluster)</span>
+      <span class="chip c-amber">20 Collections</span>
+      <span class="chip c-amber">🔒 Mongoose Transactions (atomic)</span>
+      <span class="chip c-amber">🔍 Text Search Indexes (products)</span>
+      <span class="chip c-amber">📑 Compound Indexes (barcode+store)</span>
+      <span class="chip c-amber">💾 SQLite — Desktop Offline</span>
+      <span class="chip c-amber">📦 AsyncStorage — Mobile Offline</span>
+    </div>
+    <table class="tech-table">
+      <thead><tr><th>Collection</th><th>Key Fields</th><th>Special Indexes</th></tr></thead>
+      <tbody>
+        <tr><td>orders</td><td>cashierId, storeId, items[], subtotal, discount, tax, total, costTotal, qrToken, status</td><td>{ createdAt:-1, storeId:1 } · { cashierId:1, createdAt:-1 }</td></tr>
+        <tr><td>products</td><td>barcode, name, category, sellingPrice, costPrice, stock, lowStockAlert, storeId</td><td>{ barcode:1, storeId:1 } UNIQUE · { name:'text', category:'text' }</td></tr>
+        <tr><td>stocklogs</td><td>productId, storeId, delta, reason, changedBy, orderId, note</td><td>{ createdAt:-1, storeId:1 }</td></tr>
+        <tr><td>customers</td><td>name, phone, creditLimit, creditBalance, walletBalance, loyaltyPoints, loyaltyCard</td><td>{ phone:1, storeId:1 } · { loyaltyCard:1 }</td></tr>
+        <tr><td>shifts</td><td>cashierId, openedAt, closedAt, openingCash, closingCash, expectedCash, cashDifference</td><td>{ cashierId:1, status:1 }</td></tr>
+        <tr><td>payroll</td><td>userId, month, year, basicSalary, bonus, deductions, netSalary, status</td><td>{ userId:1, month:1, year:1, storeId:1 } UNIQUE</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="sec-divider">Real-Time Events — Socket.io</div>
+  <div class="card">
+    <div class="card-title">📡 Socket.io Event Bus — Rooms are scoped per storeId</div>
+    <div style="font-size:12px;color:var(--ink3);margin-bottom:12px">Clients join their store room on connect: <code style="font-family:var(--mono);background:var(--bg2);padding:2px 6px;border-radius:4px">socket.emit('join:store', storeId)</code>. All events are broadcast to that room only.</div>
+    <div class="socket-events">
+      <div class="socket-event"><div class="socket-event-name">order:new</div><div class="socket-event-desc">Fired after every completed checkout. Payload: orderId, orderNumber, total, cashier name, timestamp.</div></div>
+      <div class="socket-event"><div class="socket-event-name">stock:updated</div><div class="socket-event-desc">Fired on every stock change (sale, purchase, adjust, transfer). Payload: productId, newStock, delta, reason.</div></div>
+      <div class="socket-event"><div class="socket-event-name">purchase:new</div><div class="socket-event-desc">Fired when a new purchase from supplier is created. Payload: purchaseId, supplierId, total.</div></div>
+      <div class="socket-event"><div class="socket-event-name">shift:opened</div><div class="socket-event-desc">Broadcast when cashier opens a shift. Payload: shiftId, cashierName, openingCash.</div></div>
+      <div class="socket-event"><div class="socket-event-name">shift:closed</div><div class="socket-event-desc">Broadcast when shift closes. Payload: shiftId, totalSales, cashDifference, status.</div></div>
+      <div class="socket-event"><div class="socket-event-name">lowstock:alert</div><div class="socket-event-desc">Fired when stock drops at or below lowStockAlert threshold after a sale. Payload: productId, name, stock.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     TAB 2 — MODULES
+════════════════════════════════════════════ -->
+<div class="panel" id="tab-modules">
+  <div class="sec-head">Feature Modules</div>
+  <div class="sec-sub">31 modules across 5 categories. Click any module card to see full details — features, API endpoints, business logic, and code snippets.</div>
+  <div class="filter-bar">
+    <span class="filter-label">Filter:</span>
+    <span id="mod-filters"></span>
+  </div>
+  <div class="mod-grid" id="mod-grid"></div>
+  <div class="mod-detail" id="mod-detail"></div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     TAB 3 — API FLOW
+════════════════════════════════════════════ -->
+<div class="panel" id="tab-flow">
+  <div class="sec-head">API Flow Diagrams</div>
+  <div class="sec-sub">Step-by-step flow for every major operation. Click a step on the left to see request/response details on the right.</div>
+  <div class="flow-tabs" id="flow-tabs"></div>
+  <div class="flow-main">
+    <div class="flow-steps-panel" id="flow-steps"></div>
+    <div class="flow-detail-panel" id="flow-detail"></div>
+  </div>
+
+  <div class="sec-divider">Complete Endpoint Reference</div>
+  <div class="card">
+    <div class="card-title">📋 All 82 Endpoints</div>
+    <div id="ep-table-container"></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     TAB 4 — ROLES & SECURITY
+════════════════════════════════════════════ -->
+<div class="panel" id="tab-roles">
+  <div class="sec-head">Roles &amp; Security</div>
+  <div class="sec-sub">Three role levels enforced at middleware level on every route. Security implemented at multiple layers from transport to database.</div>
+
+  <div class="roles-layout">
+    <div class="card" style="padding:0;overflow:hidden">
+      <div style="padding:14px 18px;border-bottom:1px solid var(--border);background:var(--bg)">
+        <div class="card-title" style="margin:0">Full Permissions Matrix</div>
+      </div>
+      <table class="perm-table" id="perm-table"></table>
+    </div>
+
+    <div>
+      <div class="card-title" style="margin-bottom:12px;padding:0">🔒 Security Stack</div>
+      <div class="sec-stack" id="sec-stack"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     TAB 5 — DEPLOYMENT
+════════════════════════════════════════════ -->
+<div class="panel" id="tab-deploy">
+  <div class="sec-head">Deployment &amp; Infrastructure</div>
+  <div class="sec-sub">Four separate deployment targets — backend API, database, desktop app, and mobile app. All can be deployed independently.</div>
+
+  <div class="deploy-targets" id="deploy-targets"></div>
+
+  <div class="sec-divider">Environment Variables</div>
+  <div class="env-grid">
+    <div class="env-card">
+      <div class="card-title">Backend .env (Required)</div>
+      <table class="env-table">
+        <tr><td>PORT</td><td>HTTP port (default 5000)</td></tr>
+        <tr><td>MONGO_URI</td><td>MongoDB Atlas connection string</td></tr>
+        <tr><td>JWT_SECRET</td><td>Min 32-char random string for access tokens</td></tr>
+        <tr><td>JWT_REFRESH_SECRET</td><td>Separate secret for refresh tokens</td></tr>
+        <tr><td>JWT_EXPIRES_IN</td><td>Access token TTL (default: 8h)</td></tr>
+        <tr><td>JWT_REFRESH_EXPIRES_IN</td><td>Refresh token TTL (default: 30d)</td></tr>
+        <tr><td>QR_SECRET</td><td>Min 32-char secret for HMAC-SHA256 QR signing</td></tr>
+        <tr><td>RECEIPT_BASE_URL</td><td>Public URL of receipt web viewer</td></tr>
+        <tr><td>ALLOWED_ORIGINS</td><td>Comma-separated CORS origins (production)</td></tr>
+        <tr><td>NODE_ENV</td><td>development | production</td></tr>
+      </table>
+    </div>
+    <div class="env-card">
+      <div class="card-title">Electron Desktop Config</div>
+      <table class="env-table">
+        <tr><td>API_BASE_URL</td><td>Backend API URL (set at build time)</td></tr>
+        <tr><td>PRINTER_INTERFACE</td><td>Thermal printer TCP/IP or USB path</td></tr>
+        <tr><td>PRINTER_WIDTH</td><td>58mm or 80mm (receipt width)</td></tr>
+        <tr><td>OFFLINE_DB_PATH</td><td>Path to SQLite file (default: ./data/pos.db)</td></tr>
+        <tr><td>SOCKET_URL</td><td>Socket.io server URL</td></tr>
+      </table>
+      <div class="card-title" style="margin-top:14px">Generate Secrets</div>
+      <div style="background:var(--ink);color:#A8C8F0;font-family:var(--mono);font-size:11px;padding:12px;border-radius:8px;line-height:1.8">node -e "console.log(<br>&nbsp;&nbsp;require('crypto')<br>&nbsp;&nbsp;.randomBytes(48)<br>&nbsp;&nbsp;.toString('hex')<br>)"</div>
+    </div>
+  </div>
+
+  <div class="sec-divider">8-Week Project Timeline</div>
+  <div class="timeline" id="timeline"></div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     TAB 6 — PRO FEATURES
+════════════════════════════════════════════ -->
+<div class="panel" id="tab-pro">
+  <div class="sec-head">Pro &amp; Advanced Features</div>
+  <div class="sec-sub">Features beyond the core build — planned as add-ons, Phase 2 upgrades, or optional integrations. All are architecturally designed into the system from the start.</div>
+  <div class="pro-grid" id="pro-grid"></div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     SAAS MULTI-TENANT SYSTEM TAB
+════════════════════════════════════════════ -->
+<div class="panel" id="tab-saas">
+  <div class="sec-head">SaaS Multi-Tenant Architecture</div>
+  <div class="sec-sub">OmniPOS operates as a fully multi-tenant SaaS platform. Each business is an isolated tenant with its own users, data, plan, and subscription — all managed through a single backend, with you as the global admin.</div>
+
+  <!-- ── PILLAR CARDS ── -->
+  <div class="saas-pillars">
+    <div class="pillar-card" style="border-top:3px solid var(--navy)">
+      <div class="pillar-icon">🔐</div>
+      <div class="pillar-title">Authentication</div>
+      <div class="pillar-desc">Who are you?<br>JWT encodes userId + tenantId + role</div>
+    </div>
+    <div class="pillar-card" style="border-top:3px solid #0F766E">
+      <div class="pillar-icon">🏢</div>
+      <div class="pillar-title">Tenant Isolation</div>
+      <div class="pillar-desc">Which business?<br>Every query filtered by tenantId</div>
+    </div>
+    <div class="pillar-card" style="border-top:3px solid #B45309">
+      <div class="pillar-icon">🛡️</div>
+      <div class="pillar-title">Authorization</div>
+      <div class="pillar-desc">What can you do?<br>Role + feature + limit checks</div>
+    </div>
+    <div class="pillar-card" style="border-top:3px solid #BE185D">
+      <div class="pillar-icon">💳</div>
+      <div class="pillar-title">Subscription</div>
+      <div class="pillar-desc">Are you allowed?<br>Plan controls features + expiry</div>
+    </div>
+  </div>
+
+  <!-- ── CORE MODELS ── -->
+  <div class="sec-divider">Core Data Models</div>
+  <div class="saas-models-grid">
+
+    <div class="saas-model-card">
+      <div class="saas-model-head">
+        <span class="saas-model-icon">🏢</span>
+        <span class="saas-model-name">Tenant</span>
+        <span class="saas-model-sub">One per business</span>
+      </div>
+      <div class="saas-model-body">
+        <div class="schema-row"><span class="sr-key">_id</span><span class="sr-val">ObjectId</span></div>
+        <div class="schema-row"><span class="sr-key">businessName</span><span class="sr-val">String</span></div>
+        <div class="schema-row"><span class="sr-key">ownerEmail</span><span class="sr-val">String</span></div>
+        <div class="schema-row highlight-row"><span class="sr-key">plan</span><span class="sr-val">"basic" | "standard" | "pro"</span></div>
+        <div class="schema-row highlight-row"><span class="sr-key">subscriptionStatus</span><span class="sr-val">"active" | "expired" | "suspended"</span></div>
+        <div class="schema-row highlight-row"><span class="sr-key">expireAt</span><span class="sr-val">Date</span></div>
+        <div class="schema-row"><span class="sr-key">isActive</span><span class="sr-val">Boolean (default: true)</span></div>
+        <div class="schema-row"><span class="sr-key">isSetupComplete</span><span class="sr-val">Boolean (default: false)</span></div>
+        <div class="schema-row"><span class="sr-key">language</span><span class="sr-val">"en" | "ar"</span></div>
+        <div class="schema-row"><span class="sr-key">currency</span><span class="sr-val">ISO 4217 code (e.g. "SAR")</span></div>
+        <div class="schema-row"><span class="sr-key">createdAt</span><span class="sr-val">Date</span></div>
+      </div>
+    </div>
+
+    <div class="saas-model-card">
+      <div class="saas-model-head">
+        <span class="saas-model-icon">👤</span>
+        <span class="saas-model-name">User</span>
+        <span class="saas-model-sub">Inside a tenant</span>
+      </div>
+      <div class="saas-model-body">
+        <div class="schema-row"><span class="sr-key">_id</span><span class="sr-val">ObjectId</span></div>
+        <div class="schema-row"><span class="sr-key">name</span><span class="sr-val">String</span></div>
+        <div class="schema-row"><span class="sr-key">email</span><span class="sr-val">String (unique per tenant)</span></div>
+        <div class="schema-row"><span class="sr-key">password</span><span class="sr-val">String (bcrypt, select:false)</span></div>
+        <div class="schema-row highlight-row"><span class="sr-key">role</span><span class="sr-val">"owner" | "manager" | "cashier"</span></div>
+        <div class="schema-row highlight-row"><span class="sr-key">tenantId</span><span class="sr-val">ObjectId → Tenant (indexed)</span></div>
+        <div class="schema-row"><span class="sr-key">isActive</span><span class="sr-val">Boolean (default: true)</span></div>
+        <div class="schema-row"><span class="sr-key">lastLogin</span><span class="sr-val">Date</span></div>
+      </div>
+    </div>
+
+    <div class="saas-model-card">
+      <div class="saas-model-head">
+        <span class="saas-model-icon">📋</span>
+        <span class="saas-model-name">Plan</span>
+        <span class="saas-model-sub">System-defined tiers</span>
+      </div>
+      <div class="saas-model-body">
+        <div class="schema-row"><span class="sr-key">name</span><span class="sr-val">"basic" | "standard" | "pro"</span></div>
+        <div class="schema-row highlight-row"><span class="sr-key">features</span><span class="sr-val">["pos","products","reports"...]</span></div>
+        <div class="schema-row highlight-row"><span class="sr-key">limits.users</span><span class="sr-val">Number (e.g. 2 | 5 | unlimited)</span></div>
+        <div class="schema-row highlight-row"><span class="sr-key">limits.products</span><span class="sr-val">Number (e.g. 500 | 2000 | unlimited)</span></div>
+        <div class="schema-row"><span class="sr-key">limits.branches</span><span class="sr-val">Number (1 | 3 | unlimited)</span></div>
+        <div class="schema-row"><span class="sr-key">price</span><span class="sr-val">Number (monthly USD)</span></div>
+        <div class="schema-row"><span class="sr-key">trialDays</span><span class="sr-val">Number (default: 7)</span></div>
+      </div>
+    </div>
+
+    <div class="saas-model-card">
+      <div class="saas-model-head">
+        <span class="saas-model-icon">💰</span>
+        <span class="saas-model-name">Subscription Log</span>
+        <span class="saas-model-sub">Payment history</span>
+      </div>
+      <div class="saas-model-body">
+        <div class="schema-row"><span class="sr-key">tenantId</span><span class="sr-val">ObjectId → Tenant</span></div>
+        <div class="schema-row"><span class="sr-key">plan</span><span class="sr-val">String</span></div>
+        <div class="schema-row"><span class="sr-key">amount</span><span class="sr-val">Number</span></div>
+        <div class="schema-row"><span class="sr-key">currency</span><span class="sr-val">String</span></div>
+        <div class="schema-row highlight-row"><span class="sr-key">paidAt</span><span class="sr-val">Date</span></div>
+        <div class="schema-row highlight-row"><span class="sr-key">periodStart</span><span class="sr-val">Date</span></div>
+        <div class="schema-row highlight-row"><span class="sr-key">periodEnd</span><span class="sr-val">Date</span></div>
+        <div class="schema-row"><span class="sr-key">method</span><span class="sr-val">"stripe" | "paypal" | "manual"</span></div>
+        <div class="schema-row"><span class="sr-key">status</span><span class="sr-val">"paid" | "failed" | "refunded"</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PLAN COMPARISON ── -->
+  <div class="sec-divider">Plan Tiers</div>
+  <div class="saas-plan-grid">
+    <div class="plan-card">
+      <div class="plan-name">Basic</div>
+      <div class="plan-price">$19<span>/mo</span></div>
+      <div class="plan-tag" style="background:#EFF6FF;color:#1D4ED8;border-color:#BFDBFE">Starter</div>
+      <div class="plan-features">
+        <div class="pf yes">✓ POS Checkout</div>
+        <div class="pf yes">✓ Products (500 max)</div>
+        <div class="pf yes">✓ Categories</div>
+        <div class="pf yes">✓ 2 Users</div>
+        <div class="pf yes">✓ 1 Branch</div>
+        <div class="pf yes">✓ Barcode Printing</div>
+        <div class="pf no">✗ Reports</div>
+        <div class="pf no">✗ Suppliers / Purchases</div>
+        <div class="pf no">✗ Accounting</div>
+        <div class="pf no">✗ Loyalty / Wallet</div>
+        <div class="pf no">✗ Payroll</div>
+        <div class="pf no">✗ Multi-Currency</div>
+      </div>
+    </div>
+    <div class="plan-card plan-featured">
+      <div class="plan-name">Standard</div>
+      <div class="plan-price">$49<span>/mo</span></div>
+      <div class="plan-tag" style="background:#FFFBEB;color:#B45309;border-color:#FDE68A">Most Popular</div>
+      <div class="plan-features">
+        <div class="pf yes">✓ POS Checkout</div>
+        <div class="pf yes">✓ Products (2,000 max)</div>
+        <div class="pf yes">✓ Categories</div>
+        <div class="pf yes">✓ 5 Users</div>
+        <div class="pf yes">✓ 3 Branches</div>
+        <div class="pf yes">✓ Reports + Shifts</div>
+        <div class="pf yes">✓ Suppliers / Purchases</div>
+        <div class="pf yes">✓ Customer + Wallet</div>
+        <div class="pf yes">✓ Loyalty Program</div>
+        <div class="pf yes">✓ Vouchers</div>
+        <div class="pf no">✗ Accounting Reports</div>
+        <div class="pf no">✗ Payroll + Banking</div>
+      </div>
+    </div>
+    <div class="plan-card">
+      <div class="plan-name">Pro</div>
+      <div class="plan-price">$99<span>/mo</span></div>
+      <div class="plan-tag" style="background:#F5F3FF;color:#7C3AED;border-color:#DDD6FE">Full Access</div>
+      <div class="plan-features">
+        <div class="pf yes">✓ POS Checkout</div>
+        <div class="pf yes">✓ Products (Unlimited)</div>
+        <div class="pf yes">✓ Categories</div>
+        <div class="pf yes">✓ Unlimited Users</div>
+        <div class="pf yes">✓ Unlimited Branches</div>
+        <div class="pf yes">✓ All Reports</div>
+        <div class="pf yes">✓ Full Inventory Suite</div>
+        <div class="pf yes">✓ Accounting + P&amp;L</div>
+        <div class="pf yes">✓ Payroll + Banking</div>
+        <div class="pf yes">✓ Arabic Language</div>
+        <div class="pf yes">✓ Multi-Currency (170+)</div>
+        <div class="pf yes">✓ Priority Support</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── FLOWS ── -->
+  <div class="sec-divider">System Flows</div>
+  <div class="saas-flows-tabs">
+    <button class="saas-ftab active" onclick="showSaasFlow('signup')">Sign-Up</button>
+    <button class="saas-ftab" onclick="showSaasFlow('login')">Login</button>
+    <button class="saas-ftab" onclick="showSaasFlow('request')">Request Lifecycle</button>
+    <button class="saas-ftab" onclick="showSaasFlow('onboard')">Onboarding</button>
+    <button class="saas-ftab" onclick="showSaasFlow('admin')">Admin Control</button>
+  </div>
+  <div id="saas-flow-content"></div>
+
+  <!-- ── SUBSCRIPTION STATES ── -->
+  <div class="sec-divider">Subscription Status Behavior</div>
+  <div class="sub-states-grid">
+    <div class="sub-state-card" style="border-left:4px solid #15803D">
+      <div class="ss-label" style="color:#15803D">🟢 Active</div>
+      <div class="ss-desc">Subscription is current and within expiry date. Full access to all plan features and limits. Normal operation for all users in tenant.</div>
+      <div class="ss-code">tenant.subscriptionStatus === 'active'
+&amp;&amp; new Date() &lt; tenant.expireAt</div>
+    </div>
+    <div class="sub-state-card" style="border-left:4px solid #B45309">
+      <div class="ss-label" style="color:#B45309">🟡 Expired</div>
+      <div class="ss-desc">Subscription period ended. Features blocked at middleware level. Read-only access may be granted. Owner receives renewal prompt on login.</div>
+      <div class="ss-code">tenant.subscriptionStatus === 'expired'
+|| new Date() &gt;= tenant.expireAt</div>
+    </div>
+    <div class="sub-state-card" style="border-left:4px solid #BE185D">
+      <div class="ss-label" style="color:#BE185D">🔴 Suspended</div>
+      <div class="ss-desc">Account manually suspended by SaaS Admin. Full lockout — no login possible. Used for payment disputes, ToS violations, or fraud prevention.</div>
+      <div class="ss-code">tenant.subscriptionStatus === 'suspended'
+|| tenant.isActive === false</div>
+    </div>
+  </div>
+
+  <!-- ── REQUEST MIDDLEWARE PIPELINE ── -->
+  <div class="sec-divider">Middleware Pipeline (Every API Request)</div>
+  <div class="pipeline-container">
+    <div class="pipe-step">
+      <div class="pipe-n">1</div>
+      <div class="pipe-body">
+        <div class="pipe-title">JWT Decode</div>
+        <div class="pipe-desc">Extract userId, tenantId, role from Bearer token. Reject if missing, expired, or invalid signature.</div>
+        <div class="pipe-code">const { userId, tenantId, role } = jwt.verify(token, SECRET)</div>
+      </div>
+    </div>
+    <div class="pipe-arrow">↓</div>
+    <div class="pipe-step">
+      <div class="pipe-n">2</div>
+      <div class="pipe-body">
+        <div class="pipe-title">Tenant Load</div>
+        <div class="pipe-desc">Fetch tenant from DB. Attach to req. Check isActive = true and isActive tenant exists.</div>
+        <div class="pipe-code">req.tenant = await Tenant.findById(tenantId)</div>
+      </div>
+    </div>
+    <div class="pipe-arrow">↓</div>
+    <div class="pipe-step pipe-step-key">
+      <div class="pipe-n">3</div>
+      <div class="pipe-body">
+        <div class="pipe-title">Subscription Check</div>
+        <div class="pipe-desc">Block request if subscription expired or account suspended. Return 403 with renewal message.</div>
+        <div class="pipe-code">if (now &gt; tenant.expireAt) return res.status(403).json({ error: 'Subscription expired' })</div>
+      </div>
+    </div>
+    <div class="pipe-arrow">↓</div>
+    <div class="pipe-step pipe-step-key">
+      <div class="pipe-n">4</div>
+      <div class="pipe-body">
+        <div class="pipe-title">Feature Check</div>
+        <div class="pipe-desc">Verify the plan includes the required feature for this route. Deny if feature not in plan.</div>
+        <div class="pipe-code">if (!plan.features.includes('reports')) return res.status(403).json({ error: 'Upgrade plan' })</div>
+      </div>
+    </div>
+    <div class="pipe-arrow">↓</div>
+    <div class="pipe-step">
+      <div class="pipe-n">5</div>
+      <div class="pipe-body">
+        <div class="pipe-title">Role Check</div>
+        <div class="pipe-desc">Verify role permission for this specific route. Cashier cannot access reports even on Pro plan.</div>
+        <div class="pipe-code">if (!allowedRoles.includes(req.user.role)) return res.status(403)</div>
+      </div>
+    </div>
+    <div class="pipe-arrow">↓</div>
+    <div class="pipe-step pipe-step-key">
+      <div class="pipe-n">6</div>
+      <div class="pipe-body">
+        <div class="pipe-title">Tenant Isolation</div>
+        <div class="pipe-desc">ALL database queries must include tenantId filter. Never allow cross-tenant data leakage. Critical security layer.</div>
+        <div class="pipe-code">Model.find({ tenantId: req.tenant._id }) // ALWAYS</div>
+      </div>
+    </div>
+    <div class="pipe-arrow">↓</div>
+    <div class="pipe-step">
+      <div class="pipe-n">7</div>
+      <div class="pipe-body">
+        <div class="pipe-title">Limit Check</div>
+        <div class="pipe-desc">For create operations, verify usage is within plan limits. Block if at or over limit.</div>
+        <div class="pipe-code">if (userCount >= plan.limits.users) return res.status(403).json({ error: 'User limit reached' })</div>
+      </div>
+    </div>
+    <div class="pipe-arrow">↓</div>
+    <div class="pipe-step">
+      <div class="pipe-n">8</div>
+      <div class="pipe-body">
+        <div class="pipe-title">Controller → Response</div>
+        <div class="pipe-desc">All checks passed. Controller runs, data returned. All data scoped to tenant — zero cross-tenant risk.</div>
+        <div class="pipe-code">res.json({ data: tenantScopedResults })</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── ADMIN PANEL ── -->
+  <div class="sec-divider">SaaS Admin Panel — Your Control Center</div>
+  <div class="admin-grid">
+    <div class="admin-card">
+      <div class="admin-card-icon">👁️</div>
+      <div class="admin-card-title">View All Tenants</div>
+      <div class="admin-card-desc">See every business registered. Filter by plan, status, date. View usage stats per tenant.</div>
+      <div class="admin-endpoint"><span class="pill-get-sm">GET</span> /admin/tenants</div>
+    </div>
+    <div class="admin-card">
+      <div class="admin-card-icon">⬆️</div>
+      <div class="admin-card-title">Upgrade / Downgrade Plan</div>
+      <div class="admin-card-desc">Change tenant plan instantly. Feature access updates on next API call — no restart needed.</div>
+      <div class="admin-endpoint"><span class="pill-patch-sm">PATCH</span> /admin/tenants/:id</div>
+    </div>
+    <div class="admin-card">
+      <div class="admin-card-icon">📅</div>
+      <div class="admin-card-title">Extend Subscription</div>
+      <div class="admin-card-desc">Add days to expireAt. Used for manual renewals, grace periods, or special client deals.</div>
+      <div class="admin-endpoint"><span class="pill-patch-sm">PATCH</span> /admin/tenants/:id/extend</div>
+    </div>
+    <div class="admin-card">
+      <div class="admin-card-icon">🔴</div>
+      <div class="admin-card-title">Suspend Account</div>
+      <div class="admin-card-desc">Immediately lock all users in a tenant. Sets isActive = false. Used for ToS violations or non-payment.</div>
+      <div class="admin-endpoint"><span class="pill-patch-sm">PATCH</span> /admin/tenants/:id/suspend</div>
+    </div>
+    <div class="admin-card">
+      <div class="admin-card-icon">📊</div>
+      <div class="admin-card-title">Revenue Dashboard</div>
+      <div class="admin-card-desc">MRR, plan distribution, active vs expired tenants, churn rate, new signups per period.</div>
+      <div class="admin-endpoint"><span class="pill-get-sm">GET</span> /admin/revenue</div>
+    </div>
+    <div class="admin-card">
+      <div class="admin-card-icon">🧑‍💻</div>
+      <div class="admin-card-title">Impersonate Tenant</div>
+      <div class="admin-card-desc">Generate a temporary admin token scoped to a specific tenant for support and debugging.</div>
+      <div class="admin-endpoint"><span class="pill-post-sm">POST</span> /admin/tenants/:id/impersonate</div>
+    </div>
+  </div>
+
+  <!-- ── SECURITY RULES ── -->
+  <div class="sec-divider">Security Rules (Never Break These)</div>
+  <div class="security-rules-grid">
+    <div class="sr-card must">
+      <div class="sr-head">✅ ALWAYS DO</div>
+      <div class="sr-item">Hash all passwords with bcrypt (salt 12)</div>
+      <div class="sr-item">Set JWT expiry on every token</div>
+      <div class="sr-item">Include tenantId in ALL Model.find() queries</div>
+      <div class="sr-item">Validate JWT before processing any request</div>
+      <div class="sr-item">Check subscription status on every protected route</div>
+      <div class="sr-item">Check feature access before executing business logic</div>
+      <div class="sr-item">Verify role permission per route</div>
+      <div class="sr-item">Rate limit login endpoint (brute force prevention)</div>
+    </div>
+    <div class="sr-card never">
+      <div class="sr-head">❌ NEVER DO</div>
+      <div class="sr-item">Allow direct DB access without token</div>
+      <div class="sr-item">Trust tenantId from client request body</div>
+      <div class="sr-item">Run queries without tenantId filter</div>
+      <div class="sr-item">Return data from another tenant's query</div>
+      <div class="sr-item">Skip subscription check on any route</div>
+      <div class="sr-item">Expose cost prices to cashier role</div>
+      <div class="sr-item">Allow expired tenants to write data</div>
+      <div class="sr-item">Store plain-text passwords anywhere</div>
+    </div>
+  </div>
+
+</div><!-- /tab-saas -->
+
+<!-- ════════════════════════════════════════════
+     DATA + JAVASCRIPT
+════════════════════════════════════════════ -->
+<script>
+/* ─────────────────────────────────────────────
+   MODULE DATA
+───────────────────────────────────────────── */
+const catColors = {
+  Core:      { bg:'#EBF0F8', ic:'#1B3A6B', strip:'#1B3A6B' },
+  Settings:  { bg:'#FEF3C7', ic:'#B45309', strip:'#D97706' },
+  Inventory: { bg:'#CCFBF1', ic:'#0F766E', strip:'#0F766E' },
+  HR:        { bg:'#FEE2E2', ic:'#B91C1C', strip:'#DC2626' },
+  Reports:   { bg:'#EDE9FE', ic:'#7C3AED', strip:'#7C3AED' },
+};
+
+const modules = [
+  /* Core */
+  { icon:'🛒', name:'POS Engine',        cat:'Core',     status:'done', eps:5,
+    desc:'The heart of the system. Ultra-fast scan-to-cart with no UI delay. Always-focused input field means the cashier never has to click — just scan.',
+    features:['Ultra-fast barcode scan — no UI delay on keyup','Always-focused scan input (auto-refocus after any action)','Manual product search by name or category','Cart memory — hold current order, load another','Multi-cart support for simultaneous orders','Unknown barcode → auto-popup to create product','Quantity increment if same product scanned again','Cart persists on browser refresh (localStorage)'],
+    endpoints:[
+      { m:'GET',  p:'/products/barcode/:code', d:'Scan lookup — fastest route in system', r:'all' },
+      { m:'POST', p:'/orders',                 d:'Checkout — atomic stock deduction + QR', r:'all' },
+      { m:'GET',  p:'/vouchers/validate/:code',d:'Apply voucher at POS', r:'all' },
+      { m:'GET',  p:'/shifts/active',          d:'Check cashier has an open shift', r:'all' },
+      { m:'GET',  p:'/customers?search=',      d:'Find customer by name/phone/card', r:'all' },
+    ],
+    code:`// Scan event handler
+input.onkeydown = async (e) => {
+  if (e.key !== 'Enter') return;
+  const product = await api.get(
+    '/products/barcode/' + input.value
+  );
+  cartStore.add(product);
+  input.value = '';       // clear
+  input.focus();          // re-focus
+};` },
+
+  { icon:'🧾', name:'Billing Engine',    cat:'Core',     status:'done', eps:3,
+    desc:'Handles all financial calculations — subtotals, multi-type discounts, configurable tax rates, and split payment across multiple methods.',
+    features:['Subtotal = Σ (sellingPrice × qty) across all items','Flat discount (e.g. ৳50 off total)','Percentage discount (e.g. 10% off subtotal)','Per-item custom discount support','Configurable tax rate per store (VAT/GST)','Tax calculated AFTER discount applied','Split payment: cash + mobile banking + card','Rounding to 2 decimal places throughout','Voucher code reduces total before payment'],
+    endpoints:[
+      { m:'POST', p:'/orders',                  d:'Submit full cart with billing payload', r:'all' },
+      { m:'GET',  p:'/vouchers/validate/:code', d:'Validate voucher before applying', r:'all' },
+      { m:'GET',  p:'/api/v1/stores/:id',       d:'Fetch tax rate for active store', r:'all' },
+    ],
+    code:`// Billing calculation
+subtotal = items.reduce((s,i) =>
+  s + i.sellingPrice * i.qty, 0);
+
+discountAmt = discount.type === 'flat'
+  ? Math.min(discount.value, subtotal)
+  : subtotal * discount.value / 100;
+
+tax   = (subtotal - discountAmt) * taxRate/100;
+total = subtotal - discountAmt + tax;
+// Round to 2dp throughout` },
+
+  { icon:'🔲', name:'QR Receipt',        cat:'Core',     status:'done', eps:2,
+    desc:'Every receipt has a secure, verifiable QR code. The QR encodes an HMAC-SHA256 signed token — not a raw orderId — preventing forgery and tampering.',
+    features:['HMAC-SHA256 signed token — orderId + timestamp + secret','30-day TTL with automatic expiry detection','Timing-safe comparison prevents timing attacks','Public receipt URL — no auth required to view','Strips costPrice from public receipt response','Status response: valid / tampered / expired','Works on any phone camera — no app needed','Store branding shown on receipt web page'],
+    endpoints:[
+      { m:'POST', p:'/orders',              d:'Creates order → generates + stores QR token', r:'all' },
+      { m:'GET',  p:'/orders/receipt/:token',d:'Public receipt viewer — verify + fetch order', r:'public' },
+    ],
+    code:`// Generate (backend)
+const payload = orderId+':'+Date.now();
+const hmac = crypto.createHmac('sha256', QR_SECRET)
+  .update(payload).digest('hex');
+const token = Buffer.from(
+  payload+':'+hmac
+).toString('base64url');
+
+// Verify (backend)
+const [oid, ts, hmac] = decoded.split(':');
+const expected = computeHmac(oid+':'+ts);
+crypto.timingSafeEqual(
+  Buffer.from(hmac), Buffer.from(expected)
+);` },
+
+  { icon:'🖨️', name:'Print Engine',      cat:'Core',     status:'done', eps:1,
+    desc:'Silent thermal receipt printing via Electron IPC. No print dialog appears — cashier just clicks checkout and the receipt prints automatically.',
+    features:['Electron IPC main/renderer communication','Silent printing — no browser print dialog','Auto-print after every successful checkout','Custom store name, address, phone on header','QR code SVG embedded in receipt body','Itemised product list with qty + price','Subtotal, discount, tax, total breakdown','Compatible with 58mm and 80mm thermal printers','Configurable via TCP/IP or USB connection'],
+    endpoints:[
+      { m:'—', p:'ipcMain.handle("print", data)', d:'Electron IPC — not an HTTP endpoint', r:'desktop' },
+    ],
+    code:`// Electron main.js
+ipcMain.handle('print-receipt', async (e, data) => {
+  const esc = buildESCPOS(data); // format receipt
+  await printer.print(esc, {
+    silent: true,
+    deviceName: config.PRINTER_INTERFACE
+  });
+  return { success: true };
+});
+
+// Renderer (React)
+await window.ipcRenderer.invoke(
+  'print-receipt', receiptData
+);` },
+
+  { icon:'🔄', name:'Real-Time Sync',    cat:'Core',     status:'done', eps:0,
+    desc:'Socket.io events keep all connected devices in sync. Admin dashboard updates live. Stock levels refresh without page reload. Multi-device cashier support.',
+    features:['Socket.io rooms scoped per storeId','Admin dashboard receives live order events','Stock levels update on all devices after any sale','Multi-device cashier support with shared cart data','Offline-first: desktop queues to SQLite when offline','Mobile queues to AsyncStorage when offline','Auto-sync queue on network reconnection','Conflict resolution: last-write-wins for stock','6 distinct event types (see Architecture tab)'],
+    endpoints:[
+      { m:'WS', p:'socket.emit("join:store", storeId)', d:'Subscribe to store-scoped events', r:'all' },
+    ],
+    code:`// Backend — emit after checkout
+req.app.get('io')
+  .to('store:' + storeId)
+  .emit('order:new', {
+    orderId, total, cashier, ts
+  });
+
+// Frontend — subscribe
+socket.on('order:new', (data) => {
+  dashboard.addOrder(data);
+  toast.success('New order: ' + data.total);
+});` },
+
+  /* Settings */
+  { icon:'🏪', name:'Company Info',      cat:'Settings', status:'done', eps:3,
+    desc:'Store-level configuration. Every order, receipt, and report is scoped to the store. Tax rate, currency, and receipt branding all configured here.',
+    features:['Store name, address, phone number','Tax rate (%) and tax label (VAT/GST/etc)','Currency symbol and code (BDT, USD, INR...)','Timezone for correct date/time on reports','Receipt footer custom message','Logo URL for receipt header branding','Supports multi-branch (one Store doc per branch)'],
+    endpoints:[
+      { m:'GET', p:'/api/v1/stores/:id', d:'Get store details', r:'all' },
+      { m:'PUT', p:'/api/v1/stores/:id', d:'Update store config', r:'admin' },
+      { m:'GET', p:'/health',            d:'Server health check', r:'public' },
+    ],
+    code:`Store schema:
+{ name, address, phone,
+  taxRate: 5,       // percent
+  taxLabel: 'VAT',
+  currency: 'BDT',
+  timezone: 'Asia/Dhaka',
+  receiptFooter: '...',
+  logo: 'https://...' }` },
+
+  { icon:'🗂️', name:'Categories',        cat:'Settings', status:'new', eps:4,
+    desc:'Product categories for filtering, search, and reporting. Each category is unique per store. Deleting is soft — products retain their category label.',
+    features:['Create/edit/remove product categories','Unique per store (no cross-store conflicts)','Used to filter products on POS search screen','Category breakdown in reports and analytics','Soft delete — products retain category history','8 seed categories created by default','Manager-level access to create/edit'],
+    endpoints:[
+      { m:'GET',    p:'/categories',    d:'List all active categories', r:'all' },
+      { m:'POST',   p:'/categories',    d:'Create new category', r:'manager' },
+      { m:'PUT',    p:'/categories/:id',d:'Rename category', r:'manager' },
+      { m:'DELETE', p:'/categories/:id',d:'Soft delete category', r:'admin' },
+    ],
+    code:`Category.index(
+  { name: 1, storeId: 1 },
+  { unique: true }
+);
+// Enforces unique names per store
+// but same name can exist in diff stores` },
+
+  { icon:'📦', name:'Products',          cat:'Settings', status:'done', eps:6,
+    desc:'Full product management with barcode uniqueness enforced per store. costPrice is always hidden from cashier-role responses at the controller level.',
+    features:['Barcode unique per store (compound index)','sellingPrice + costPrice (costPrice hidden from cashier)','Unit types: pcs / kg / liter / dozen / pack','Low-stock alert threshold per product','Full-text search by name and category','Soft delete (isActive: false)','Batch CSV import planned (Phase 2)','Auto-generate barcode if none provided (planned)'],
+    endpoints:[
+      { m:'GET',    p:'/products',              d:'List products (paginated, text search)', r:'all' },
+      { m:'GET',    p:'/products/barcode/:code',d:'POS scan lookup', r:'all' },
+      { m:'GET',    p:'/products/:id',          d:'Get single product', r:'all' },
+      { m:'POST',   p:'/products',              d:'Create product', r:'manager' },
+      { m:'PUT',    p:'/products/:id',          d:'Update product', r:'manager' },
+      { m:'DELETE', p:'/products/:id',          d:'Soft delete product', r:'admin' },
+    ],
+    code:`// costPrice protection
+const sanitize = (product, role) => {
+  const obj = product.toObject();
+  if (role === 'cashier')
+    delete obj.costPrice;
+  return obj;
+};
+// Applied in every controller
+// that returns product data` },
+
+  { icon:'🔖', name:'Barcode Printing',  cat:'Settings', status:'new', eps:2,
+    desc:'Generate and print barcodes for products. Individual or bulk sheets. Electron renders via JsBarcode and sends to the thermal or label printer.',
+    features:['Generate EAN-13 or Code128 barcode SVG per product','Bulk sheet: select multiple products → print label sheet','Barcode renders via JsBarcode in Electron','Print directly from product list table','Custom label size (38×25mm, 58×30mm, etc.)','Shows product name + barcode + price on label','Download as PNG or PDF for external printing'],
+    endpoints:[
+      { m:'GET',  p:'/barcodes/generate/:id', d:'Returns barcode data (value, format, name)', r:'all' },
+      { m:'POST', p:'/barcodes/bulk',          d:'Returns array of barcode data for products', r:'manager' },
+    ],
+    code:`// Frontend (Electron)
+JsBarcode('#barcode-svg', product.barcode, {
+  format: 'CODE128',
+  displayValue: true,
+  fontSize: 14,
+  height: 50,
+  width: 2
+});
+// Then print via Electron IPC` },
+
+  { icon:'🧑‍💼', name:'Salesman',          cat:'Settings', status:'new', eps:4,
+    desc:'Track field salesmen with commission rates. Attach a salesman to any order at POS. Performance reports show total sales and earned commission per salesman.',
+    features:['Salesman profile: name, phone, email','Commission rate as percentage of sale total','Attach salesman to order at POS checkout','Auto-calculate commission per linked sale','Performance report: orders, revenue, commission','Date-range filter on performance report','Total sales and commission aggregated live'],
+    endpoints:[
+      { m:'GET', p:'/salesman',                 d:'List all salesman', r:'manager' },
+      { m:'GET', p:'/salesman/:id',             d:'Get salesman details', r:'manager' },
+      { m:'GET', p:'/salesman/:id/performance', d:'Sales + commission report', r:'manager' },
+      { m:'POST',p:'/salesman',                 d:'Add salesman', r:'admin' },
+    ],
+    code:`// Performance aggregation
+Order.aggregate([
+  { $match: { salesmanId, storeId } },
+  { $group: {
+    totalOrders: { $sum: 1 },
+    totalSales:  { $sum: '$total' },
+    commission:  { $sum: {
+      $multiply: ['$total', rate/100]
+    }}
+  }}
+])` },
+
+  { icon:'💰', name:'Customer Wallet',   cat:'Settings', status:'new', eps:3,
+    desc:'Prepaid wallet system per customer. Top up at counter, spend at POS. Sales returns can refund to wallet instead of cash.',
+    features:['Prepaid wallet balance per customer','Top-up by cash, bank transfer, or mobile banking','Auto-deduct from wallet at POS checkout','Sales return → refund to wallet option','Overpaid credit auto-converts to wallet credit','Wallet balance shown at POS when customer selected','Full transaction history in customer profile'],
+    endpoints:[
+      { m:'POST', p:'/customers/:id/wallet/topup', d:'Add funds to wallet', r:'manager' },
+      { m:'GET',  p:'/customers/:id',              d:'View wallet balance', r:'all' },
+      { m:'POST', p:'/sales-returns',              d:'Refund to wallet on return', r:'all' },
+    ],
+    code:`// Top-up
+Customer.findByIdAndUpdate(id, {
+  $inc: { walletBalance: amount }
+});
+
+// At POS checkout
+if (method === 'wallet') {
+  if (customer.walletBalance < total)
+    throw 'Insufficient wallet balance';
+  customer.walletBalance -= total;
+}` },
+
+  { icon:'🎯', name:'Loyalty Card',      cat:'Settings', status:'new', eps:4,
+    desc:'Points-based loyalty program. Customers earn points on every purchase. Points can be redeemed for discounts at POS. Fully configurable earn/redeem rates.',
+    features:['Points earned per currency unit (configurable)','Point monetary value (e.g. 1pt = ৳0.01)','Minimum points to redeem (e.g. 100 pts)','Loyalty card number per customer','Redeem points as discount at POS checkout','Points history log per customer (LoyaltyTransaction model)','Manual points adjustment by manager','Tier system planned (Phase 2)'],
+    endpoints:[
+      { m:'GET',  p:'/loyalty/settings',            d:'Get loyalty program config for store', r:'all' },
+      { m:'PUT',  p:'/loyalty/settings',            d:'Update points rates and TTL', r:'admin' },
+      { m:'POST', p:'/loyalty/redeem',              d:'Redeem points for discount at POS', r:'all' },
+      { m:'POST', p:'/loyalty/adjust',              d:'Manual points adjustment by manager', r:'manager' },
+    ],
+    code:`// On checkout (earned)
+const earned = Math.floor(
+  order.total * settings.pointsPerCurrency
+);
+customer.loyaltyPoints += earned;
+
+// On redeem
+const discount = redeemPoints * settings.pointsValue;
+// Minimum: settings.minRedeemPoints
+customer.loyaltyPoints -= redeemPoints;` },
+
+  { icon:'🏦', name:'Banking',           cat:'Settings', status:'new', eps:6,
+    desc:'Track bank accounts with full transaction ledger. Record deposits, withdrawals, and account-to-account transfers. Used in accounting reports for cash flow.',
+    features:['Multiple bank accounts per store','Opening balance + running current balance','Record deposits with reference/slip number','Record withdrawals with description','Account-to-account internal transfers','Full transaction ledger per account (BankTransaction model)','Balance updates atomically with each transaction','Used in cash flow and balance sheet reports'],
+    endpoints:[
+      { m:'GET',  p:'/banking/accounts',                  d:'List accounts with balances', r:'manager' },
+      { m:'POST', p:'/banking/accounts',                  d:'Add bank account', r:'admin' },
+      { m:'GET',  p:'/banking/accounts/:id/transactions', d:'Transaction ledger', r:'manager' },
+      { m:'POST', p:'/banking/accounts/:id/deposit',      d:'Record deposit', r:'manager' },
+      { m:'POST', p:'/banking/accounts/:id/withdraw',     d:'Record withdrawal', r:'manager' },
+      { m:'POST', p:'/banking/transfer',                  d:'Transfer between accounts', r:'manager' },
+    ],
+    code:`// Deposit
+BankAccount.findByIdAndUpdate(id, {
+  $inc: { currentBalance: +amount }
+});
+BankTransaction.create({
+  type: 'deposit', amount,
+  balanceAfter: newBalance,
+  reference, date
+});` },
+
+  /* Inventory */
+  { icon:'🚚', name:'Supplier',          cat:'Inventory',status:'new', eps:5,
+    desc:'Supplier profiles with live payable balance tracking. Every purchase adds to supplier balance; payments and returns reduce it. Full ledger view per supplier.',
+    features:['Supplier profile: name, company, phone, email, address','Opening balance (amount owed at setup)','Running currentBalance (auto-maintained)','Balance increases on purchase (unpaid portion)','Balance decreases on payment recorded','Balance decreases on purchase return','Search by name, company, or phone','Soft deactivate preserves all purchase history'],
+    endpoints:[
+      { m:'GET',    p:'/suppliers',    d:'List suppliers (searchable)', r:'manager' },
+      { m:'GET',    p:'/suppliers/:id',d:'Get supplier + current balance', r:'manager' },
+      { m:'POST',   p:'/suppliers',    d:'Create with opening balance', r:'manager' },
+      { m:'PUT',    p:'/suppliers/:id',d:'Update supplier details', r:'manager' },
+      { m:'DELETE', p:'/suppliers/:id',d:'Soft deactivate', r:'admin' },
+    ],
+    code:`// Balance tracking
+On purchase:   Supplier.balance += balanceDue
+On payment:    Supplier.balance -= amount
+On return:     Supplier.balance -= returnTotal
+// Ensures real-time payables accuracy` },
+
+  { icon:'🛍️', name:'Purchase',          cat:'Inventory',status:'new', eps:4,
+    desc:'Buying stock from a supplier. MongoDB transaction ensures stock increments and supplier balance update are atomic — either both succeed or both roll back.',
+    features:['Select supplier + add products with cost price','Stock incremented via stockService (atomic)','StockLog written for every item (reason: restock)','Discount and tax on purchase supported','Partial/full payment tracking at purchase time','Record additional payments later (credit purchasing)','Auto-generate purchase number (PUR-YYYYMMDD-0001)','Supplier balance auto-updated on create + payment'],
+    endpoints:[
+      { m:'GET',  p:'/purchases',           d:'List purchases (filter by supplier, status, date)', r:'manager' },
+      { m:'GET',  p:'/purchases/:id',       d:'Get purchase detail with items', r:'manager' },
+      { m:'POST', p:'/purchases',           d:'Create — atomic stock + supplier update', r:'manager' },
+      { m:'PUT',  p:'/purchases/:id/payment',d:'Record payment to supplier', r:'manager' },
+    ],
+    code:`// POST /purchases — transaction
+const session = await mongoose.startSession();
+session.startTransaction();
+// 1. adjustStock(+qty) × N items
+// 2. Save Purchase document
+// 3. Supplier.balance += balanceDue
+await session.commitTransaction();
+// If any step fails → all roll back` },
+
+  { icon:'↩️', name:'Purchase Return',   cat:'Inventory',status:'new', eps:2,
+    desc:'Return damaged or incorrect stock back to supplier. Atomic: deducts stock and reduces supplier balance in one transaction.',
+    features:['Select items from original purchase to return','Partial returns supported (not all items required)','Atomic: stock deducted + supplier balance reduced','StockLog written per item (reason: return)','Auto-generate return number (PRN-XXXXXX-001)','Reason field for return documentation','Linked to original purchase for traceability','Manager-level access required'],
+    endpoints:[
+      { m:'GET',  p:'/purchase-returns', d:'List all purchase returns', r:'manager' },
+      { m:'POST', p:'/purchase-returns', d:'Create return — atomic stock + supplier', r:'manager' },
+    ],
+    code:`// POST /purchase-returns — transaction
+// 1. adjustStock(-qty) × N items
+//    reason: 'return'
+// 2. Save PurchaseReturn document
+// 3. Supplier.balance -= returnTotal
+await session.commitTransaction();
+// Stock goes down, debt to supplier goes down` },
+
+  { icon:'📋', name:'Quotation',         cat:'Inventory',status:'new', eps:5,
+    desc:'Create price quotations for customers before finalizing a sale. Accepted quotations can be converted to actual Orders with a single API call.',
+    features:['Create quotation with customer name or linked customer','Items with qty, unit price, and per-item discount','Valid-until date with automatic "expired" status','Status flow: draft → sent → accepted/rejected','One-click convert to real Order','Converted order reference stored on quotation','Cashier-level access (any authenticated user)','Auto-generate quote number (QUO-YYYYMMDD-0001)'],
+    endpoints:[
+      { m:'GET',  p:'/quotations',          d:'List quotations (filter by status)', r:'all' },
+      { m:'GET',  p:'/quotations/:id',      d:'Get quotation detail', r:'all' },
+      { m:'POST', p:'/quotations',          d:'Create new quotation', r:'all' },
+      { m:'PUT',  p:'/quotations/:id',      d:'Update status or items', r:'all' },
+      { m:'POST', p:'/quotations/:id/convert',d:'Convert to Order → checkout', r:'all' },
+    ],
+    code:`// POST /quotations/:id/convert
+// 1. Validate quotation status !== 'expired'
+// 2. Create Order from quotation items
+// 3. Trigger checkout flow (stock deduct etc.)
+// 4. Set quotation.status = 'accepted'
+// 5. Set quotation.convertedToOrderId = order._id` },
+
+  { icon:'🔙', name:'Sales Return',      cat:'Inventory',status:'new', eps:2,
+    desc:'Accept product returns from customers. Restores stock and refunds in the customer\'s preferred method — cash, wallet credit, or loyalty points.',
+    features:['Partial returns — return any subset of items','Stock restored via stockService (atomic)','Refund options: cash / wallet balance / loyalty points','Optional link to original order for audit trail','Optional link to customer account','LoyaltyTransaction created if refunding as points','Cashier-level access (all roles can process)','Auto-generate return number (SRN-XXXXXX-001)'],
+    endpoints:[
+      { m:'GET',  p:'/sales-returns', d:'List returns (filter by date, cashier)', r:'manager' },
+      { m:'POST', p:'/sales-returns', d:'Create — restore stock + apply refund', r:'all' },
+    ],
+    code:`// Refund routing
+if (refundMethod === 'cash') {
+  // no balance update — pay at counter
+} else if (refundMethod === 'wallet') {
+  customer.walletBalance += totalAmount;
+} else if (refundMethod === 'loyalty_points') {
+  const pts = Math.floor(totalAmount);
+  customer.loyaltyPoints += pts;
+  // writes LoyaltyTransaction record
+}` },
+
+  { icon:'📊', name:'Stock Adjustment',  cat:'Inventory',status:'done', eps:4,
+    desc:'Manual stock level corrections. Every adjustment is immutably logged — who changed, what, when, and why. Used for damage write-offs, counting corrections, and opening stock.',
+    features:['Manual +/- stock adjustment per product','Reason codes: restock / manual_adjustment / damage / return','Every change writes immutable StockLog entry','Low-stock alert emitted via Socket.io after adjust','Manager+ role required for manual adjustments','Real-time stock broadcast to all connected devices','Bulk adjust planned (Phase 2)','Full audit trail with user and timestamp'],
+    endpoints:[
+      { m:'GET',  p:'/inventory/stock',    d:'All products with current stock levels', r:'all' },
+      { m:'GET',  p:'/inventory/low-stock',d:'Products at or below alert threshold', r:'manager' },
+      { m:'GET',  p:'/inventory/logs',     d:'Full stock audit trail (paginated)', r:'manager' },
+      { m:'POST', p:'/inventory/adjust',   d:'Manual stock adjustment', r:'manager' },
+    ],
+    code:`// stockService.js — called for EVERY mutation
+async function adjustStock(
+  productId, delta, reason,
+  userId, orderId, note, session
+) {
+  // 1. findByIdAndUpdate $inc stock
+  // 2. Validate stock >= 0
+  // 3. Create StockLog document
+  // 4. Return updated product
+}` },
+
+  { icon:'🔀', name:'Stock Transfer',    cat:'Inventory',status:'new', eps:4,
+    desc:'Move stock between store branches. Two-phase process: source deducts stock immediately; destination confirms receipt to add stock on their side.',
+    features:['Two-phase: initiate (source) → receive (destination)','Source stock deducted immediately on initiate','Destination stock added only on confirmation','Status flow: pending → in_transit → received/cancelled','StockLog written at both ends (deduct + restock)','Manager-level access at both stores required','Full transfer history with who sent, who received','Notes field for transfer documentation'],
+    endpoints:[
+      { m:'GET',  p:'/stock-transfers',          d:'List transfers (both sent and received)', r:'manager' },
+      { m:'GET',  p:'/stock-transfers/:id',      d:'Get transfer detail with items', r:'manager' },
+      { m:'POST', p:'/stock-transfers',          d:'Initiate transfer — deducts source stock', r:'manager' },
+      { m:'PUT',  p:'/stock-transfers/:id/receive',d:'Receive — adds to destination stock', r:'manager' },
+    ],
+    code:`// Phase 1: source store initiates
+adjustStock(-qty, 'manual_adjustment', ...)
+StockTransfer.status = 'in_transit'
+
+// Phase 2: destination store confirms
+adjustStock(+qty, 'restock', ...)
+StockTransfer.status = 'received'
+StockTransfer.receivedBy = userId` },
+
+  /* HR */
+  { icon:'💳', name:'Credit Customer',   cat:'HR',       status:'new', eps:3,
+    desc:'Give selected customers a credit limit. They can buy on credit up to their limit and repay later. Credit balance flows into accounting receivables.',
+    features:['Per-customer credit limit (manager sets)','creditBalance tracks total amount owed by customer','Credit used at POS if payment method = "credit"','Prevent purchase if creditBalance + total > creditLimit','Record repayments via dedicated endpoint','Overpayment auto-moves to wallet balance','Credit balance feeds into Accounting Receivables report','Full payment history per customer'],
+    endpoints:[
+      { m:'GET',  p:'/customers',                    d:'List customers with credit balance', r:'all' },
+      { m:'POST', p:'/customers/:id/credit/payment', d:'Record customer credit repayment', r:'manager' },
+      { m:'PUT',  p:'/customers/:id',                d:'Update credit limit', r:'manager' },
+    ],
+    code:`// At POS checkout (credit payment)
+const newBalance = customer.creditBalance + total;
+if (newBalance > customer.creditLimit)
+  throw 'Credit limit exceeded';
+customer.creditBalance += total;
+
+// Repayment
+customer.creditBalance -= payment;
+if (customer.creditBalance < 0) {
+  // Overpayment → wallet
+  customer.walletBalance += Math.abs(credit);
+  customer.creditBalance = 0;
+}` },
+
+  { icon:'💸', name:'Expenses',          cat:'HR',       status:'new', eps:5,
+    desc:'Record operational expenses by type. Used in Profit & Loss calculations. Expense types are customizable — create Rent, Electricity, Salary, etc.',
+    features:['Expense type categories (fully customizable)','6 seed types: Rent, Electricity, Transport, Salary, Maintenance, Miscellaneous','Record date, amount, payment method, reference number','Payment methods: cash / bank / mobile banking','Date-range expense reports and totals','Used in P&L: Profit = Revenue − COGS − Expenses','Manager-level access to create/view expenses','Admin required to delete'],
+    endpoints:[
+      { m:'GET',    p:'/expenses/types',    d:'List all expense types', r:'all' },
+      { m:'POST',   p:'/expenses/types',    d:'Create custom expense type', r:'manager' },
+      { m:'DELETE', p:'/expenses/types/:id',d:'Remove expense type', r:'admin' },
+      { m:'GET',    p:'/expenses',          d:'List expenses (date range, type filter)', r:'manager' },
+      { m:'POST',   p:'/expenses',          d:'Record new expense', r:'manager' },
+    ],
+    code:`Expense: {
+  expenseTypeId, storeId,
+  createdBy,
+  amount, description,
+  date, paymentMethod,
+  reference  // receipt or cheque no.
+}
+// Used in P&L aggregation pipeline` },
+
+  { icon:'🎟️', name:'Vouchers',          cat:'HR',       status:'new', eps:4,
+    desc:'Create discount voucher codes. Flat or percentage discounts with usage limits, validity dates, and minimum order values. Validated at POS before applying.',
+    features:['Flat (৳) or percentage (%) discount types','Usage limit — 1-use, multi-use, or unlimited','Valid-from and valid-until dates','Minimum order value before voucher applies','Maximum discount cap for percentage vouchers','Per-customer vouchers or public codes','Validate endpoint returns remaining uses + rules','Cashier validates at POS before applying discount'],
+    endpoints:[
+      { m:'GET',    p:'/vouchers',               d:'List all vouchers with stats', r:'manager' },
+      { m:'GET',    p:'/vouchers/validate/:code', d:'Validate code at POS — returns discount amount', r:'all' },
+      { m:'POST',   p:'/vouchers',               d:'Create new voucher', r:'manager' },
+      { m:'PUT',    p:'/vouchers/:id',            d:'Update or deactivate voucher', r:'manager' },
+    ],
+    code:`// Validate endpoint response
+{ valid: true,
+  code: 'SAVE10',
+  type: 'percent', value: 10,
+  discountAmount: 45.50, // computed
+  remaining: 47,
+  minOrderValue: 200 }
+// Frontend applies if valid: true` },
+
+  { icon:'💼', name:'Payroll',            cat:'HR',       status:'new', eps:3,
+    desc:'Monthly salary processing for all staff. One payroll entry per employee per month. Net salary calculated automatically. Manager creates, admin marks paid.',
+    features:['One payroll per user per month per year (enforced unique index)','Basic salary + bonus + deductions fields','netSalary auto-calculated on save','Payment method: cash / bank / mobile','Mark as paid with payment date','Manager creates payroll entries','Admin marks payroll as paid','Payroll feeds into expense calculations for staff cost'],
+    endpoints:[
+      { m:'GET',  p:'/payroll',        d:'List payroll records (filter by month/year/status)', r:'manager' },
+      { m:'GET',  p:'/payroll/:id',    d:'Get single payroll record', r:'manager' },
+      { m:'POST', p:'/payroll',        d:'Create payroll entry for employee', r:'manager' },
+      { m:'PUT',  p:'/payroll/:id/pay',d:'Mark payroll as paid with date', r:'admin' },
+    ],
+    code:`// Unique enforcement
+Payroll.index({
+  userId:1, month:1,
+  year:1, storeId:1
+}, { unique: true });
+// Prevents double-paying same employee/month
+
+netSalary = basicSalary + bonus - deductions;` },
+
+  /* Reports */
+  { icon:'📈', name:'POS Reports',       cat:'Reports',  status:'done', eps:5,
+    desc:'Sales analytics via MongoDB aggregation pipelines. All reports are real-time — no pre-computed caches. Date filters, cashier filters, and product drill-downs.',
+    features:['Daily summary: total orders, revenue, profit, discount, tax','Date-range report with same metrics over any period','Top products by quantity sold and by revenue','Hourly sales breakdown to identify peak hours','Per-cashier performance: orders, revenue, average order value','All via MongoDB aggregation — computed fresh each request','Profit = Σ total − Σ costTotal (using cost snapshots in orders)','Export to PDF/Excel planned (Phase 2)'],
+    endpoints:[
+      { m:'GET', p:'/reports/daily',              d:'Daily summary for date (default: today)', r:'manager' },
+      { m:'GET', p:'/reports/range',              d:'Summary for startDate to endDate', r:'manager' },
+      { m:'GET', p:'/reports/top-products',       d:'Top sellers by qty or revenue', r:'manager' },
+      { m:'GET', p:'/reports/hourly',             d:'Hourly breakdown for a given date', r:'manager' },
+      { m:'GET', p:'/reports/cashier-performance',d:'Per-cashier stats for date range', r:'admin' },
+    ],
+    code:`// Profit calculation (per order)
+costTotal = Σ (costPrice × qty)
+// snapshot taken at checkout time
+// so price changes don't affect history
+
+// Daily aggregation
+{ totalSales, totalOrders,
+  totalProfit: totalSales - totalCost,
+  totalDiscount, totalTax, avgOrderValue }` },
+
+  { icon:'🕐', name:'Shift Closing',     cat:'Reports',  status:'new', eps:4,
+    desc:'Cashiers open a shift with a cash count and close with another count. The system computes expected cash from sales and flags any discrepancy.',
+    features:['Open shift: enter opening cash amount in drawer','Track all orders, returns, discounts during shift','System computes expectedCash from cashSales − returns','Cashier enters closingCash (physical count)','cashDifference = closingCash − expectedCash','Positive = cashier has more (over) / Negative = short','Manager views all shifts and cash differences','Shift report shows breakdown by payment method'],
+    endpoints:[
+      { m:'GET',  p:'/shifts/active', d:'Check if cashier has an open shift', r:'all' },
+      { m:'POST', p:'/shifts/open',   d:'Open new shift with opening cash', r:'all' },
+      { m:'POST', p:'/shifts/close',  d:'Close shift with physical cash count', r:'all' },
+      { m:'GET',  p:'/shifts',        d:'All shifts with differences (paginated)', r:'manager' },
+    ],
+    code:`// On close:
+expectedCash = openingCash
+  + shift.cashSales
+  - shift.cashReturns
+cashDifference = closingCash - expectedCash
+// +ve = over, -ve = short
+// Stored on Shift document permanently` },
+
+  { icon:'📒', name:'Accounting',        cat:'Reports',  status:'new', eps:5,
+    desc:'Full double-entry style reports aggregated from all system data. P&L, balance sheet, cash flow, payables, and receivables — all from MongoDB aggregation pipelines.',
+    features:['Profit & Loss: Revenue − COGS − Expenses = Net Profit','Balance Sheet: Assets (cash + receivables + inventory) vs Liabilities (payables)','Cash Flow: Operating (sales − expenses) + Investing + Financing','Payables: per-supplier outstanding balance ledger','Receivables: per-customer outstanding credit ledger','All date-range filterable','Data sourced from: Orders, Purchases, Expenses, Payroll, Customers, Suppliers','Export planned (Phase 2)'],
+    endpoints:[
+      { m:'GET', p:'/accounting/profit-loss',  d:'P&L statement for date range', r:'manager' },
+      { m:'GET', p:'/accounting/balance-sheet',d:'Balance sheet snapshot', r:'admin' },
+      { m:'GET', p:'/accounting/cash-flow',    d:'Cash flow for date range', r:'manager' },
+      { m:'GET', p:'/accounting/payables',     d:'Supplier payables ledger', r:'manager' },
+      { m:'GET', p:'/accounting/receivables',  d:'Customer receivables ledger', r:'manager' },
+    ],
+    code:`// P&L aggregation
+revenue   = Σ order.total       (status:completed)
+cogs      = Σ order.costTotal
+grossProfit = revenue - cogs
+
+expenses  = Σ expense.amount
+payroll   = Σ payroll.netSalary
+netProfit = grossProfit - expenses - payroll` },
+
+  { icon:'📜', name:'Stock Audit Logs',  cat:'Reports',  status:'done', eps:1,
+    desc:'Every stock change ever made is logged in StockLog. Immutable records with who, when, why, and the delta. Essential for inventory discrepancy investigations.',
+    features:['Every stock change creates one StockLog per item','Fields: productId, storeId, delta, reason, changedBy, orderId, note','Reason codes: sale / restock / return / manual_adjustment / damage','Linked to Order or Purchase ID for full traceability','Filter by product, reason, user, or date range','Paginated (default 50 per page)','Cannot be edited or deleted — immutable audit trail','Exported in accounting investigation tools (Phase 2)'],
+    endpoints:[
+      { m:'GET', p:'/inventory/logs', d:'Full stock audit log (paginated, filterable)', r:'manager' },
+    ],
+    code:`StockLog: {
+  productId, storeId,
+  delta: -2,        // negative = removed
+  reason: 'sale',
+  changedBy: userId,
+  orderId: orderId, // or purchaseId
+  note: null,
+  createdAt: Date   // auto-indexed
+}` },
+
+  { icon:'💹', name:'P&L + Cash Flow',   cat:'Reports',  status:'new', eps:5,
+    desc:'Financial performance reports aggregated across all data. The P&L uses cost snapshots from orders so historical profit is accurate even if prices change.',
+    features:['Gross profit = Revenue − COGS','Net profit = Gross profit − Expenses − Payroll','Cash flow: tracks all monetary in/out movements','Operating activities: sales, expenses, payroll','Investing activities: equipment, purchases','Financing activities: bank transfers, loans','Supplier payables aging (30 / 60 / 90 days)','Customer receivables aging breakdown'],
+    endpoints:[
+      { m:'GET', p:'/accounting/profit-loss',  d:'P&L with gross and net profit', r:'manager' },
+      { m:'GET', p:'/accounting/balance-sheet',d:'Snapshot of assets vs liabilities', r:'admin' },
+      { m:'GET', p:'/accounting/cash-flow',    d:'Operating + investing + financing summary', r:'manager' },
+      { m:'GET', p:'/accounting/payables',     d:'Supplier payables with aging buckets', r:'manager' },
+      { m:'GET', p:'/accounting/receivables',  d:'Customer receivables with aging', r:'manager' },
+    ],
+    code:`// Cash Flow — operating
+inflows  = Σ order.total (cash payments)
+          + Σ customer credit payments
+outflows = Σ expense.amount
+          + Σ supplier payments
+          + Σ payroll.netSalary
+
+operatingCashFlow = inflows - outflows` },
+];
+
+/* ─────────────────────────────────────────────
+   FLOW DATA
+───────────────────────────────────────────── */
+const flows = {
+  checkout: {
+    label:'🛒 Checkout', title:'POS Checkout Flow',
+    desc:'From barcode scan to printed receipt. The checkout itself (POST /orders) runs inside a MongoDB transaction — if any item has insufficient stock, the entire operation rolls back.',
+    steps:[
+      { n:1, title:'Open Shift',           type:'api',  tag:'POST', path:'/shifts/open',
+        desc:'Cashier opens a new shift at start of day with opening cash amount.',
+        req:'{ openingCash: 1500 }',
+        res:'{ shift: { _id, cashierId, openedAt, openingCash, status:"open" } }',
+        notes:['Required before processing any orders','Only one open shift per cashier at a time','Stores openingCash for end-of-day reconciliation'] },
+      { n:2, title:'Find Customer (optional)', type:'api', tag:'GET', path:'/customers?search=phone',
+        desc:'Search for customer by name, phone, or loyalty card to attach to the order.',
+        req:'GET /customers?search=01800',
+        res:'{ customers: [{ _id, name, walletBalance, loyaltyPoints, creditBalance }] }',
+        notes:['Optional — orders can be anonymous','Attaching customer enables wallet, credit, and points','Loyalty card scan triggers this search'] },
+      { n:3, title:'Scan Product',          type:'api',  tag:'GET', path:'/products/barcode/:code',
+        desc:'Fastest route in the system. Input auto-focuses after each scan. Returns product snapshot with stock level.',
+        req:'GET /products/barcode/8901030862533',
+        res:'{ product: { _id, name, sellingPrice, stock, unit } }\n// costPrice hidden for cashier role',
+        notes:['404 response → trigger "Create Product" popup','costPrice stripped from response for cashier role','Stock level shown so cashier knows availability'] },
+      { n:4, title:'Build Cart (frontend)',  type:'local',tag:'LOCAL',path:'cartStore.addItem()',
+        desc:'No API call. Cart is managed in React state / Zustand store. Running total recalculated instantly.',
+        req:'// No HTTP request\ncartStore.addItem(product, qty=1)',
+        res:'// Cart updates instantly in UI\n{ items: [...], subtotal, discount, tax, total }',
+        notes:['Zero network latency — pure frontend calculation','Scanning same barcode increments qty automatically','Cart persisted to localStorage (survives page refresh)'] },
+      { n:5, title:'Apply Voucher (optional)',type:'api', tag:'GET', path:'/vouchers/validate/:code',
+        desc:'Validate voucher code before applying. Returns computed discount amount.',
+        req:'GET /vouchers/validate/SAVE10',
+        res:'{ valid: true, type:"percent", value:10,\n  discountAmount: 45.50, remaining: 47 }',
+        notes:['Only apply if valid: true in response','Discount amount computed server-side to prevent manipulation','usedCount increments on successful checkout'] },
+      { n:6, title:'Checkout',              type:'api',  tag:'POST',path:'/orders',
+        desc:'THE core endpoint. Starts a MongoDB transaction. Validates all stock, deducts, saves order, and generates QR in one atomic operation.',
+        req:'{\n  items: [{ productId, qty }],\n  discount: { type:"flat", value:50 },\n  payment: [{ method:"cash", amount:210 }],\n  customerId: "...",  // optional\n  shiftId: "..."      // optional\n}',
+        res:'{\n  order: { _id, orderNumber, items, total },\n  receipt: { qrToken, qrUrl, storeName }\n}',
+        notes:['MongoDB transaction: stock deduct + order save + QR — atomic','Payment sum must equal computed total (± 0.01 tolerance)','costTotal snapshot saved for accurate future profit calculations','Socket.io "order:new" event broadcast to all store devices'] },
+      { n:7, title:'Print Receipt',         type:'ipc',  tag:'IPC', path:'ipcMain.handle("print-receipt")',
+        desc:'Electron IPC call from renderer to main process. Silent print — no dialog. Thermal printer receives ESC/POS formatted data.',
+        req:'window.ipcRenderer.invoke(\n  "print-receipt", { order, store }\n)',
+        res:'{ success: true, printedAt: timestamp }',
+        notes:['Silent printing — cashier never sees print dialog','QR code rendered as SVG then converted to bitmap for thermal printer','Auto-triggered after successful checkout response'] },
+      { n:8, title:'Close Shift',           type:'api',  tag:'POST',path:'/shifts/close',
+        desc:'End of day — cashier counts cash in drawer and submits. System computes expected vs actual and flags any difference.',
+        req:'{ closingCash: 1680 }',
+        res:'{ shift: { expectedCash:1672, closingCash:1680,\n  cashDifference:+8, totalSales:342 } }',
+        notes:['cashDifference = closingCash − expectedCash','Positive = cashier has more than expected (over)','Negative = cashier has less (short) — investigate'] },
+    ]
+  },
+  purchase: {
+    label:'🛍️ Purchase', title:'Purchase from Supplier',
+    desc:'Buying stock from a supplier. Everything in step 3 (POST /purchases) is wrapped in a MongoDB transaction — if stock update fails for any item, the purchase document is not saved and the supplier balance is not changed.',
+    steps:[
+      { n:1, title:'Select Supplier',       type:'api',  tag:'GET', path:'/suppliers',
+        desc:'Search or browse supplier list to select for this purchase.',
+        req:'GET /suppliers?search=Agro',
+        res:'{ suppliers: [{ _id, name, company, currentBalance }] }',
+        notes:['currentBalance shows what you currently owe this supplier','Filter by name or company name','Create supplier first if not exists'] },
+      { n:2, title:'Add Purchase Items',    type:'local',tag:'LOCAL',path:'purchaseCart.addItem()',
+        desc:'Build the purchase cart: select products, enter quantity and cost price. Cost price can differ from stored cost price (e.g. price negotiated for this delivery).',
+        req:'// Frontend cart — no API\npurchaseCart.add({ productId, name, qty,\n  costPrice, expiryDate })',
+        res:'// UI updates with line totals\nsubtotal = Σ (costPrice × qty)',
+        notes:['Cost price entered manually for each purchase','Can differ from existing product.costPrice','expiryDate per item for perishable stock management'] },
+      { n:3, title:'Create Purchase',       type:'api',  tag:'POST',path:'/purchases',
+        desc:'Atomic MongoDB transaction: increment stock for all items, save purchase document, update supplier balance.',
+        req:'{\n  supplierId: "...",\n  items: [{ productId, name, qty, costPrice }],\n  discount: 0, tax: 0,\n  amountPaid: 500,\n  paymentMethod: "cash",\n  notes: "Delivery note #123"\n}',
+        res:'{ purchase: { _id, purchaseNumber:"PUR-20250501-0001",\n  total:1200, balanceDue:700,\n  paymentStatus:"partial" } }',
+        notes:['MongoDB transaction — atomic stock + supplier update','StockLog written for each item (reason: restock)','paymentStatus: unpaid | partial | paid','balanceDue = total − amountPaid → added to Supplier.currentBalance'] },
+      { n:4, title:'Record Further Payment',type:'api',  tag:'PUT', path:'/purchases/:id/payment',
+        desc:'If purchase was on credit, record payments over time. Each payment reduces supplier balance.',
+        req:'PUT /purchases/:id/payment\n{ amount: 300 }',
+        res:'{ purchase: { amountPaid:800, balanceDue:400,\n  paymentStatus:"partial" } }',
+        notes:['Can be called multiple times until fully paid','Supplier.currentBalance decrements by amount paid','paymentStatus auto-updates to "paid" when balanceDue reaches 0'] },
+    ]
+  },
+  return: {
+    label:'🔙 Sales Return', title:'Customer Sales Return',
+    desc:'Processing a customer return. Stock is restored and the refund is applied in the customer\'s preferred method — all inside a MongoDB transaction.',
+    steps:[
+      { n:1, title:'Find Original Order (optional)', type:'api', tag:'GET', path:'/orders/:id',
+        desc:'Look up the original order if customer has receipt or order number.',
+        req:'GET /orders/ORD-20250501-0042\n// or scan QR token from receipt',
+        res:'{ order: { _id, items, total, createdAt, cashierId } }',
+        notes:['Optional — can process return without original order reference','QR scan on printed receipt can link to this order','orderId stored on SalesReturn for audit trail'] },
+      { n:2, title:'Select Return Items',   type:'local',tag:'LOCAL',path:'returnCart.add()',
+        desc:'Cashier selects which items from the order are being returned, and in what quantity. Partial returns are fully supported.',
+        req:'// Frontend — no API\nreturnCart.add({ productId, name,\n  qty, unitPrice })',
+        res:'// Total computed in UI\ntotalAmount = Σ (unitPrice × qty)',
+        notes:['Partial returns: any subset of original items','Qty to return can be less than ordered qty','unitPrice fetched from original order snapshot'] },
+      { n:3, title:'Select Refund Method',  type:'local',tag:'LOCAL',path:'UI selection',
+        desc:'Choose how the customer receives their refund: physical cash, wallet credit, or loyalty points.',
+        req:'// Frontend selection\nrefundMethod: "cash" | "wallet" | "loyalty_points"',
+        res:'// No API call yet\n// walletBalance / points shown if customer attached',
+        notes:['Cash: no balance update — pay at counter','Wallet: customer can use next purchase','Loyalty points: 1 point per ৳1 returned (configurable)'] },
+      { n:4, title:'Create Return',         type:'api',  tag:'POST',path:'/sales-returns',
+        desc:'Atomic transaction: restore stock for all returned items, apply refund to customer account.',
+        req:'{\n  orderId: "...",      // optional\n  customerId: "...",  // optional\n  items: [{ productId, qty, unitPrice }],\n  refundMethod: "wallet",\n  reason: "Damaged item"\n}',
+        res:'{ salesReturn: { _id, returnNumber:"SRN-123456-001",\n  totalAmount:120, refundMethod:"wallet" } }',
+        notes:['MongoDB transaction — stock restore + refund atomic','StockLog written per item (reason: return)','If wallet: customer.walletBalance += totalAmount','If points: customer.loyaltyPoints += floor(totalAmount)','LoyaltyTransaction record created for points refund'] },
+    ]
+  },
+  shift: {
+    label:'🕐 Shift Close', title:'POS Shift Opening & Closing',
+    desc:'Cashiers open a shift at start of day with a physical cash count, and close at end of day with another count. The system calculates expected cash from sales and reveals any discrepancy.',
+    steps:[
+      { n:1, title:'Count Opening Cash',    type:'local',tag:'LOCAL',path:'cashier counts drawer',
+        desc:'Cashier physically counts cash in the POS drawer before starting their shift.',
+        req:'// Physical action\n// Count notes and coins\n// Enter total in system',
+        res:'// Ready to open shift',
+        notes:['This is the baseline for the day\'s cash reconciliation','Should match handover from previous cashier','Discrepancies noted before shift starts'] },
+      { n:2, title:'Open Shift',            type:'api',  tag:'POST',path:'/shifts/open',
+        desc:'Create a new open shift record with the opening cash count.',
+        req:'{ openingCash: 1500 }',
+        res:'{ shift: { _id, cashierId, openedAt, openingCash,\n  status:"open", storeId } }',
+        notes:['Only one open shift per cashier at a time','System validates no existing open shift','shiftId can optionally be attached to orders during shift'] },
+      { n:3, title:'Process Orders',        type:'local',tag:'LOCAL',path:'normal POS operations',
+        desc:'Cashier processes sales throughout the shift. Each order tracks which payment methods were used.',
+        req:'// All orders processed normally\n// Shift tracks: cashSales, mobileSales,\n// cardSales, totalOrders, totalReturns',
+        res:'// Shift totals updated in real-time',
+        notes:['Orders are not directly linked to shift in this version','Shift totals computed from order timestamps within shift time window','Returns during shift reduce totalSales and cashSales accordingly'] },
+      { n:4, title:'Count Closing Cash',    type:'local',tag:'LOCAL',path:'cashier counts drawer',
+        desc:'At end of shift, cashier counts all physical cash in the drawer.',
+        req:'// Physical action\n// Expected = openingCash + cashSales − cashReturns\n// Actual = what cashier physically counts',
+        res:'// Ready to close shift',
+        notes:['Should equal: openingCash + all cash received − all cash given in returns','Any difference (over or short) will be flagged','Common causes: wrong change given, theft, miscounting'] },
+      { n:5, title:'Close Shift',           type:'api',  tag:'POST',path:'/shifts/close',
+        desc:'Submit the closing cash count. System computes expected, calculates difference, and saves the shift report.',
+        req:'{ closingCash: 1680, notes:"Counted twice" }',
+        res:'{ shift: {\n  openingCash: 1500,\n  closingCash: 1680,\n  expectedCash: 1672,  // computed\n  cashDifference: +8,  // over by 8\n  totalSales: 3420,\n  totalOrders: 28,\n  cashSales: 2100,\n  mobileSales: 1320,\n  status: "closed"\n} }',
+        notes:['expectedCash = openingCash + cashSales − cashReturns','cashDifference = closingCash − expectedCash','Positive difference = cashier has more than expected','Negative difference = cashier has less (shortage)','Manager sees all shifts and can investigate differences'] },
+    ]
+  },
+  qr: {
+    label:'🔲 QR Verify', title:'QR Receipt Verification',
+    desc:'Customer scans the QR code on their receipt. The web viewer verifies the HMAC signature, checks the TTL, fetches the order, and displays receipt details — without exposing cost prices or margins.',
+    steps:[
+      { n:1, title:'Customer Scans QR',     type:'local',tag:'—',   path:'phone camera',
+        desc:'Customer points any phone camera at the QR code on their printed receipt. No app installation required.',
+        req:'// Physical action — camera scan\n// QR contains encoded URL:\n// https://receipt.domain.com/r/{token}',
+        res:'// Browser opens receipt URL',
+        notes:['Works with any phone camera — iOS and Android native','No app download required — just a URL','QR code is generated at checkout and printed immediately'] },
+      { n:2, title:'Fetch Receipt',         type:'api',  tag:'GET', path:'/orders/receipt/:token',
+        desc:'Public endpoint — no authentication required. Backend decodes and verifies the token before returning any data.',
+        req:'GET /api/v1/orders/receipt/eyJ...\n// No Authorization header needed',
+        res:'// Verified or rejected response\n// see steps 3-6 for detail',
+        notes:['This is the only unauthenticated data endpoint in the system','Rate limited to prevent token enumeration attacks','All verification happens server-side — client never sees raw orderId'] },
+      { n:3, title:'Decode Token',          type:'local',tag:'SYS', path:'qrService.verifyQrToken()',
+        desc:'Base64url decode the token to extract: orderId, timestamp, and HMAC signature.',
+        req:'// Token format (after decode)\n"orderId:timestamp:hmacSignature"',
+        res:'// Three components extracted\norderId = "66abc123..."\ntimestamp = 1714556400000\nhmac = "a3f8c2..."',
+        notes:['base64url decoding is URL-safe (no +/= characters)','Token is opaque to the client — just an encoded string','Malformed tokens return { valid:false, reason:"Malformed token" }'] },
+      { n:4, title:'Verify HMAC Signature', type:'local',tag:'SYS', path:'crypto.timingSafeEqual()',
+        desc:'Recompute the HMAC-SHA256 signature and compare with the one in the token using timing-safe comparison.',
+        req:'// Recompute\nexpected = HMAC-SHA256(QR_SECRET, orderId+":"+timestamp)\n// Compare\ncrypto.timingSafeEqual(token_hmac, expected)',
+        res:'// Match: continue\n// Mismatch: { valid:false, reason:"Token tampered" }',
+        notes:['timingSafeEqual prevents timing attacks that could reveal signature length','If ANY byte differs, the comparison fails','QR_SECRET is never exposed — only exists in server environment'] },
+      { n:5, title:'Check Token Age',       type:'local',tag:'SYS', path:'TTL validation',
+        desc:'Check that the token is not older than 30 days using the embedded timestamp.',
+        req:'const ageMs = Date.now() - Number(timestamp);\nconst ttlMs = 30 * 24 * 60 * 60 * 1000;\nif (ageMs > ttlMs) // expired',
+        res:'// Valid: token age ≤ 30 days\n// Expired: { valid:false, reason:"Token expired (30-day TTL)" }',
+        notes:['30-day TTL is configurable (TOKEN_TTL_DAYS constant)','Expired receipts return clear message — not a server error','Timestamp embedded in token prevents clock manipulation'] },
+      { n:6, title:'Return Receipt',        type:'api',  tag:'RES', path:'JSON response',
+        desc:'Fetch order from DB, strip all cost prices, populate store and cashier details, return with verification status.',
+        req:'// Order fetched from MongoDB\n// Populated: storeId (name, phone, logo)\n// Populated: cashierId (name)',
+        res:'{\n  status: "valid",\n  order: {\n    orderNumber, items, // costPrice removed\n    subtotal, discount, tax, total,\n    payment, createdAt,\n    store: { name, phone, address, logo },\n    cashier: { name }\n  }\n}',
+        notes:['costPrice field deleted from every item in response','Gross margin is never visible to customers','Store branding shown: name, phone, address, logo','Status field: "valid" | "tampered" | "expired"'] },
+    ]
+  }
+};
+
+const allEndpoints = [
+  { group:'Auth', routes:[
+    {m:'POST',p:'/api/v1/auth/login',      d:'Authenticate and receive JWT + refresh token', r:'public'},
+    {m:'POST',p:'/api/v1/auth/refresh',    d:'Exchange refresh token for new access token',  r:'public'},
+    {m:'POST',p:'/api/v1/auth/logout',     d:'Logout (client drops token)',                  r:'all'},
+    {m:'GET', p:'/api/v1/auth/me',         d:'Get current authenticated user profile',       r:'all'},
+  ]},
+  { group:'Users', routes:[
+    {m:'GET',  p:'/api/v1/users',   d:'List all users (paginated, role filter)',r:'admin'},
+    {m:'POST', p:'/api/v1/users',   d:'Create new user (any role)',             r:'admin'},
+    {m:'PUT',  p:'/api/v1/users/:id',d:'Update user details or password',      r:'admin'},
+    {m:'DELETE',p:'/api/v1/users/:id',d:'Soft deactivate user account',        r:'admin'},
+  ]},
+  { group:'Products', routes:[
+    {m:'GET',   p:'/api/v1/products',               d:'List (paginated, text search, category filter)',r:'all'},
+    {m:'GET',   p:'/api/v1/products/barcode/:code', d:'POS scan lookup — fastest endpoint',           r:'all'},
+    {m:'GET',   p:'/api/v1/products/:id',           d:'Get single product by ID',                     r:'all'},
+    {m:'POST',  p:'/api/v1/products',               d:'Create product',                               r:'manager'},
+    {m:'PUT',   p:'/api/v1/products/:id',           d:'Update product details',                       r:'manager'},
+    {m:'DELETE',p:'/api/v1/products/:id',           d:'Soft delete (isActive: false)',                r:'admin'},
+  ]},
+  { group:'Orders', routes:[
+    {m:'GET', p:'/api/v1/orders',               d:'List orders (date, cashier, status filter)',r:'manager'},
+    {m:'GET', p:'/api/v1/orders/:id',           d:'Get order detail with items',              r:'all'},
+    {m:'POST',p:'/api/v1/orders',               d:'Checkout — MongoDB transaction',           r:'all'},
+    {m:'PUT', p:'/api/v1/orders/:id/void',      d:'Void order + restore stock atomically',    r:'manager'},
+    {m:'GET', p:'/api/v1/orders/receipt/:token',d:'Public QR receipt (no auth required)',     r:'public'},
+  ]},
+  { group:'Categories', routes:[
+    {m:'GET',   p:'/api/v1/categories',     d:'List active categories',  r:'all'},
+    {m:'POST',  p:'/api/v1/categories',     d:'Create category',         r:'manager'},
+    {m:'PUT',   p:'/api/v1/categories/:id', d:'Rename category',         r:'manager'},
+    {m:'DELETE',p:'/api/v1/categories/:id', d:'Soft delete',             r:'admin'},
+  ]},
+  { group:'Inventory', routes:[
+    {m:'GET', p:'/api/v1/inventory/stock',    d:'All products with stock levels',       r:'all'},
+    {m:'GET', p:'/api/v1/inventory/low-stock',d:'Products at/below alert threshold',    r:'manager'},
+    {m:'GET', p:'/api/v1/inventory/logs',     d:'Full audit trail (paginated)',         r:'manager'},
+    {m:'POST',p:'/api/v1/inventory/adjust',   d:'Manual stock adjustment',              r:'manager'},
+  ]},
+  { group:'Suppliers', routes:[
+    {m:'GET',   p:'/api/v1/suppliers',     d:'List (search by name/company/phone)',r:'manager'},
+    {m:'GET',   p:'/api/v1/suppliers/:id', d:'Get supplier + balance',             r:'manager'},
+    {m:'POST',  p:'/api/v1/suppliers',     d:'Create with opening balance',        r:'manager'},
+    {m:'PUT',   p:'/api/v1/suppliers/:id', d:'Update supplier',                    r:'manager'},
+    {m:'DELETE',p:'/api/v1/suppliers/:id', d:'Soft deactivate',                    r:'admin'},
+  ]},
+  { group:'Customers', routes:[
+    {m:'GET', p:'/api/v1/customers',                    d:'List (search name/phone/loyalty card)',r:'all'},
+    {m:'GET', p:'/api/v1/customers/:id',                d:'Get customer with all balances',      r:'all'},
+    {m:'POST',p:'/api/v1/customers',                    d:'Register new customer',               r:'all'},
+    {m:'PUT', p:'/api/v1/customers/:id',                d:'Update details / credit limit',       r:'manager'},
+    {m:'POST',p:'/api/v1/customers/:id/wallet/topup',   d:'Add funds to wallet',                 r:'manager'},
+    {m:'POST',p:'/api/v1/customers/:id/credit/payment', d:'Record credit repayment',             r:'manager'},
+    {m:'GET', p:'/api/v1/customers/:id/loyalty-history',d:'Points transaction history',          r:'all'},
+  ]},
+  { group:'Purchases', routes:[
+    {m:'GET', p:'/api/v1/purchases',              d:'List purchases (filter supplier, status, date)',r:'manager'},
+    {m:'GET', p:'/api/v1/purchases/:id',          d:'Get purchase detail',                          r:'manager'},
+    {m:'POST',p:'/api/v1/purchases',              d:'Create — atomic stock + supplier balance',      r:'manager'},
+    {m:'PUT', p:'/api/v1/purchases/:id/payment',  d:'Record supplier payment',                       r:'manager'},
+  ]},
+  { group:'Purchase Returns', routes:[
+    {m:'GET', p:'/api/v1/purchase-returns', d:'List purchase returns',                            r:'manager'},
+    {m:'POST',p:'/api/v1/purchase-returns', d:'Create — deduct stock + reduce supplier balance',  r:'manager'},
+  ]},
+  { group:'Sales Returns', routes:[
+    {m:'GET', p:'/api/v1/sales-returns', d:'List returns (date, cashier filter)',              r:'manager'},
+    {m:'POST',p:'/api/v1/sales-returns', d:'Create — restore stock + refund wallet/points',   r:'all'},
+  ]},
+  { group:'Quotations', routes:[
+    {m:'GET', p:'/api/v1/quotations',           d:'List quotations (status filter)',r:'all'},
+    {m:'GET', p:'/api/v1/quotations/:id',       d:'Get quotation detail',           r:'all'},
+    {m:'POST',p:'/api/v1/quotations',           d:'Create quotation',               r:'all'},
+    {m:'PUT', p:'/api/v1/quotations/:id',       d:'Update status or items',         r:'all'},
+    {m:'POST',p:'/api/v1/quotations/:id/convert',d:'Convert to order',             r:'all'},
+  ]},
+  { group:'Stock Transfers', routes:[
+    {m:'GET', p:'/api/v1/stock-transfers',             d:'List transfers (sent + received)',        r:'manager'},
+    {m:'GET', p:'/api/v1/stock-transfers/:id',         d:'Get transfer detail',                     r:'manager'},
+    {m:'POST',p:'/api/v1/stock-transfers',             d:'Initiate — deducts source stock',         r:'manager'},
+    {m:'PUT', p:'/api/v1/stock-transfers/:id/receive', d:'Confirm receipt — adds dest stock',       r:'manager'},
+  ]},
+  { group:'Shifts', routes:[
+    {m:'GET', p:'/api/v1/shifts/active', d:'Get cashier\'s open shift (if any)',r:'all'},
+    {m:'POST',p:'/api/v1/shifts/open',   d:'Open shift with opening cash count',r:'all'},
+    {m:'POST',p:'/api/v1/shifts/close',  d:'Close + compute cash reconciliation',r:'all'},
+    {m:'GET', p:'/api/v1/shifts',        d:'All shift history (paginated)',      r:'manager'},
+  ]},
+  { group:'Expenses', routes:[
+    {m:'GET',   p:'/api/v1/expenses/types',    d:'List expense type categories',r:'all'},
+    {m:'POST',  p:'/api/v1/expenses/types',    d:'Create expense type',         r:'manager'},
+    {m:'DELETE',p:'/api/v1/expenses/types/:id',d:'Remove expense type',         r:'admin'},
+    {m:'GET',   p:'/api/v1/expenses',          d:'List expenses (date/type filter)',r:'manager'},
+    {m:'POST',  p:'/api/v1/expenses',          d:'Record expense',              r:'manager'},
+    {m:'DELETE',p:'/api/v1/expenses/:id',      d:'Delete expense',              r:'admin'},
+  ]},
+  { group:'Vouchers', routes:[
+    {m:'GET', p:'/api/v1/vouchers',                d:'List vouchers with usage stats',r:'manager'},
+    {m:'GET', p:'/api/v1/vouchers/validate/:code', d:'Validate code at POS',          r:'all'},
+    {m:'POST',p:'/api/v1/vouchers',                d:'Create voucher',                r:'manager'},
+    {m:'PUT', p:'/api/v1/vouchers/:id',            d:'Update / deactivate',           r:'manager'},
+  ]},
+  { group:'Payroll', routes:[
+    {m:'GET', p:'/api/v1/payroll',        d:'List payroll (month/year/status filter)',r:'manager'},
+    {m:'GET', p:'/api/v1/payroll/:id',    d:'Get payroll record',                     r:'manager'},
+    {m:'POST',p:'/api/v1/payroll',        d:'Create payroll entry',                   r:'manager'},
+    {m:'PUT', p:'/api/v1/payroll/:id/pay',d:'Mark as paid with payment date',         r:'admin'},
+  ]},
+  { group:'Banking', routes:[
+    {m:'GET', p:'/api/v1/banking/accounts',                  d:'List accounts with balances',  r:'manager'},
+    {m:'POST',p:'/api/v1/banking/accounts',                  d:'Add bank account',              r:'admin'},
+    {m:'PUT', p:'/api/v1/banking/accounts/:id',              d:'Update account details',        r:'admin'},
+    {m:'GET', p:'/api/v1/banking/accounts/:id/transactions', d:'Transaction ledger',            r:'manager'},
+    {m:'POST',p:'/api/v1/banking/accounts/:id/deposit',      d:'Record deposit',                r:'manager'},
+    {m:'POST',p:'/api/v1/banking/accounts/:id/withdraw',     d:'Record withdrawal',             r:'manager'},
+    {m:'POST',p:'/api/v1/banking/transfer',                  d:'Account-to-account transfer',   r:'manager'},
+  ]},
+  { group:'Loyalty', routes:[
+    {m:'GET', p:'/api/v1/loyalty/settings', d:'Get program config (earn/redeem rates)',r:'all'},
+    {m:'PUT', p:'/api/v1/loyalty/settings', d:'Update points rates',                  r:'admin'},
+    {m:'POST',p:'/api/v1/loyalty/redeem',   d:'Redeem points for discount at POS',    r:'all'},
+    {m:'POST',p:'/api/v1/loyalty/adjust',   d:'Manual points adjustment',              r:'manager'},
+  ]},
+  { group:'Accounting', routes:[
+    {m:'GET',p:'/api/v1/accounting/profit-loss',  d:'P&L with gross + net profit',      r:'manager'},
+    {m:'GET',p:'/api/v1/accounting/balance-sheet',d:'Assets vs liabilities snapshot',   r:'admin'},
+    {m:'GET',p:'/api/v1/accounting/cash-flow',    d:'Operating cash flow for period',   r:'manager'},
+    {m:'GET',p:'/api/v1/accounting/payables',     d:'Supplier payables ledger + aging', r:'manager'},
+    {m:'GET',p:'/api/v1/accounting/receivables',  d:'Customer receivables + aging',     r:'manager'},
+  ]},
+  { group:'Salesman', routes:[
+    {m:'GET', p:'/api/v1/salesman',                 d:'List salesman',               r:'manager'},
+    {m:'GET', p:'/api/v1/salesman/:id',             d:'Get salesman profile',        r:'manager'},
+    {m:'GET', p:'/api/v1/salesman/:id/performance', d:'Sales + commission report',   r:'manager'},
+    {m:'POST',p:'/api/v1/salesman',                 d:'Add salesman',                r:'admin'},
+    {m:'PUT', p:'/api/v1/salesman/:id',             d:'Update salesman',             r:'admin'},
+  ]},
+  { group:'Reports', routes:[
+    {m:'GET',p:'/api/v1/reports/daily',              d:'Daily summary (default: today)',r:'manager'},
+    {m:'GET',p:'/api/v1/reports/range',              d:'Summary for startDate—endDate', r:'manager'},
+    {m:'GET',p:'/api/v1/reports/top-products',       d:'Top sellers by qty or revenue', r:'manager'},
+    {m:'GET',p:'/api/v1/reports/hourly',             d:'Hourly breakdown for a date',   r:'manager'},
+    {m:'GET',p:'/api/v1/reports/cashier-performance',d:'Per-cashier stats',             r:'admin'},
+  ]},
+  { group:'Barcodes', routes:[
+    {m:'GET', p:'/api/v1/barcodes/generate/:id',d:'Barcode data for one product', r:'all'},
+    {m:'POST',p:'/api/v1/barcodes/bulk',         d:'Bulk barcode data for sheet',  r:'manager'},
+  ]},
+];
+
+/* ─────────────────────────────────────────────
+   PERMISSIONS DATA
+───────────────────────────────────────────── */
+const permissions = [
+  { cat:'POS Operations' },
+  { name:'Process sales & checkout',  admin:'✓',manager:'✓',cashier:'✓' },
+  { name:'Scan products at POS',      admin:'✓',manager:'✓',cashier:'✓' },
+  { name:'Apply voucher codes',       admin:'✓',manager:'✓',cashier:'✓' },
+  { name:'Open/close own shift',      admin:'✓',manager:'✓',cashier:'✓' },
+  { name:'Process sales returns',     admin:'✓',manager:'✓',cashier:'✓' },
+  { name:'View order details',        admin:'✓',manager:'✓',cashier:'✓' },
+  { name:'Void orders',               admin:'✓',manager:'✓',cashier:'✗' },
+
+  { cat:'Inventory Management' },
+  { name:'View stock levels',         admin:'✓',manager:'✓',cashier:'✓' },
+  { name:'Create/edit products',      admin:'✓',manager:'✓',cashier:'✗' },
+  { name:'Delete products',           admin:'✓',manager:'✗',cashier:'✗' },
+  { name:'Manual stock adjustment',   admin:'✓',manager:'✓',cashier:'✗' },
+  { name:'Create purchases',          admin:'✓',manager:'✓',cashier:'✗' },
+  { name:'Stock transfers',           admin:'✓',manager:'✓',cashier:'✗' },
+  { name:'Manage suppliers',          admin:'✓',manager:'✓',cashier:'✗' },
+
+  { cat:'Customer & HR' },
+  { name:'View customers',            admin:'✓',manager:'✓',cashier:'✓' },
+  { name:'Create customers',          admin:'✓',manager:'✓',cashier:'✓' },
+  { name:'Set credit limits',         admin:'✓',manager:'✓',cashier:'✗' },
+  { name:'Top-up wallet',             admin:'✓',manager:'✓',cashier:'✗' },
+  { name:'Manage loyalty settings',   admin:'✓',manager:'✗',cashier:'✗' },
+  { name:'Manage salesman',           admin:'✓',manager:'VIEW',cashier:'✗' },
+  { name:'Create payroll',            admin:'✓',manager:'✓',cashier:'✗' },
+  { name:'Mark payroll paid',         admin:'✓',manager:'✗',cashier:'✗' },
+  { name:'Record expenses',           admin:'✓',manager:'✓',cashier:'✗' },
+  { name:'Manage vouchers',           admin:'✓',manager:'✓',cashier:'✗' },
+
+  { cat:'Reports & Finance' },
+  { name:'View POS reports',          admin:'✓',manager:'✓',cashier:'✗' },
+  { name:'View accounting reports',   admin:'✓',manager:'VIEW',cashier:'✗' },
+  { name:'Balance sheet access',      admin:'✓',manager:'✗',cashier:'✗' },
+  { name:'View cashier performance',  admin:'✓',manager:'✗',cashier:'✗' },
+  { name:'Banking transactions',      admin:'✓',manager:'✓',cashier:'✗' },
+  { name:'Add bank accounts',         admin:'✓',manager:'✗',cashier:'✗' },
+
+  { cat:'System Administration' },
+  { name:'User management (CRUD)',    admin:'✓',manager:'✗',cashier:'✗' },
+  { name:'System settings / store',  admin:'✓',manager:'✗',cashier:'✗' },
+  { name:'View cost prices',          admin:'✓',manager:'✓',cashier:'✗' },
+  { name:'View shift history (all)',  admin:'✓',manager:'✓',cashier:'OWN' },
+];
+
+const securityItems = [
+  { icon:'🔑', title:'JWT Authentication', body:'Access tokens (8h) + refresh tokens (30d). Tokens are stateless JWTs — no session storage. Silent re-authentication using refresh token before expiry.' },
+  { icon:'🔒', title:'bcrypt Password Hashing', body:'All passwords hashed with bcrypt at salt round 12 before storage. Plain passwords never appear in logs, DB, or API responses.' },
+  { icon:'🛡️', title:'Role-Based Access Control', body:'3 roles: admin, manager, cashier. allow() middleware wraps every route. Returns 403 with clear message on access denial.' },
+  { icon:'🚦', title:'Rate Limiting', body:'Auth endpoints: 20 req/15min (brute-force protection). All API routes: 300 req/min. Standard headers returned. Configurable via express-rate-limit.' },
+  { icon:'🪖', title:'Helmet.js Security Headers', body:'Sets X-Frame-Options, Content-Security-Policy, X-Content-Type-Options, HSTS, Referrer-Policy. Prevents clickjacking and MIME-type attacks.' },
+  { icon:'✅', title:'Joi Input Validation', body:'Every POST/PUT body validated with Joi schema. Unknown fields stripped (stripUnknown:true). All errors returned at once (abortEarly:false).' },
+  { icon:'💰', title:'Cost Price Protection', body:'costPrice field deleted from product/order responses for cashier-role users. Enforced at controller level — never just hidden in UI.' },
+  { icon:'🔲', title:'HMAC-SHA256 QR Tokens', body:'QR tokens contain orderId + timestamp + HMAC signature. crypto.timingSafeEqual() prevents timing attacks. 30-day TTL with embedded timestamp.' },
+  { icon:'⚛️', title:'MongoDB Transactions', body:'Checkout, purchase, void, return, and transfer all use MongoDB transactions. Failure at any step rolls back ALL changes atomically.' },
+];
+
+/* ─────────────────────────────────────────────
+   DEPLOYMENT DATA
+───────────────────────────────────────────── */
+const deployTargets = [
+  { icon:'☁️', name:'Backend API', sub:'Node.js + Express', items:[
+    'VPS (Ubuntu 22.04) / Render / Railway',
+    'PM2 process manager with cluster mode',
+    'Nginx reverse proxy + SSL termination',
+    'Let\'s Encrypt free SSL certificate',
+    'Auto-restart on crash (PM2)',
+    'Environment: NODE_ENV=production',
+    'Egress: MongoDB Atlas + Socket.io',
+  ]},
+  { icon:'🍃', name:'Database', sub:'MongoDB Atlas', items:[
+    'M10 cluster or higher (replica set)',
+    'Replica set required for transactions',
+    '20 indexed collections',
+    'Automated daily backups',
+    'Connection string via MONGO_URI env',
+    'VPC peering for production security',
+    'Atlas Search for full-text (optional)',
+  ]},
+  { icon:'🖥️', name:'Desktop App', sub:'Electron .exe', items:[
+    'electron-builder → Windows .exe installer',
+    'SQLite via better-sqlite3 (offline storage)',
+    'Auto-sync queue on network reconnect',
+    'Silent thermal printing via node-thermal-printer',
+    'IPC: main ↔ renderer for print + storage',
+    'Auto-updater via electron-updater',
+    'Supports 58mm and 80mm thermal printers',
+  ]},
+  { icon:'📱', name:'Mobile App', sub:'React Native + Expo', items:[
+    'Expo EAS Build → Android APK',
+    'AsyncStorage for offline data cache',
+    'React Native Camera for QR scanning',
+    'Socket.io-client for live updates',
+    'Inventory view + order history',
+    'iOS build available via Expo',
+    'OTA updates via Expo Updates',
+  ]},
+];
+
+const timeline = [
+  { wk:'W1–2', dt:' April 10–17', done:true, phase:'Phase 1', task:'Backend Foundation',
+    desc:'Node.js + Express setup, all 20 MongoDB schemas, JWT auth system, RBAC (3 roles), rate limiting, Joi validation, all 23 route groups wired up, seed script with demo data.',
+    chips:['Node.js', 'Express', 'MongoDB', 'JWT', 'Socket.io'] },
+  { wk:'W2–3', dt:'April 17–24', done:true, phase:'Phase 2', task:'POS Engine + Desktop Shell',
+    desc:'Electron + React POS screen, always-focused scan input, cart management (Zustand), live billing calculations, unknown barcode popup, hold order system.',
+    chips:['Electron', 'React', 'Zustand', 'ESC/POS'] },
+  { wk:'W3–4', dt:'April 28–May 5', done:false, phase:'Phase 3', task:'Billing + QR Receipt + Print',
+    desc:'Split payment modal, voucher application, HMAC-signed QR generation, web receipt viewer, tamper detection page, Electron IPC silent thermal printing.',
+    chips:['QR Code', 'HMAC', 'Thermal Print', 'Web Receipt'] },
+  { wk:'W4–5', dt:'May 5– Jun 2', done:false, phase:'Phase 4', task:'Inventory + Purchase System',
+    desc:'Supplier CRUD, Purchase with atomic stock (transaction), Purchase Return, Sales Return with wallet/points refund, Stock Transfer two-phase flow.',
+    chips:['Transactions', 'Stock Transfer', 'Purchase Return'] },
+  { wk:'W5–6', dt:'Jun 2–11', done:false, phase:'Phase 5', task:'HR + Customer Modules',
+    desc:'Credit customer system, wallet top-up, loyalty card + points engine, salesman commission tracking, payroll processing, expense management, voucher system.',
+    chips:['Loyalty', 'Payroll', 'Credit', 'Wallet', 'Expenses'] },
+  { wk:'W6–7', dt:'Jun 9–18', done:false, phase:'Phase 6', task:'Reports + Accounting Dashboard',
+    desc:'POS daily/range/hourly reports, shift close reconciliation, P&L statement, balance sheet, cash flow, payables/receivables, banking ledger, export PDF/Excel.',
+    chips:['Aggregation', 'P&L', 'Cash Flow', 'Banking'] },
+  { wk:'W7–8', dt:'Jun 16–25', done:false, phase:'Phase 7', task:'Mobile App + Real-Time',
+    desc:'React Native Expo app with inventory view and order history, AsyncStorage offline, QR scanner, Socket.io live dashboard sync, low-stock push alerts.',
+    chips:['React Native', 'Expo', 'Socket.io', 'AsyncStorage'] },
+  { wk:'W8', dt:'Jun 23–30', done:false, phase:'Phase 8', task:'QA + Deploy + Handover',
+    desc:'Full QA pass across all modules, Electron .exe build and installer, APK build via Expo EAS, VPS deployment with Nginx + PM2, MongoDB Atlas setup, handover docs.',
+    chips:['QA', '.exe Build', 'APK', 'VPS', 'Documentation'] },
+];
+
+/* ─────────────────────────────────────────────
+   PRO FEATURES DATA
+───────────────────────────────────────────── */
+const proFeatures = [
+  { icon:'🧠', title:'AI Demand Prediction', status:'planned', strip:'#7C3AED',
+    tagClasses:['c-purple'],tags:['AI/ML','Phase 3'],
+    desc:'Predict stockout dates based on 90-day sales velocity per product.',
+    detail:'Algorithm: sales_per_day = total_sold / 90. days_left = current_stock / sales_per_day. Alert threshold: 3 days. Displayed as: "Rice 1kg will run out in ~3 days at current sell rate." Integrates with low-stock notification system.' },
+  { icon:'📦', title:'Auto Restock Suggestions', status:'planned', strip:'#0F766E',
+    tagClasses:['c-teal'],tags:['Inventory AI','Phase 3'],
+    desc:'Suggest reorder quantities and timing based on sales history and supplier lead time.',
+    detail:'Formula: suggested_qty = (sales_per_day × lead_time_days × safety_factor) − current_stock. Safety factor configurable (default 1.5). Grouped by supplier for easy purchase order creation.' },
+  { icon:'💬', title:'WhatsApp Integration', status:'addon', strip:'#15803D',
+    tagClasses:['c-green'],tags:['WhatsApp Business API','Add-on'],
+    desc:'Send digital receipts to customers via WhatsApp immediately after checkout.',
+    detail:'Requires WhatsApp Business API key. Customer phone number must be on file. Message template: "Thank you for shopping at [Store]! View your receipt: [QR URL]". Also supports low-stock and payment reminders.' },
+  { icon:'🎯', title:'Advanced Loyalty Tiers', status:'planned', strip:'#B45309',
+    tagClasses:['c-amber'],tags:['CRM','Phase 3'],
+    desc:'Multi-tier loyalty: Silver, Gold, Platinum. Different earn rates and perks per tier.',
+    detail:'Tier thresholds configurable. Silver (0–999 pts): 1pt/৳1. Gold (1000–4999 pts): 1.5pt/৳1. Platinum (5000+ pts): 2pt/৳1. Birthday double-points. Tier downgrade after 12 months inactivity.' },
+  { icon:'🧾', title:'GST / VAT Engine', status:'ready', strip:'#1B3A6B',
+    tagClasses:['c-navy'],tags:['Tax','HSN Codes','Ready'],
+    desc:'Itemised tax calculation with HSN codes per product. Tax-inclusive and tax-exclusive pricing modes.',
+    detail:'configurable per store: tax rate, tax label, inclusive/exclusive mode. HSN code field on each product. Receipt shows: "Item: ৳100 + VAT 5% = ৳105". Tax breakdown on all reports and P&L.' },
+  { icon:'🏢', title:'Multi-Branch Management', status:'planned', strip:'#C2410C',
+    tagClasses:['c-coral'],tags:['Enterprise','Phase 4'],
+    desc:'Manage multiple store branches from a single admin panel with consolidated reporting.',
+    detail:'One MongoDB cluster, one schema. Admin sees all branches. Manager scoped to assigned store. Consolidated P&L across branches. Cross-branch stock transfer already built. Branch comparison reports.' },
+  { icon:'💳', title:'Card / Mobile Payment', status:'addon', strip:'#7C3AED',
+    tagClasses:['c-purple'],tags:['bKash','Nagad','Stripe','Add-on'],
+    desc:'Direct card and mobile banking payment integration with auto-reconciliation.',
+    detail:'BD: bKash, Nagad, Rocket API integration. International: Stripe, PayPal. Payment confirmed via webhook → order marked paid. Auto-reconciliation against banking records. QR-based payment screen for customers.' },
+  { icon:'📊', title:'Excel / PDF Export', status:'ready', strip:'#0F766E',
+    tagClasses:['c-teal'],tags:['Export','Phase 2','Ready'],
+    desc:'Export any report — sales, P&L, payroll, stock audit — to Excel (.xlsx) or PDF.',
+    detail:'Backend: exceljs for .xlsx, puppeteer/pdfkit for PDF. Frontend: download link returned by API. Available for: daily report, date-range report, payroll list, stock audit log, P&L statement, purchase history.' },
+  { icon:'🔔', title:'Push Notifications + Alerts', status:'planned', strip:'#B45309',
+    tagClasses:['c-amber'],tags:['Alerts','Phase 3'],
+    desc:'Low-stock alerts, shift-end reminders, payment-due alerts via push or email.',
+    detail:'Socket.io "lowstock:alert" event already implemented. Extension: connect to Firebase Cloud Messaging for mobile push. Email: Nodemailer + daily digest. Alert types: low stock, unpaid supplier invoice, shift not closed, customer credit overdue.' },
+  { icon:'📱', title:'Customer Self-Service App', status:'planned', strip:'#1B3A6B',
+    tagClasses:['c-navy'],tags:['React Native','Phase 4'],
+    desc:'Customer-facing mobile app to check loyalty points, order history, and wallet balance.',
+    detail:'Separate React Native app (not the admin mobile app). Customer logs in with phone number OTP. Views: loyalty points + history, wallet balance + top-up, purchase history + receipt QR, available vouchers.' },
+  { icon:'🎁', title:'Gift Card System', status:'planned', strip:'#15803D',
+    tagClasses:['c-green'],tags:['Gift Cards','Phase 3'],
+    desc:'Issue reloadable gift cards. Customers can purchase and redeem at POS.',
+    detail:'GiftCard model: code, balance, issuedTo, expiryDate. Sold like a product, redeemed like wallet. Track: purchased by, gifted to, redeemed by. Physical card with barcode or digital code via WhatsApp/SMS.' },
+  { icon:'📋', title:'Purchase Order Management', status:'planned', strip:'#C2410C',
+    tagClasses:['c-coral'],tags:['PO','Quotation to Purchase','Phase 3'],
+    desc:'Formal purchase order flow: draft PO → send to supplier → receive goods → auto-create purchase.',
+    detail:'PurchaseOrder model: status: draft → sent → partially_received → received. Receive items against PO → auto-triggers Purchase + stock increment. Supplier can view PO via shared link. Links to Quotation → PO → Purchase chain.' },
+];
+
+/* ═══════════════════════════════════════════
+   RENDER FUNCTIONS
+═══════════════════════════════════════════ */
+const cats = ['All','Core','Settings','Inventory','HR','Reports'];
+let activeCat = 'All', selMod = null, activeFlow = 'checkout', activeStep = 0;
+
+/* ─ Modules ─ */
+function renderModFilters() {
+  document.getElementById('mod-filters').innerHTML = cats.map(c =>
+    `<button class="filter-btn ${c===activeCat?'active':''}" onclick="setCat('${c}')">
+      ${c==='All'?'All Modules':c} <span style="opacity:.55;font-size:11px;margin-left:3px">${c==='All'?modules.length:modules.filter(m=>m.cat===c).length}</span>
+    </button>`
+  ).join('');
+}
+function setCat(c) {
+  activeCat = c; selMod = null;
+  document.getElementById('mod-detail').classList.remove('show');
+  renderModFilters(); renderModGrid();
+}
+function renderModGrid() {
+  const list = activeCat==='All' ? modules : modules.filter(m=>m.cat===activeCat);
+  document.getElementById('mod-grid').innerHTML = list.map(m => {
+    const ri = modules.indexOf(m);
+    const cc = catColors[m.cat];
+    return `<div class="mod-card ${selMod===ri?'sel':''}" style="--accent-color:${cc.strip}"
+               onclick="selModule(${ri})">
+      <div class="mod-icon-wrap" style="background:${cc.bg};">${m.icon}</div>
+      <div class="mod-name">${m.name}</div>
+      <div class="mod-cat">${m.cat}</div>
+      <div class="mod-foot">
+        <span class="mod-eps">${m.eps} endpoint${m.eps!==1?'s':''}</span>
+        <span class="status-pill ${m.status==='done'?'sp-done':'sp-new'}">${m.status==='done'?'Phase 1':'New'}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+function selModule(idx) {
+  selMod = idx; renderModGrid();
+  const m = modules[idx];
+  const cc = catColors[m.cat];
+  const detail = document.getElementById('mod-detail');
+  detail.innerHTML = `
+    <div class="mod-detail-header">
+      <div class="mod-detail-icon">${m.icon}</div>
+      <div style="flex:1">
+        <div class="mod-detail-title">${m.name}</div>
+        <div class="mod-detail-meta">
+          <span class="badge" style="background:${cc.bg};color:${cc.ic};border:1px solid ${cc.strip}30">${m.cat}</span>
+          <span class="badge ${m.status==='done'?'c-teal':'c-navy'}">${m.status==='done'?'✓ Phase 1':'★ New in v2'}</span>
+          <span class="badge c-ink">${m.eps} endpoint${m.eps!==1?'s':''}</span>
+        </div>
+        <div style="font-size:13px;color:var(--ink3);margin-top:8px;line-height:1.6;max-width:700px">${m.desc}</div>
+      </div>
+    </div>
+    <div class="mod-detail-body">
+      <div>
+        <div class="detail-col-title">Features</div>
+        ${m.features.map(f=>`<div class="feature-item">${f}</div>`).join('')}
+      </div>
+      <div>
+        <div class="detail-col-title">API Endpoints</div>
+        ${m.endpoints.map(e=>`
+          <div class="ep-row">
+            <div>
+              <span class="tag m-${e.m.toLowerCase()}">${e.m}</span>
+            </div>
+            <div>
+              <div class="ep-path">${e.p}</div>
+              <div class="ep-desc">${e.d} · <span class="tag r-${e.r}">${e.r}</span></div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+      <div>
+        <div class="detail-col-title">Logic / Code</div>
+        <div class="code-box">${m.code}</div>
+      </div>
+    </div>
+  `;
+  detail.classList.add('show');
+  setTimeout(()=>detail.scrollIntoView({behavior:'smooth',block:'nearest'}),50);
+}
+
+/* ─ Flow ─ */
+function renderFlowTabs() {
+  document.getElementById('flow-tabs').innerHTML = Object.entries(flows).map(([k,v])=>
+    `<button class="flow-tab ${k===activeFlow?'active':''}" onclick="setFlow('${k}')">${v.label}</button>`
+  ).join('');
+}
+function setFlow(k) { activeFlow=k; activeStep=0; renderFlowTabs(); renderFlow(); }
+
+const mClass = {GET:'m-get',POST:'m-post',PUT:'m-put',DELETE:'m-delete',LOCAL:'m-sys','—':'m-sys',SYS:'m-sys',RES:'m-get',IPC:'m-ipc',WS:'m-socket'};
+
+function renderFlow() {
+  const f = flows[activeFlow];
+  document.getElementById('flow-steps').innerHTML = f.steps.map((s,i)=>`
+    <div class="flow-step ${i===activeStep?'active-step':''}" onclick="setStep(${i})">
+      <div class="fstep-num-col">
+        <div class="fstep-num ${s.type==='api'?'api-n':''} ${i===activeStep?'key-n':''}">${s.n}</div>
+      </div>
+      <div class="fstep-body">
+        <div class="fstep-title">${s.title} <span class="tag ${mClass[s.tag]||'m-sys'}" style="font-size:9px">${s.tag}</span></div>
+        <div class="fstep-sub">${s.desc.length>70?s.desc.slice(0,70)+'…':s.desc}</div>
+      </div>
+    </div>
+  `).join('');
+  renderStepDetail();
+}
+function setStep(i) { activeStep=i; renderFlow(); }
+function renderStepDetail() {
+  const f = flows[activeFlow];
+  const s = f.steps[activeStep];
+  document.getElementById('flow-detail').innerHTML = `
+    <div class="fdp-title">${f.title}</div>
+    <div class="fdp-sub">${f.desc}</div>
+    <div class="fdp-method">
+      <div class="fdp-section-head">Current Step — ${s.n} of ${f.steps.length}</div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <span class="tag ${mClass[s.tag]||'m-sys'}" style="font-size:11px;padding:4px 10px">${s.tag}</span>
+        <span style="font-family:var(--mono);font-size:13px;color:var(--ink2);font-weight:500">${s.path}</span>
+      </div>
+      <div style="font-size:13px;color:var(--ink2);line-height:1.6">${s.desc}</div>
+    </div>
+    <div class="fdp-body-grid">
+      <div>
+        <div class="fdp-section-head">Request / Input</div>
+        <div class="req-box">${s.req}</div>
+      </div>
+      <div>
+        <div class="fdp-section-head">Response / Output</div>
+        <div class="res-box">${s.res}</div>
+      </div>
+    </div>
+    <div class="notes-list">
+      ${s.notes.map(n=>`<div class="note-item">${n}</div>`).join('')}
+    </div>
+  `;
+}
+
+/* ─ Endpoint table ─ */
+function renderEpTable() {
+  document.getElementById('ep-table-container').innerHTML =
+    allEndpoints.map(g=>`
+      <div style="margin-bottom:20px">
+        <div style="font-size:11px;font-weight:700;color:var(--navy);letter-spacing:.5px;margin-bottom:6px;display:flex;align-items:center;gap:8px">
+          ${g.group} <span class="badge c-navy">${g.routes.length}</span>
+        </div>
+        <table class="ep-table">
+          <thead><tr><th>Method</th><th>Path</th><th>Description</th><th>Access</th></tr></thead>
+          <tbody>${g.routes.map(r=>`
+            <tr>
+              <td><span class="tag ${mClass[r.m]||'m-sys'}">${r.m}</span></td>
+              <td class="mono">${r.p}</td>
+              <td>${r.d}</td>
+              <td><span class="tag ${r.r==='all'?'r-all':r.r==='admin'?'r-admin':r.r==='public'?'c-teal':'r-manager'}">${r.r}</span></td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    `).join('');
+}
+
+/* ─ Permissions ─ */
+function renderPermissions() {
+  const rows = permissions.map(p => {
+    if (p.cat) return `<tr><td class="perm-cat" colspan="4">${p.cat}</td></tr>`;
+    const cell = (v) => {
+      if (v==='✓') return `<td><span class="yes-mark">✓</span></td>`;
+      if (v==='✗') return `<td><span class="no-mark">✗</span></td>`;
+      return `<td><span class="partial">${v}</span></td>`;
+    };
+    return `<tr><td>${p.name}</td>${cell(p.admin)}${cell(p.manager)}${cell(p.cashier)}</tr>`;
+  }).join('');
+  document.getElementById('perm-table').innerHTML = `
+    <thead><tr>
+      <th style="text-align:left">Permission</th>
+      <th style="width:90px">👑 Admin</th>
+      <th style="width:90px">🗂️ Manager</th>
+      <th style="width:90px">🧑‍💻 Cashier</th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  `;
+  document.getElementById('sec-stack').innerHTML = securityItems.map(s=>`
+    <div class="sec-item">
+      <div class="sec-item-head">${s.icon} ${s.title}</div>
+      <div class="sec-item-body">${s.body}</div>
+    </div>
+  `).join('');
+}
+
+/* ─ Deploy ─ */
+function renderDeploy() {
+  document.getElementById('deploy-targets').innerHTML = deployTargets.map(t=>`
+    <div class="dt-card">
+      <div class="dt-header">
+        <div class="dt-icon">${t.icon}</div>
+        <div><div class="dt-name">${t.name}</div><div class="dt-sub">${t.sub}</div></div>
+      </div>
+      <div class="dt-body">
+        ${t.items.map(i=>`<div class="dt-item"><span class="dt-item-icon">·</span>${i}</div>`).join('')}
+      </div>
+    </div>
+  `).join('');
+  document.getElementById('timeline').innerHTML = timeline.map((t,i)=>`
+    <div class="tl-row">
+      <div class="tl-left">
+        <div class="tl-wk">${t.wk}</div>
+        <div class="tl-dt">${t.dt}</div>
+      </div>
+      <div class="tl-mid">
+        <div class="tl-dot ${t.done?'done':''}"></div>
+        ${i<timeline.length-1?'<div class="tl-line"></div>':''}
+      </div>
+      <div class="tl-right">
+        <div class="tl-phase">${t.phase}</div>
+        <div class="tl-task">${t.task} ${t.done?'<span class="badge c-teal" style="font-size:9px;vertical-align:middle">✓ Done</span>':''}</div>
+        <div class="tl-desc">${t.desc}</div>
+        <div class="tl-chips">${t.chips.map(c=>`<span class="badge c-ink" style="font-size:10px">${c}</span>`).join('')}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ─ Pro Features ─ */
+function renderPro() {
+  const statLabel = {planned:'Planned',ready:'Ready',addon:'Add-on'};
+  const statClass = {planned:'ps-planned',ready:'ps-ready',addon:'ps-addon'};
+  document.getElementById('pro-grid').innerHTML = proFeatures.map(f=>`
+    <div class="pro-card" style="--strip:${f.strip}">
+      <span class="pro-status ${statClass[f.status]}">${statLabel[f.status]}</span>
+      <div class="pro-icon">${f.icon}</div>
+      <div class="pro-title">${f.title}</div>
+      <div class="pro-desc">${f.desc}</div>
+      <div class="pro-detail">${f.detail}</div>
+      <div class="pro-tags">${f.tags.map(t=>`<span class="tag c-ink">${t}</span>`).join('')}</div>
+    </div>
+  `).join('');
+}
+
+/* ─ Tab switching ─ */
+function showTab(id) {
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelector(`[onclick="showTab('${id}')"]`).classList.add('active');
+  document.getElementById('tab-'+id).classList.add('active');
+}
+
+/* ─ Init ─ */
+renderModFilters(); renderModGrid();
+renderFlowTabs(); renderFlow(); renderEpTable();
+renderPermissions(); renderDeploy(); renderPro();
+
+/* ─────────────────────────────────────────────
+   SAAS FLOW DATA + RENDERER
+───────────────────────────────────────────── */
+const SAAS_FLOWS = {
+  signup: {
+    label: '📝 Sign-Up Flow',
+    steps: [
+      { type:'api', title:'User visits /signup',        desc:'Frontend form: Business Name, Email, Password. Client-side validation only.',                                           code:'POST /api/v1/auth/signup' },
+      { type:'sys', title:'Validate input (Joi)',        desc:'Server validates all fields. Email format, password min length, business name required.',                              code:"const { error } = signupSchema.validate(req.body)" },
+      { type:'sys', title:'Check email not taken',       desc:'Query Users collection with { email } — no tenantId filter needed here. Email must be globally unique.',              code:"const exists = await User.findOne({ email })" },
+      { type:'key', title:'Create Tenant document',      desc:'A new isolated business account is born. Trial subscription starts with 7-day expiry. Plan set to "basic" by default.', code:"const tenant = await Tenant.create({ businessName, ownerEmail: email, plan: 'basic', subscriptionStatus: 'active', expireAt: trialEnd })" },
+      { type:'key', title:'Create Owner User',           desc:'Owner account linked to the new tenant. Role = "owner". Password hashed with bcrypt (salt 12).',                      code:"await User.create({ name, email, password: hashed, role: 'owner', tenantId: tenant._id })" },
+      { type:'sys', title:'Send welcome email',          desc:'Optional: send onboarding email with setup guide link and trial expiry date.',                                         code:"await sendEmail({ to: email, template: 'welcome', tenant })" },
+      { type:'key', title:'Return JWT token',            desc:'Sign JWT with userId + tenantId + role. User is immediately logged in — no separate login step.',                      code:"const token = jwt.sign({ userId, tenantId: tenant._id, role: 'owner' }, SECRET, { expiresIn: '8h' })" },
+    ]
+  },
+  login: {
+    label: '🔐 Login Flow',
+    steps: [
+      { type:'api', title:'POST /auth/login',            desc:'User submits email + password. Rate limited: 20 attempts per 15 minutes per IP.',                                       code:'POST /api/v1/auth/login' },
+      { type:'sys', title:'Find user by email',          desc:'Query Users with { email }. If not found → generic "Invalid credentials" (never reveal which field failed).',          code:"const user = await User.findOne({ email }).select('+password')" },
+      { type:'sys', title:'Compare password (bcrypt)',   desc:'Constant-time comparison prevents timing attacks. If mismatch → 401 Invalid credentials.',                              code:"const match = await bcrypt.compare(password, user.password)" },
+      { type:'key', title:'Load tenant + check status', desc:'Fetch tenant document. If subscriptionStatus = suspended → 403 Account suspended. If isActive = false → 403.',         code:"const tenant = await Tenant.findById(user.tenantId)" },
+      { type:'key', title:'Check subscription expiry',  desc:'If now > tenant.expireAt → still allow login but flag as expired in token payload. Owner can renew from dashboard.',    code:"const expired = new Date() > tenant.expireAt" },
+      { type:'sys', title:'Update lastLogin timestamp', desc:'Record last login date for security auditing and admin visibility.',                                                      code:"await User.findByIdAndUpdate(user._id, { lastLogin: new Date() })" },
+      { type:'key', title:'Sign JWT tokens',            desc:'Access token (8h) contains userId, tenantId, role, plan. Refresh token (30d) for silent re-auth.',                      code:"const token = jwt.sign({ userId, tenantId, role, plan: tenant.plan }, SECRET, { expiresIn: '8h' })" },
+    ]
+  },
+  request: {
+    label: '🔄 Request Lifecycle',
+    steps: [
+      { type:'api', title:'Frontend sends API request',  desc:'Every request includes Authorization: Bearer <token> header. Missing header → 401 immediately.',                        code:'Authorization: Bearer eyJhbGci...' },
+      { type:'sys', title:'JWT verification middleware', desc:'jwt.verify() checks signature + expiry. On success: req.user = { userId, tenantId, role, plan }.',                     code:"req.user = jwt.verify(token, SECRET)" },
+      { type:'key', title:'Tenant load + status check', desc:'Fetch tenant. Check: isActive, subscriptionStatus, expireAt. Any failure → 403 block. This runs on EVERY request.',    code:"const tenant = await Tenant.findById(req.user.tenantId)" },
+      { type:'key', title:'Feature gate check',         desc:'Route declares required feature. Middleware checks plan.features[]. Denied → 403 "Upgrade your plan to access reports".', code:"checkFeature('reports') // plan.features.includes('reports')" },
+      { type:'sys', title:'Role permission check',      desc:'RBAC middleware verifies role. Cashier cannot access /reports even on Pro plan. Role + Feature both required.',           code:"allow('admin', 'manager') // role middleware" },
+      { type:'key', title:'Tenant isolation enforced',  desc:'Controller injects tenantId into ALL queries. This is the most critical security boundary — prevents any cross-tenant leak.', code:"Model.find({ tenantId: req.tenant._id })" },
+      { type:'sys', title:'Limit enforcement',          desc:'For create ops: count existing records vs plan limit. Block if at limit with clear upgrade message.',                     code:"if (count >= plan.limits.products) return 403" },
+      { type:'api', title:'Response returned',          desc:'All data is tenant-scoped. Response contains only data belonging to the requesting tenant.',                              code:"res.json({ data: results }) // 100% tenant-scoped" },
+    ]
+  },
+  onboard: {
+    label: '🚀 Onboarding Flow',
+    steps: [
+      { type:'key', title:'First login → setup wizard', desc:'If tenant.isSetupComplete === false, redirect owner to onboarding wizard. Cannot access POS until setup done.',         code:"if (!tenant.isSetupComplete) redirect('/setup')" },
+      { type:'sys', title:'Step 1 — Store settings',   desc:'Set business name, address, phone, logo. Select language (Arabic/English) and currency (SAR/BDT/USD etc.).',             code:"PUT /api/v1/settings { businessName, language, currency }" },
+      { type:'sys', title:'Step 2 — Add categories',   desc:'Create at least one product category. Examples: Grains, Beverages, Household, Snacks.',                                  code:"POST /api/v1/categories { name: 'Grains' }" },
+      { type:'sys', title:'Step 3 — Add products',     desc:'Add first products with barcode, prices, and stock levels. Or import via CSV batch upload.',                             code:"POST /api/v1/products { barcode, name, sellingPrice, stock }" },
+      { type:'sys', title:'Step 4 — Configure tax',    desc:'Set VAT/GST rate and label. E.g. VAT 15% for Saudi Arabia. Can be 0 if not applicable.',                               code:"PUT /api/v1/settings { taxRate: 15, taxLabel: 'VAT' }" },
+      { type:'sys', title:'Step 5 — Add staff',        desc:'Create manager and cashier accounts. Plan limits enforced. Basic plan: max 2 users total.',                              code:"POST /api/v1/users { name, email, role: 'cashier' }" },
+      { type:'key', title:'Mark setup complete',        desc:'All steps done. tenant.isSetupComplete = true. Redirect to POS dashboard. Trial countdown begins from signup date.',    code:"await Tenant.findByIdAndUpdate(tenantId, { isSetupComplete: true })" },
+    ]
+  },
+  admin: {
+    label: '⚙️ Admin Control',
+    steps: [
+      { type:'key', title:'Admin authentication',       desc:'SaaS admin logs in with a super-admin account (no tenantId). JWT role = "superadmin". Separate admin portal.',          code:"jwt.sign({ userId, role: 'superadmin' }, ADMIN_SECRET)" },
+      { type:'sys', title:'View all tenants',           desc:'List all registered businesses. Filter by plan, status, expiry. Search by name or email.',                               code:"GET /admin/tenants?plan=basic&status=active" },
+      { type:'sys', title:'View tenant details',        desc:'See full tenant: users, products count, orders count, revenue, last activity, subscription history.',                    code:"GET /admin/tenants/:id/details" },
+      { type:'key', title:'Upgrade / downgrade plan',  desc:'Change tenant plan. Feature access updates immediately on next API call. No restart required.',                          code:"PATCH /admin/tenants/:id { plan: 'pro', expireAt: nextMonth }" },
+      { type:'sys', title:'Extend subscription',        desc:'Add X days to expireAt. Used for grace periods, renewals, or compensation. Logged in SubscriptionLog.',                 code:"PATCH /admin/tenants/:id/extend { days: 30 }" },
+      { type:'key', title:'Suspend account',            desc:'Set tenant.isActive = false. All users immediately locked out. Login returns 403. Used for ToS violations.',            code:"PATCH /admin/tenants/:id/suspend { reason: 'Non-payment' }" },
+      { type:'sys', title:'Revenue dashboard',          desc:'View MRR (monthly recurring revenue), plan distribution pie chart, active vs expired tenants, churn rate, new signups.',  code:"GET /admin/revenue?period=2026-04" },
+    ]
+  }
+};
+
+let activeSaasFlow = 'signup';
+
+function showSaasFlow(key) {
+  activeSaasFlow = key;
+  document.querySelectorAll('.saas-ftab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.saas-ftab').forEach(b => {
+    if (b.getAttribute('onclick') === `showSaasFlow('${key}')`) b.classList.add('active');
+  });
+  renderSaasFlow(key);
+}
+
+const sfTypeClass = { key:'sfs-n-key', api:'sfs-n-api', sys:'sfs-n-sys' };
+
+function renderSaasFlow(key) {
+  const flow = SAAS_FLOWS[key];
+  const html = `<div class="saas-flow-steps">
+    ${flow.steps.map((s, i) => `
+      <div class="sfs-step ${s.type === 'key' ? 'sfs-key' : ''}">
+        <div class="sfs-left">
+          <div class="sfs-num ${sfTypeClass[s.type] || 'sfs-n-sys'}">${i + 1}</div>
+        </div>
+        <div class="sfs-body">
+          <div class="sfs-title">${s.title}</div>
+          <div class="sfs-desc">${s.desc}</div>
+          <div class="sfs-code">${s.code}</div>
+        </div>
+      </div>
+    `).join('')}
+  </div>`;
+  document.getElementById('saas-flow-content').innerHTML = html;
+}
+
+// Init SaaS tab
+renderSaasFlow('signup');
+
+</script>
+</body>
+</html>
