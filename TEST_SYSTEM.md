@@ -66,8 +66,7 @@
 
 #### Multi-Language Support
 - **English (en):** ✅ Configured
-- **Bengali (যোগ):** ✅ Configured  
-- **Arabic (العربية):** ✅ Configured
+- **Bengali (বাংলা):** ✅ Configured  - **Arabic (العربية):** ✅ Configured
 - **Language Toggle:** StatusIndicator component
 - **Persistence:** localStorage
 

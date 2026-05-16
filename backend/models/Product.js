@@ -5,33 +5,46 @@ const productSchema = new Schema(
         barcode: {
             type: String,
             required: true,
-            unique: true,
-            index: true, // For fast barcode lookup
+            index: true,
         },
         name: {
             type: String,
             required: true,
+            text: true, // Enable full-text search
         },
         category: {
             type: String,
             default: 'General',
+            text: true,
         },
         costPrice: {
             type: Number,
-            required: true, // Cost to business
+            required: true,
+            select: false, // Don't return to cashier role
         },
         sellingPrice: {
             type: Number,
-            required: true, // MRP / Retail Price
+            required: true,
         },
         stock: {
             type: Number,
             required: true,
             default: 0,
         },
+        lowStockAlert: {
+            type: Number,
+            default: 10, // Alert when stock <= this
+        },
         unit: {
             type: String,
-            default: 'pcs', // pcs, kg, liter, etc.
+            enum: ['pcs', 'kg', 'liter', 'dozen', 'pack'],
+            default: 'pcs',
+        },
+        storeId: {
+            type: Schema.Types.ObjectId,
+            ref: 'Store',
+            required: true,
+            index: true,
         },
         description: {
             type: String,
@@ -47,9 +60,9 @@ const productSchema = new Schema(
     }
 );
 
-// Profit calculation (virtual field)
-productSchema.virtual('profit').get(function () {
-    return this.sellingPrice - this.costPrice;
-});
+// Compound unique index: barcode unique per store
+productSchema.index({ barcode: 1, storeId: 1 }, { unique: true });
+// Text index for full-text search
+productSchema.index({ name: 'text', category: 'text' });
 
 module.exports = model('Product', productSchema);

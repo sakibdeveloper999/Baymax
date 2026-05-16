@@ -10,28 +10,41 @@ const userSchema = new Schema(
         email: {
             type: String,
             required: true,
-            unique: true,
             lowercase: true,
             index: true,
         },
         password: {
             type: String,
             required: true,
+            select: false, // Don't return password by default
         },
         role: {
             type: String,
-            enum: ['admin', 'manager', 'cashier'],
+            enum: ['owner', 'manager', 'cashier'],
             default: 'cashier',
+        },
+        tenantId: {
+            type: Schema.Types.ObjectId,
+            ref: 'Tenant',
+            required: true,
+            index: true,
         },
         isActive: {
             type: Boolean,
             default: true,
+        },
+        lastLogin: {
+            type: Date,
+            default: null,
         },
     },
     {
         timestamps: true,
     }
 );
+
+// Compound unique index: email unique per tenant
+userSchema.index({ email: 1, tenantId: 1 }, { unique: true });
 
 // Hash password before saving
 userSchema.pre('save', async function (next) {
