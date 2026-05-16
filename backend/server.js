@@ -84,6 +84,7 @@ const categoryRoutes = require('./routes/categories');
 const storeRoutes = require('./routes/stores');
 const orderRoutes = require('./routes/orders');
 const customerRoutes = require('./routes/customers');
+const supplierRoutes = require('./routes/suppliers');
 
 // Public routes (no auth required)
 app.use('/api/auth', authRoutes);
@@ -94,6 +95,7 @@ app.use('/api/categories', verifyToken, checkSubscription, categoryRoutes);
 app.use('/api/stores', verifyToken, checkSubscription, storeRoutes);
 app.use('/api/orders', verifyToken, checkSubscription, orderRoutes);
 app.use('/api/customers', verifyToken, checkSubscription, customerRoutes);
+app.use('/api/suppliers', verifyToken, checkSubscription, supplierRoutes);
 
 // ──── ROUTES TO CREATE IN NEXT PHASE ────
 // app.use('/api/suppliers', verifyToken, checkSubscription, supplierRoutes);
@@ -210,4 +212,5 @@ server.listen(PORT, () => {
     });
 
     module.exports = app;
+});
 
