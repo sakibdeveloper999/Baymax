@@ -16,8 +16,9 @@ jobs:
         with:
           node-version: 20
       - run: npm ci
+        working-directory: ./desktop
       - run: npm test
-
+        working-directory: ./desktop
   publish-npm:
     needs: build
     runs-on: ubuntu-latest
@@ -28,6 +29,10 @@ jobs:
           node-version: 20
           registry-url: https://registry.npmjs.org/
       - run: npm ci
+        working-directory: ./desktop
+      - run: npm run react-build
+        working-directory: ./desktop
       - run: npm publish
+        working-directory: ./desktop
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
