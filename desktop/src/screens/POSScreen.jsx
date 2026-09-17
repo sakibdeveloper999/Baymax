@@ -1,171 +1,123 @@
-import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import React, { useEffect, useRef, useState } from 'react';
 import useCartStore from '../store/cartSlice';
+import apiClient from '../config/api';
+import generateReceipt from '../utils/receipt';
+import printReceipt from '../utils/printer';
 
-export default function POSScreen() {
-    const { t } = useTranslation();
-    const [searchQuery, setSearchQuery] = useState('');
-    const [selectedCategory, setSelectedCategory] = useState('All');
-    const items = useCartStore((state) => state.getItems());
-    const addToCart = useCartStore((state) => state.addItem);
-    const removeFromCart = useCartStore((state) => state.removeItem);
-    const total = useCartStore((state) => state.getTotal());
-
-    const products = [
-        { id: 1, name: 'Rice 5kg', category: 'Grains', price: 200, barcode: '111001' },
-        { id: 2, name: 'Oil 1L', category: 'Oils', price: 150, barcode: '111002' },
-        { id: 3, name: 'Sugar 2kg', category: 'Grains', price: 150, barcode: '111003' },
-        { id: 4, name: 'Flour 1kg', category: 'Grains', price: 120, barcode: '111004' },
-        { id: 5, name: 'Salt 500g', category: 'Spices', price: 75, barcode: '111005' },
-        { id: 6, name: 'Milk 1L', category: 'Dairy', price: 100, barcode: '111006' },
-        { id: 7, name: 'Butter 250g', category: 'Dairy', price: 200, barcode: '111007' },
-        { id: 8, name: 'Eggs 12pcs', category: 'Dairy', price: 180, barcode: '111008' },
-    ];
-
-    const categories = ['All', 'Grains', 'Oils', 'Spices', 'Dairy'];
-
-    const filteredProducts = products.filter(p => {
-        const matchSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            p.barcode.includes(searchQuery);
-        const matchCategory = selectedCategory === 'All' || p.category === selectedCategory;
-        return matchSearch && matchCategory;
-    });
-
-    return (
-        <div className="p-6 space-y-4 h-full">
-            {/* Header */}
-            <div className="flex items-center justify-between">
-                <h1 className="text-3xl font-bold text-gray-900">Point of Sale</h1>
-                <div className="text-sm text-gray-600">
-                    <span>Store: Main Branch</span> | <span>Cashier: Admin</span>
-                </div>
-            </div>
-
-            {/* Main Grid: Products + Cart */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-150px)]">
-                {/* Products Section */}
-                <div className="lg:col-span-2 flex flex-col space-y-4">
-                    {/* Search & Filter */}
-                    <div className="bg-white rounded-lg shadow p-4 space-y-4">
-                        {/* Search Bar */}
-                        <div className="relative">
-                            <input
-                                type="text"
-                                placeholder="Scan barcode or search product..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full px-4 py-3 border-2 border-primary-500 rounded-lg focus:outline-none focus:border-primary-600 text-lg"
-                                autoFocus
-                            />
-                            <span className="absolute right-4 top-3 text-gray-400">🔍</span>
-                        </div>
-
-                        {/* Category Filter */}
-                        <div className="flex gap-2 overflow-x-auto pb-2">
-                            {categories.map((cat) => (
-                                <button
-                                    key={cat}
-                                    onClick={() => setSelectedCategory(cat)}
-                                    className={`px-4 py-2 rounded-full whitespace-nowrap text-sm font-medium transition ${selectedCategory === cat
-                                            ? 'bg-primary-500 text-white'
-                                            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                                        }`}
-                                >
-                                    {cat}
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Products Grid */}
-                    <div className="bg-white rounded-lg shadow p-4 flex-1 overflow-y-auto">
-                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-                            {filteredProducts.map((product) => (
-                                <button
-                                    key={product.id}
-                                    onClick={() => addToCart(product)}
-                                    className="p-3 border-2 border-gray-200 rounded-lg hover:border-primary-500 hover:shadow-lg transition bg-white"
-                                >
-                                    <div className="text-3xl mb-2">📦</div>
-                                    <p className="font-semibold text-sm text-gray-900 line-clamp-2">{product.name}</p>
-                                    <p className="text-xs text-gray-600 mt-1">{product.category}</p>
-                                    <p className="text-lg font-bold text-primary-600 mt-2">${product.price}</p>
-                                    <p className="text-xs text-gray-500 mt-1">{product.barcode}</p>
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-
-                {/* Cart Section */}
-                <div className="bg-white rounded-lg shadow flex flex-col">
-                    {/* Cart Header */}
-                    <div className="bg-primary-600 text-white p-4 rounded-t-lg">
-                        <h2 className="text-lg font-bold">Shopping Cart</h2>
-                        <p className="text-primary-200 text-sm">Items: {items.length}</p>
-                    </div>
-
-                    {/* Cart Items */}
-                    <div className="flex-1 overflow-y-auto p-4 space-y-2">
-                        {items.length === 0 ? (
-                            <div className="flex items-center justify-center h-40 text-gray-500">
-                                <div className="text-center">
-                                    <p className="text-3xl mb-2">🛒</p>
-                                    <p>Cart is empty</p>
-                                </div>
-                            </div>
-                        ) : (
-                            items.map((item) => (
-                                <div key={item.productId} className="bg-gray-50 p-3 rounded-lg border border-gray-200">
-                                    <div className="flex justify-between items-start mb-2">
-                                        <div className="flex-1">
-                                            <p className="font-semibold text-sm text-gray-900">{item.productName}</p>
-                                            <p className="text-xs text-gray-600">${item.unitPrice} x {item.quantity}</p>
-                                        </div>
-                                        <p className="font-bold text-primary-600">${(item.unitPrice * item.quantity).toFixed(2)}</p>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <button
-                                            onClick={() => removeFromCart(item.productId)}
-                                            className="flex-1 px-2 py-1 bg-danger-500 hover:bg-danger-600 text-white text-xs rounded transition"
-                                        >
-                                            Remove
-                                        </button>
-                                    </div>
-                                </div>
-                            ))
-                        )}
-                    </div>
-
-                    {/* Cart Summary */}
-                    <div className="border-t border-gray-200 p-4 space-y-3">
-                        <div className="space-y-2 bg-gray-50 p-3 rounded-lg">
-                            <div className="flex justify-between text-sm">
-                                <span className="text-gray-600">Subtotal:</span>
-                                <span className="font-semibold text-gray-900">${total.toFixed(2)}</span>
-                            </div>
-                            <div className="flex justify-between text-sm">
-                                <span className="text-gray-600">Tax (10%):</span>
-                                <span className="font-semibold text-gray-900">${(total * 0.1).toFixed(2)}</span>
-                            </div>
-                            <div className="border-t border-gray-200 pt-2 flex justify-between text-lg">
-                                <span className="font-bold text-gray-900">Total:</span>
-                                <span className="font-bold text-primary-600">${(total * 1.1).toFixed(2)}</span>
-                            </div>
-                        </div>
-
-                        {/* Action Buttons */}
-                        <div className="space-y-2">
-                            <button className="w-full bg-success-600 hover:bg-success-700 text-white py-3 rounded-lg font-bold transition text-lg">
-                                💳 Complete Payment
-                            </button>
-                            <button className="w-full bg-warning-500 hover:bg-warning-600 text-white py-2 rounded-lg font-medium transition">
-                                ⏸️ Hold Order
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+export default function POSScreen({ store, user, onBusyChange }) {
+    const scanRef = useRef(null);
+    const [search, setSearch] = useState('');
+    const [category, setCategory] = useState('All');
+    const [products, setProducts] = useState([]);
+    const [page, setPage] = useState(1);
+    const [pages, setPages] = useState(1);
+    const [loading, setLoading] = useState(false);
+    const [busy, setBusy] = useState(false);
+    const [error, setError] = useState('');
+    const [receipt, setReceipt] = useState(null);
+    const cart = useCartStore();
+    useEffect(() => { onBusyChange?.(busy); return () => onBusyChange?.(false); }, [busy, onBusyChange]);
+    const money = value => new Intl.NumberFormat(undefined, { style: 'currency', currency: store?.currency || 'USD' }).format(value);
+    const message = error => typeof error.response?.data?.error === 'string' ? error.response.data.error : error.response?.data?.error?.message || error.message;
+    useEffect(() => {
+        cart.setTaxRate(store?.taxRate || 0);
+        setReceipt(null);
+        setSearch('');
+        setCategory('All');
+        setPage(1);
+        // Store selection owns the tax rate.
+    }, [store?._id, store?.taxRate]);
+    useEffect(() => {
+        if (!store?._id) return;
+        let active = true;
+        setLoading(true); setError(''); setProducts([]);
+        apiClient.get('/api/products', { params: { page, limit: 100 } }).then(({ data }) => {
+            if (active) { setProducts(data.data); setPages(Math.max(1, data.pagination?.pages || 1)); }
+        }).catch(error => { if (active) setError(message(error)); })
+            .finally(() => { if (active) setLoading(false); });
+        return () => { active = false; };
+    }, [store?._id, page]);
+    const categoryName = product => product.categoryId?.name || product.category || 'General';
+    const categories = ['All', ...new Set(products.map(categoryName))];
+    const filtered = products.filter(product => (category === 'All' || categoryName(product) === category)
+        && (product.name.toLowerCase().includes(search.toLowerCase()) || product.barcode.includes(search)));
+    const addProduct = product => { cart.addItem(product); scanRef.current?.focus(); };
+    const scanProduct = async event => {
+        if (event.key !== 'Enter' || busy || !search.trim()) return;
+        event.preventDefault(); setError(''); setBusy(true);
+        try {
+            const { data } = await apiClient.get(`/api/products/barcode/${encodeURIComponent(search.trim())}`);
+            addProduct(data.data); setSearch('');
+        } catch (error) { setError(error.response?.status === 404 ? 'Barcode not found. Create this product in Products before selling it.' : message(error)); }
+        finally { setBusy(false); scanRef.current?.focus(); }
+    };
+    const subtotal = cart.items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
+    const discountAmount = cart.discountType === 'percentage' ? subtotal * Math.min(100, cart.discount) / 100 : Math.min(subtotal, cart.discount);
+    const tax = (subtotal - discountAmount) * cart.taxRate / 100;
+    const printOrder = async order => {
+        const result = await printReceipt(generateReceipt({ ...order, ...order.billing, createdAt: order.timestamp }, {
+            storeName: store.name, storeAddress: store.address, storePhone: store.phone,
+        }));
+        if (!result.success) setError(`Sale saved, but printing failed: ${result.error}`);
+    };
+    const checkout = async () => {
+        if (!cart.items.length || busy || !store) return;
+        setBusy(true); setError('');
+        try {
+            const { data } = await apiClient.post('/api/orders', {
+                items: cart.items.map(({ productId, quantity, unitPrice }) => ({ productId, quantity, unitPrice })),
+                discount: { type: cart.discountType === 'percentage' ? 'percent' : 'flat', value: cart.discount },
+                paymentMethod: cart.paymentMethod,
+            });
+            const completed = data.data;
+            setReceipt(completed);
+            cart.clearCart();
+            setProducts(current => current.map(product => ({ ...product, stock: Math.max(0, product.stock - (cart.items.find(item => item.productId === product._id)?.quantity || 0)) })));
+            if (window.electron?.printReceipt) await printOrder(completed);
+        } catch (error) { setError(message(error)); }
+        finally { setBusy(false); scanRef.current?.focus(); }
+    };
+    const receiptUrl = receipt?.qrToken ? `${window.location.href.split('#')[0]}#receipt/${encodeURIComponent(receipt.qrToken)}` : '';
+    return <div className="p-6 space-y-4">
+        <div className="flex justify-between items-center"><h1 className="text-3xl font-bold">Point of Sale</h1><p>{store?.name || 'Select a store'} ? {user?.name || ''}</p></div>
+        {error && <p role="alert" className="alert-danger p-3 rounded">{error}</p>}
+        {receipt && <div role="status" className="alert-success p-3 rounded flex gap-4 items-center">
+            <span>Sale saved: {receipt.orderNumber} ? {money(receipt.billing.total)}</span>
+            <button onClick={() => printOrder(receipt)} className="btn-outline">Print receipt</button>
+            {receiptUrl && <a href={receiptUrl} target="_blank" rel="noreferrer" className="underline">View receipt</a>}
+        </div>}
+        {cart.heldOrders.length > 0 && <div className="flex gap-2 flex-wrap" aria-label="Held orders">
+            {cart.heldOrders.map((order, index) => <button key={order.id} disabled={busy} className="btn-outline" onClick={() => { cart.resumeOrder(order.id); scanRef.current?.focus(); }}>Resume order {index + 1} ({order.items.length} items)</button>)}
+        </div>}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <section className="lg:col-span-2 space-y-4">
+                <input ref={scanRef} aria-label="Scan barcode or search products" placeholder="Scan barcode and press Enter, or search this page..." value={search} onChange={event => setSearch(event.target.value)} onKeyDown={scanProduct} autoFocus disabled={busy} />
+                <div className="flex gap-2 flex-wrap">{categories.map(value => <button key={value} className={category === value ? 'btn-primary' : 'btn-outline'} onClick={() => setCategory(value)}>{value}</button>)}</div>
+                {loading ? <p role="status">Loading products...</p> : <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    {filtered.map(product => <button key={product._id} disabled={busy || product.stock <= 0} onClick={() => addProduct(product)} className="bg-white border rounded-lg p-4 text-left hover:border-blue-500 disabled:opacity-50">
+                        <strong className="block">{product.name}</strong><span className="block text-sm">{categoryName(product)}</span>
+                        <span className="block font-bold text-blue-700">{money(product.sellingPrice)}</span><span className="text-xs">{product.barcode} ? Stock: {product.stock}</span>
+                    </button>)}
+                    {!filtered.length && <p>No products found.</p>}
+                </div>}
+                <div className="flex gap-3 items-center"><button className="btn-outline" disabled={page <= 1 || loading} onClick={() => setPage(page - 1)}>Previous</button><span>Page {page} of {pages}</span><button className="btn-outline" disabled={page >= pages || loading} onClick={() => setPage(page + 1)}>Next</button></div>
+            </section>
+            <section className="bg-white border rounded-lg p-4 space-y-4">
+                <h2 className="text-xl font-bold">Shopping Cart</h2>
+                {!cart.items.length && <p>Cart is empty</p>}
+                {cart.items.map(item => <div key={item.productId} className="border-b pb-3">
+                    <strong>{item.productName}</strong><p>{money(item.unitPrice)} x {item.quantity} = {money(item.unitPrice * item.quantity)}</p>
+                    <div className="flex gap-2"><button disabled={busy} aria-label={`Decrease ${item.productName}`} onClick={() => cart.updateQuantity(item.productId, item.quantity - 1)} className="btn-outline">?</button><button disabled={busy} aria-label={`Increase ${item.productName}`} onClick={() => cart.updateQuantity(item.productId, item.quantity + 1)} className="btn-outline">+</button><button disabled={busy} onClick={() => cart.removeItem(item.productId)} className="text-red-700">Remove</button></div>
+                </div>)}
+                <fieldset disabled={busy} className="space-y-2">
+                    <label className="block">Discount<input aria-label="Discount" type="number" min="0" max={cart.discountType === 'percentage' ? 100 : subtotal} value={cart.discount} onChange={event => cart.setDiscount(event.target.value, cart.discountType)} /></label>
+                    <select aria-label="Discount type" value={cart.discountType} onChange={event => cart.setDiscount(cart.discount, event.target.value)}><option value="percentage">Percentage</option><option value="fixed">Flat amount</option></select>
+                    <select aria-label="Payment method" value={cart.paymentMethod} onChange={event => cart.setPaymentMethod(event.target.value)}><option value="cash">Cash</option><option value="card">Card</option><option value="mobile">Mobile banking</option></select>
+                </fieldset>
+                <div><p>Subtotal: {money(subtotal)}</p><p>Discount: ?{money(discountAmount)}</p><p>{store?.taxLabel || 'Tax'} ({cart.taxRate}%): {money(tax)}</p><p className="text-xl font-bold">Total: {money(cart.getTotal())}</p></div>
+                <button disabled={busy || !cart.items.length || !store} onClick={checkout} className="btn-success w-full">{busy ? 'Please wait...' : 'Complete Payment'}</button>
+                <button disabled={busy || !cart.items.length} onClick={() => { cart.holdOrder(); scanRef.current?.focus(); }} className="btn-warning w-full">Hold Order</button>
+            </section>
         </div>
-    );
+    </div>;
 }

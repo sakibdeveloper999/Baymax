@@ -4,11 +4,13 @@ import './App.css';
 
 // Layouts
 import MainLayout from './layouts/MainLayout';
+import SessionGate from './components/SessionGate';
 
 // Screens
 import Dashboard from './screens/Dashboard';
 import POSScreen from './screens/POSScreen';
 import ProductsManager from './screens/ProductsManager';
+import CategoriesManager from './screens/CategoriesManager';
 import CustomersManager from './screens/CustomersManager';
 import SuppliersManager from './screens/SuppliersManager';
 import OrdersManager from './screens/OrdersManager';
@@ -35,48 +37,51 @@ function App() {
     const receiptToken = window.location.hash.startsWith('#receipt/') ? window.location.hash.slice(9) : '';
     if (receiptToken) return <ReceiptViewer token={receiptToken} />;
 
-    const renderScreen = () => {
+    const preview = screen => <><p role="status" className="bg-amber-50 text-amber-900 p-3">Sample preview ? this screen does not yet show your business data.</p>{screen}</>;
+
+    const renderScreen = (session) => {
         switch (currentScreen) {
             case 'dashboard':
-                return <Dashboard />;
+                return preview(<Dashboard />);
 
             case 'pos':
-                return <POSScreen />;
+                return <POSScreen key={session.store._id} store={session.store} user={session.user} onBusyChange={session.setTransactionBusy} />;
 
             case 'products':
+                return <ProductsManager user={session.user} />;
             case 'categories':
-                return <ProductsManager />;
+                return <CategoriesManager user={session.user} />;
 
             case 'customers':
-                return <CustomersManager />;
+                return <CustomersManager user={session.user} />;
 
             case 'suppliers':
-                return <SuppliersManager />;
+                return <SuppliersManager user={session.user} />;
 
             case 'orders':
-                return <OrdersManager />;
+                return preview(<OrdersManager />);
 
             case 'inventory':
-                return <InventoryManager />;
+                return preview(<InventoryManager />);
 
             case 'reports':
-                return <Reports />;
+                return preview(<Reports />);
 
             case 'settings':
-                return <Settings />;
+                return preview(<Settings />);
 
             default:
-                return <Dashboard />;
+                return preview(<Dashboard />);
         }
     };
 
     return (
-        <MainLayout
+        <SessionGate>{session => <MainLayout key={session.store._id}
             currentScreen={currentScreen}
             onScreenChange={setCurrentScreen}
         >
-            {renderScreen()}
-        </MainLayout>
+            {renderScreen(session)}
+        </MainLayout>}</SessionGate>
     );
 }
 
