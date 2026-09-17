@@ -29,10 +29,11 @@ class SyncService {
      * Sync all pending orders to backend
      */
     async syncPendingOrders() {
-        if (!this.isOnline) {
-            return; // Offline - skip sync
+        if (!this.isOnline || this.syncing || !localStorage.getItem('authToken')) {
+            return; // Wait for connectivity, authentication, and any active sync
         }
 
+        this.syncing = true;
         try {
             const pendingOrders = await localDB.getPendingOrders();
 
@@ -43,7 +44,13 @@ class SyncService {
             for (const order of pendingOrders) {
                 try {
                     // POST to backend
-                    const response = await apiClient.post('/api/orders', order);
+                    const response = await apiClient.post('/api/orders/checkout', {
+                        items: order.items.map(({ productId, quantity, unitPrice }) => ({ productId, quantity, unitPrice })),
+                        paymentMethod: order.paymentMethod,
+                        discount: typeof order.discount === 'object' ? order.discount : { type: 'flat', value: order.discount || 0 },
+                        ...(order.customerId ? { customerId: order.customerId } : {}),
+                        ...(order.notes ? { notes: order.notes } : {}),
+                    });
 
                     if (response.data.success) {
                         // Mark as synced in local DB
@@ -65,6 +72,8 @@ class SyncService {
             }
         } catch (error) {
             console.error('Sync error:', error);
+        } finally {
+            this.syncing = false;
         }
     }
 

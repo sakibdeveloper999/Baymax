@@ -15,6 +15,7 @@ import OrdersManager from './screens/OrdersManager';
 import InventoryManager from './screens/InventoryManager';
 import Reports from './screens/Reports';
 import Settings from './screens/Settings';
+import ReceiptViewer from './screens/ReceiptViewer';
 
 function App() {
     const { i18n } = useTranslation();
@@ -30,6 +31,9 @@ function App() {
             document.documentElement.lang = i18n.language;
         }
     }, [i18n.language]);
+
+    const receiptToken = window.location.hash.startsWith('#receipt/') ? window.location.hash.slice(9) : '';
+    if (receiptToken) return <ReceiptViewer token={receiptToken} />;
 
     const renderScreen = () => {
         switch (currentScreen) {

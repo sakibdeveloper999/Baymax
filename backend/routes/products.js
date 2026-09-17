@@ -13,7 +13,7 @@ const { productSchemas } = require('../utils/validationSchemas');
 const Product = require('../models/Product');
 const Category = require('../models/Category');
 const StockLog = require('../models/StockLog');
-const { stockService } = require('../services/stockService');
+const stockService = require('../utils/stockService');
 const { sanitizeProduct } = require('../utils/helpers');
 const {
     asyncHandler: handler,
@@ -36,7 +36,7 @@ router.get('/',
 
         const skip = (page - 1) * limit;
         const query = {
-            tenantId: req.user.tenantId,
+
             storeId: req.storeId,
             isActive: true,
         };
@@ -55,8 +55,9 @@ router.get('/',
         }
 
         const products = await Product.find(query)
+            .select('+costPrice')
             .populate('categoryId', 'name')
-            .populate('supplerId', 'name company')
+            .populate('supplierId', 'name company')
             .sort({ [sortBy]: sortOrder === 'asc' ? 1 : -1 })
             .skip(skip)
             .limit(parseInt(limit));
@@ -83,17 +84,23 @@ router.get('/',
 // GET /api/products/:id — Get single product with stock log
 // ═══════════════════════════════════════════════════════════════
 
+router.get('/barcode/:code', verifyToken, checkSubscription, handler(async (req, res) => {
+    const product = await Product.findOne({ barcode: req.params.code, storeId: req.storeId, isActive: true }).select('+costPrice');
+    if (!product) throw new NotFoundError('Product not found');
+    res.json({ success: true, data: sanitizeProduct(product, req.user.role) });
+}));
+
 router.get('/:id',
     verifyToken,
     checkSubscription,
     handler(async (req, res) => {
         const product = await Product.findOne({
             _id: req.params.id,
-            tenantId: req.user.tenantId,
             storeId: req.storeId,
         })
+            .select('+costPrice')
             .populate('categoryId', 'name description')
-            .populate('supperId', 'name company phone email');
+            .populate('supplierId', 'name company phone email');
 
         if (!product) {
             throw new NotFoundError('Product not found');
@@ -113,7 +120,7 @@ router.get('/:id',
         res.json({
             success: true,
             data: {
-                ...sanitized.toObject(),
+                ...sanitized,
                 recentStockLogs: stockLogs,
             },
         });
@@ -136,7 +143,6 @@ router.post('/',
         // Verify category exists and belongs to store
         const category = await Category.findOne({
             _id: categoryId,
-            tenantId: req.user.tenantId,
             storeId: req.storeId,
         });
 
@@ -148,7 +154,7 @@ router.post('/',
         const existing = await Product.findOne({
             barcode,
             storeId: req.storeId,
-            tenantId: req.user.tenantId,
+
         });
 
         if (existing) {
@@ -160,6 +166,7 @@ router.post('/',
             barcode,
             name,
             categoryId,
+            category: category.name,
             costPrice,
             sellingPrice,
             stock: stock || 0,
@@ -167,7 +174,6 @@ router.post('/',
             unit,
             supplierId: supplier || null,
             description,
-            tenantId: req.user.tenantId,
             storeId: req.storeId,
         });
 
@@ -178,7 +184,7 @@ router.post('/',
             await StockLog.create({
                 productId: product._id,
                 storeId: req.storeId,
-                tenantId: req.user.tenantId,
+
                 delta: stock,
                 reason: 'restock',
                 changedBy: req.user.id,
@@ -209,7 +215,6 @@ router.put('/:id',
 
         const product = await Product.findOne({
             _id: req.params.id,
-            tenantId: req.user.tenantId,
             storeId: req.storeId,
         });
 
@@ -221,7 +226,6 @@ router.put('/:id',
         if (categoryId) {
             const category = await Category.findOne({
                 _id: categoryId,
-                tenantId: req.user.tenantId,
                 storeId: req.storeId,
             });
 
@@ -230,6 +234,7 @@ router.put('/:id',
             }
 
             product.categoryId = categoryId;
+            product.category = category.name;
         }
 
         // Update allowed fields
@@ -261,7 +266,6 @@ router.delete('/:id',
     handler(async (req, res) => {
         const product = await Product.findOne({
             _id: req.params.id,
-            tenantId: req.user.tenantId,
             storeId: req.storeId,
         });
 
@@ -294,7 +298,6 @@ router.patch('/:id/stock',
 
         const product = await Product.findOne({
             _id: req.params.id,
-            tenantId: req.user.tenantId,
             storeId: req.storeId,
         });
 

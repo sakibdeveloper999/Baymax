@@ -10,7 +10,8 @@
         "react-build": "react-scripts build",
         "electron-start": "wait-on http://localhost:3000 && electron .",
         "electron-build": "npm run react-build && electron-builder",
-        "eject": "react-scripts eject"
+        "eject": "react-scripts eject",
+        "test": "react-scripts test --watchAll=false"
     },
     "dependencies": {
         "react": "^18.2.0",
@@ -36,14 +37,14 @@
         "productName": "Baymax OmniPOS",
         "files": [
             "build/**/*",
-            "public/electron.js"
+            "public/electron.js",
+            "public/preload.js"
         ],
         "win": {
             "target": [
                 "portable",
-                "installer"
-            ],
-            "icon": "build/logo.ico"
+                "nsis"
+            ]
         }
     },
     "browserslist": {

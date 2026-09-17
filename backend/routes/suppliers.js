@@ -30,7 +30,7 @@ const {
     asyncHandler,
     NotFoundError,
     ValidationError,
-} = require('../utils/errors');
+} = require('../utils/errorHandler');
 
 // ═══════════════════════════════════════════════════════════════
 // Helper: Validate MongoDB ObjectId
@@ -65,7 +65,7 @@ router.get('/',
         const skip = (pageNumber - 1) * limitNumber;
 
         const query = {
-            tenantId: req.user.tenantId,
+
             storeId: req.storeId,
             isActive: true,
         };
@@ -146,8 +146,6 @@ router.post('/',
 
             openingBalance: balance,
             currentBalance: balance,
-
-            tenantId: req.user.tenantId,
             storeId: req.storeId,
         });
 
@@ -176,7 +174,6 @@ router.get('/:id',
 
         const supplier = await Supplier.findOne({
             _id: req.params.id,
-            tenantId: req.user.tenantId,
             storeId: req.storeId,
             isActive: true,
         });
@@ -216,7 +213,6 @@ router.put('/:id',
 
         const supplier = await Supplier.findOne({
             _id: req.params.id,
-            tenantId: req.user.tenantId,
             storeId: req.storeId,
             isActive: true,
         });
@@ -267,7 +263,6 @@ router.delete('/:id',
 
         const supplier = await Supplier.findOne({
             _id: req.params.id,
-            tenantId: req.user.tenantId,
             storeId: req.storeId,
             isActive: true,
         });
@@ -302,7 +297,6 @@ router.get('/:id/payables',
 
         const supplier = await Supplier.findOne({
             _id: req.params.id,
-            tenantId: req.user.tenantId,
             storeId: req.storeId,
             isActive: true,
         });
@@ -370,7 +364,6 @@ router.patch('/:id/payables',
 
         const supplier = await Supplier.findOne({
             _id: req.params.id,
-            tenantId: req.user.tenantId,
             storeId: req.storeId,
             isActive: true,
         });

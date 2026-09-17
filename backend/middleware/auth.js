@@ -4,6 +4,7 @@ const Tenant = require('../models/Tenant');
 
 // Verify JWT Token and load user from DB
 const verifyToken = async (req, res, next) => {
+    if (req.user && req.tenant) return next();
     try {
         const token = req.headers.authorization?.split(' ')[1];
 
@@ -16,17 +17,13 @@ const verifyToken = async (req, res, next) => {
         // Load user from DB to ensure account is still active
         const user = await User.findById(decoded.userId).populate('tenantId');
 
-        if (!user || !user.isActive) {
+        if (!user || !user.isActive || !user.tenantId) {
             return res.status(403).json({ success: false, error: 'User account is deactivated' });
         }
 
         // Attach user and tenant to request
         req.user = user;
         req.tenant = user.tenantId;
-
-        // Update last login
-        user.lastLogin = new Date();
-        await user.save();
 
         next();
     } catch (error) {
@@ -44,7 +41,7 @@ const requireRole = (...allowedRoles) => {
             return res.status(401).json({ success: false, error: 'Unauthorized' });
         }
 
-        if (!allowedRoles.includes(req.user.role)) {
+        if (!allowedRoles.flat().includes(req.user.role)) {
             return res.status(403).json({
                 success: false,
                 error: `Access denied. Required roles: ${allowedRoles.join(', ')}`

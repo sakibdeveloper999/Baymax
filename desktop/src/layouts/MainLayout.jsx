@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import Navbar from './Navbar';
-import Sidebar from './Sidebar';
+import Navbar from '../components/Navbar';
+import Sidebar from '../components/Sidebar';
 
 export default function MainLayout({ children, currentScreen, onScreenChange }) {
     const { t } = useTranslation();

@@ -34,7 +34,7 @@ const subscriptionLogSchema = new Schema(
         },
         method: {
             type: String,
-            enum: ['stripe', 'paypal', 'manual'],
+            enum: ['stripe', 'paypal', 'manual', 'trial'],
             default: 'manual',
         },
         status: {

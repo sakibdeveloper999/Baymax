@@ -14,8 +14,8 @@ const { orderSchemas, paginationSchema } = require('../utils/validationSchemas')
 const Order = require('../models/Order');
 const Product = require('../models/Product');
 const Customer = require('../models/Customer');
-const { stockService } = require('../services/stockService');
-const { qrService } = require('../services/qrService');
+const stockService = require('../utils/stockService');
+const qrService = require('../utils/qrService');
 const { calculateBilling, formatResponse } = require('../utils/helpers');
 const {
     asyncHandler,
@@ -28,7 +28,7 @@ const {
 // POST /api/orders/checkout — Create order + deduct stock + generate QR
 // ═══════════════════════════════════════════════════════════════
 
-router.post('/checkout',
+router.post(['/', '/checkout'],
     verifyToken,
     checkSubscription,
     checkFeature('pos'),
@@ -36,6 +36,10 @@ router.post('/checkout',
     validate(orderSchemas.checkout),
     asyncHandler(async (req, res) => {
         const { items, customerId, discount, paymentMethod, notes } = req.body;
+
+        if (['credit', 'wallet'].includes(paymentMethod) && !customerId) {
+            throw new ValidationError('Customer required for credit or wallet payments');
+        }
 
         // Start MongoDB transaction
         const session = await mongoose.startSession();
@@ -46,10 +50,9 @@ router.post('/checkout',
             const productIds = items.map(i => i.productId);
             const products = await Product.find({
                 _id: { $in: productIds },
-                tenantId: req.user.tenantId,
                 storeId: req.storeId,
                 isActive: true,
-            }).session(session);
+            }).select('+costPrice').session(session);
 
             if (products.length !== items.length) {
                 throw new NotFoundError('One or more products not found');
@@ -85,7 +88,7 @@ router.post('/checkout',
                 orderItems,
                 discountInfo.value,
                 discountInfo.type,
-                0 // Tax handled at store level
+                req.store.taxRate
             );
 
             const costTotal = orderItems.reduce((sum, item) => sum + (item.costPrice * item.quantity), 0);
@@ -94,16 +97,13 @@ router.post('/checkout',
             // 4. Create order document
             const order = new Order({
                 storeId: req.storeId,
-                tenantId: req.user.tenantId,
+
                 cashierId: req.user.id,
                 customerId: customerId || null,
                 items: orderItems,
                 subtotal: billing.subtotal,
-                discount: {
-                    type: discountInfo.type,
-                    value: discountInfo.value,
-                    amount: billing.discountAmount,
-                },
+                discount: billing.discountAmount,
+                discountType: discountInfo.type,
                 tax: billing.tax,
                 costTotal,
                 profit,
@@ -139,14 +139,14 @@ router.post('/checkout',
             if (customerId) {
                 const customer = await Customer.findOne({
                     _id: customerId,
-                    tenantId: req.user.tenantId,
                     storeId: req.storeId,
                 }).session(session);
 
+                if (!customer) throw new NotFoundError('Customer not found');
                 if (customer) {
                     if (paymentMethod === 'credit') {
                         // Add to customer's credit debt
-                        if (customer.creditBalance >= customer.creditLimit) {
+                        if (customer.creditBalance + billing.total > customer.creditLimit) {
                             throw new ValidationError('Customer credit limit exceeded');
                         }
                         customer.creditBalance += billing.total;
@@ -193,7 +193,7 @@ router.post('/checkout',
                 },
             });
         } catch (error) {
-            await session.abortTransaction();
+            if (session.inTransaction()) await session.abortTransaction();
             throw error;
         } finally {
             session.endSession();
@@ -213,7 +213,7 @@ router.get('/',
 
         const skip = (page - 1) * limit;
         const query = {
-            tenantId: req.user.tenantId,
+
             storeId: req.storeId,
         };
 
@@ -261,7 +261,6 @@ router.get('/:id',
     asyncHandler(async (req, res) => {
         const order = await Order.findOne({
             _id: req.params.id,
-            tenantId: req.user.tenantId,
             storeId: req.storeId,
         })
             .populate('customerId')
@@ -298,7 +297,8 @@ router.get('/:id/receipt',
             throw new ValidationError(`QR Token ${verification.status}`);
         }
 
-        const order = await Order.findById(verification.orderId)
+        if (verification.orderId !== req.params.id) throw new ValidationError('QR token does not match order');
+        const order = await Order.findOne({ _id: verification.orderId, storeId: req.storeId })
             .populate('customerId')
             .populate('storeId')
             .populate('items.productId', 'barcode name');
@@ -346,7 +346,6 @@ router.patch('/:id/status',
 
         const order = await Order.findOne({
             _id: req.params.id,
-            tenantId: req.user.tenantId,
             storeId: req.storeId,
         });
 

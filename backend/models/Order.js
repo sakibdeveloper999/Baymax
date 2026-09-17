@@ -23,6 +23,8 @@ const orderItemSchema = new Schema({
 
 const orderSchema = new Schema(
     {
+        profit: { type: Number, default: 0 },
+        qrExpiresAt: Date,
         orderNumber: {
             type: String,
             required: true,
@@ -106,12 +108,10 @@ orderSchema.index({ createdAt: -1, storeId: 1 });
 orderSchema.index({ cashierId: 1, createdAt: -1 });
 
 // Pre-save hook to generate order number if not exists
-orderSchema.pre('save', async function (next) {
+orderSchema.pre('validate', function (next) {
     if (!this.orderNumber) {
-        const date = new Date();
-        const dateStr = date.toISOString().slice(0, 10).replace(/-/g, '');
-        const count = await this.constructor.countDocuments({ storeId: this.storeId, createdAt: { $gte: new Date(date.getFullYear(), date.getMonth(), date.getDate()) } });
-        this.orderNumber = `ORD-${dateStr}-${String(count + 1).padStart(4, '0')}`;
+        const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+        this.orderNumber = `ORD-${dateStr}-${this._id.toString()}`;
     }
     next();
 });

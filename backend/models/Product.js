@@ -2,6 +2,8 @@ const { Schema, model } = require('mongoose');
 
 const productSchema = new Schema(
     {
+        categoryId: { type: Schema.Types.ObjectId, ref: 'Category', default: null },
+        supplierId: { type: Schema.Types.ObjectId, ref: 'Supplier', default: null },
         barcode: {
             type: String,
             required: true,
@@ -10,12 +12,10 @@ const productSchema = new Schema(
         name: {
             type: String,
             required: true,
-            text: true, // Enable full-text search
         },
         category: {
             type: String,
             default: 'General',
-            text: true,
         },
         costPrice: {
             type: Number,
@@ -37,7 +37,7 @@ const productSchema = new Schema(
         },
         unit: {
             type: String,
-            enum: ['pcs', 'kg', 'liter', 'dozen', 'pack'],
+            enum: ['pcs', 'kg', 'liter', 'ltr', 'dozen', 'pack', 'meter', 'box', 'carton'],
             default: 'pcs',
         },
         storeId: {

@@ -8,7 +8,10 @@ const printReceipt = async (receiptText) => {
         } else {
             // Browser environment (fallback to print dialog)
             const printWindow = window.open('', '', 'height=600,width=800');
-            printWindow.document.write('<pre>' + receiptText + '</pre>');
+            if (!printWindow) throw new Error('Allow popups to print receipts');
+            const pre = printWindow.document.createElement('pre');
+            pre.textContent = receiptText;
+            printWindow.document.body.appendChild(pre);
             printWindow.document.close();
             printWindow.print();
             return { success: true };

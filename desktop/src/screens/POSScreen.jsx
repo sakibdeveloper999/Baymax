@@ -116,17 +116,17 @@ export default function POSScreen() {
                             </div>
                         ) : (
                             items.map((item) => (
-                                <div key={item.id} className="bg-gray-50 p-3 rounded-lg border border-gray-200">
+                                <div key={item.productId} className="bg-gray-50 p-3 rounded-lg border border-gray-200">
                                     <div className="flex justify-between items-start mb-2">
                                         <div className="flex-1">
-                                            <p className="font-semibold text-sm text-gray-900">{item.name}</p>
-                                            <p className="text-xs text-gray-600">${item.sellingPrice} x {item.quantity}</p>
+                                            <p className="font-semibold text-sm text-gray-900">{item.productName}</p>
+                                            <p className="text-xs text-gray-600">${item.unitPrice} x {item.quantity}</p>
                                         </div>
-                                        <p className="font-bold text-primary-600">${(item.sellingPrice * item.quantity).toFixed(2)}</p>
+                                        <p className="font-bold text-primary-600">${(item.unitPrice * item.quantity).toFixed(2)}</p>
                                     </div>
                                     <div className="flex items-center gap-2">
                                         <button
-                                            onClick={() => removeFromCart(item.id)}
+                                            onClick={() => removeFromCart(item.productId)}
                                             className="flex-1 px-2 py-1 bg-danger-500 hover:bg-danger-600 text-white text-xs rounded transition"
                                         >
                                             Remove

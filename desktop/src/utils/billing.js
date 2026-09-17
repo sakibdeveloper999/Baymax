@@ -5,9 +5,9 @@ const calculateSubtotal = (items) => {
 
 const applyDiscount = (subtotal, discount, isPercentage = false) => {
     if (isPercentage) {
-        return subtotal - (subtotal * discount) / 100;
+        return subtotal - (subtotal * Math.max(0, Math.min(100, discount))) / 100;
     }
-    return subtotal - discount;
+    return subtotal - Math.max(0, Math.min(subtotal, discount));
 };
 
 const calculateTax = (amount, taxRate) => {

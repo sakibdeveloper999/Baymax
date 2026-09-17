@@ -44,6 +44,7 @@ app.use('/api/', apiLimiter);
 
 // Authentication & authorization (injected into protected routes)
 const { verifyToken } = require('./middleware/auth');
+const { requireStore } = require('./middleware/store');
 const { checkSubscription } = require('./middleware/subscription');
 
 // ══════════════════════════════════
@@ -56,7 +57,7 @@ mongoose.connect(process.env.MONGO_URI, {
 })
     .then(() => {
         console.log('✅ MongoDB Connected');
-        console.log(`   Cluster: ${process.env.MONGO_URI.split('/')[2]}`);
+
     })
     .catch((err) => {
         console.error('❌ MongoDB Connection Error:', err.message);
@@ -89,16 +90,21 @@ const supplierRoutes = require('./routes/suppliers');
 // Public routes (no auth required)
 app.use('/api/auth', authRoutes);
 
+// Public signed receipt endpoint from the app map; token validation is mandatory.
+const { getPublicReceipt } = require('./controllers/receiptController');
+const { asyncHandler } = require('./utils/errorHandler');
+app.get('/api/orders/receipt/:token', asyncHandler(getPublicReceipt));
+
 // Protected routes (require verifyToken + checkSubscription)
-app.use('/api/products', verifyToken, checkSubscription, productRoutes);
-app.use('/api/categories', verifyToken, checkSubscription, categoryRoutes);
+app.use('/api/products', verifyToken, checkSubscription, requireStore, productRoutes);
+app.use('/api/categories', verifyToken, checkSubscription, requireStore, categoryRoutes);
 app.use('/api/stores', verifyToken, checkSubscription, storeRoutes);
-app.use('/api/orders', verifyToken, checkSubscription, orderRoutes);
-app.use('/api/customers', verifyToken, checkSubscription, customerRoutes);
-app.use('/api/suppliers', verifyToken, checkSubscription, supplierRoutes);
+app.use('/api/orders', verifyToken, checkSubscription, requireStore, orderRoutes);
+app.use('/api/customers', verifyToken, checkSubscription, requireStore, customerRoutes);
+app.use('/api/suppliers', verifyToken, checkSubscription, requireStore, supplierRoutes);
 
 // ──── ROUTES TO CREATE IN NEXT PHASE ────
-// app.use('/api/suppliers', verifyToken, checkSubscription, supplierRoutes);
+// app.use('/api/suppliers', verifyToken, checkSubscription, requireStore, supplierRoutes);
 // app.use('/api/purchases', verifyToken, checkSubscription, purchaseRoutes);
 // app.use('/api/stock-transfers', verifyToken, checkSubscription, stockTransferRoutes);
 // app.use('/api/quotations', verifyToken, checkSubscription, quotationRoutes);

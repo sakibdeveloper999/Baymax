@@ -47,7 +47,18 @@ app.on('activate', () => {
 
 // IPC Handlers (for printing, file system access, etc.)
 ipcMain.handle('print-receipt', async (event, receiptData) => {
-    // Placeholder for print functionality
-    console.log('Print receipt:', receiptData);
-    return { success: true };
+    const printWindow = new BrowserWindow({ show: false, webPreferences: { nodeIntegration: false, contextIsolation: true, sandbox: true } });
+    try {
+        const text = String(receiptData).replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
+        await printWindow.loadURL('data:text/html;charset=utf-8,' + encodeURIComponent('<pre>' + text + '</pre>'));
+        return await new Promise((resolve) => {
+            printWindow.webContents.print({ silent: false }, (success, failureReason) => {
+                resolve({ success, ...(success ? {} : { error: failureReason }) });
+            });
+        });
+    } catch (error) {
+        return { success: false, error: error.message };
+    } finally {
+        printWindow.close();
+    }
 });

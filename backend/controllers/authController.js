@@ -44,11 +44,10 @@ exports.signup = async (req, res) => {
         await tenant.save();
 
         // Create owner user
-        const hashedPassword = await hashPassword(value.password);
         const user = new User({
             name: value.businessName + ' Owner',
             email: value.ownerEmail,
-            password: hashedPassword,
+            password: value.password,
             role: 'owner',
             tenantId: tenant._id,
         });

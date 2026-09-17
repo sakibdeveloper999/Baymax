@@ -15,10 +15,8 @@ function Cart() {
 
     // Calculate breakdown (using exact same formula as store's getTotal())
     const subtotal = calculateSubtotal(items);
-    const discountAmount = discountType === 'percentage'
-        ? (subtotal * discount) / 100
-        : discount;
-    const taxableAmount = subtotal - discountAmount;
+    const taxableAmount = applyDiscount(subtotal, discount, discountType === 'percentage');
+    const discountAmount = subtotal - taxableAmount;
     const taxAmount = calculateTax(taxableAmount, taxRate);
     if (items.length === 0) {
         return (

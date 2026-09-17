@@ -30,7 +30,7 @@ router.get('/',
 
         const skip = (page - 1) * limit;
         const query = {
-            tenantId: req.user.tenantId,
+
             storeId: req.storeId,
             isActive: true,
         };
@@ -88,7 +88,6 @@ router.post('/',
             creditBalance: 0,
             walletBalance: walletBalance || 0,
             loyaltyPoints: 0,
-            tenantId: req.user.tenantId,
             storeId: req.storeId,
         });
 
@@ -112,7 +111,6 @@ router.get('/:id',
     asyncHandler(async (req, res) => {
         const customer = await Customer.findOne({
             _id: req.params.id,
-            tenantId: req.user.tenantId,
             storeId: req.storeId,
         });
 
@@ -152,7 +150,6 @@ router.put('/:id',
 
         const customer = await Customer.findOne({
             _id: req.params.id,
-            tenantId: req.user.tenantId,
             storeId: req.storeId,
         });
 
@@ -186,7 +183,6 @@ router.delete('/:id',
     asyncHandler(async (req, res) => {
         const customer = await Customer.findOne({
             _id: req.params.id,
-            tenantId: req.user.tenantId,
             storeId: req.storeId,
         });
 
@@ -214,7 +210,6 @@ router.get('/:id/wallet',
     asyncHandler(async (req, res) => {
         const customer = await Customer.findOne({
             _id: req.params.id,
-            tenantId: req.user.tenantId,
             storeId: req.storeId,
         });
 
@@ -249,7 +244,6 @@ router.patch('/:id/wallet',
 
         const customer = await Customer.findOne({
             _id: req.params.id,
-            tenantId: req.user.tenantId,
             storeId: req.storeId,
         });
 
@@ -289,7 +283,6 @@ router.patch('/:id/loyalty/redeem',
 
         const customer = await Customer.findOne({
             _id: req.params.id,
-            tenantId: req.user.tenantId,
             storeId: req.storeId,
         });
 
@@ -309,7 +302,7 @@ router.patch('/:id/loyalty/redeem',
         await LoyaltyTransaction.create({
             customerId: req.params.id,
             storeId: req.storeId,
-            tenantId: req.user.tenantId,
+
             points: -points,
             type: 'redeem',
         });

@@ -14,7 +14,7 @@ const authSchemas = {
         businessName: Joi.string().min(3).max(100).required(),
         ownerEmail: Joi.string().email().required(),
         password: Joi.string().min(8).max(100).required(),
-        language: Joi.string().valid('en', 'bn').default('en'),
+        language: Joi.string().valid('en', 'ar', 'bn').default('en'),
         currency: Joi.string().length(3).default('USD'),
     }).required(),
 
@@ -39,9 +39,9 @@ const productSchemas = {
         categoryId: Joi.string().required(),
         costPrice: Joi.number().positive().required(),
         sellingPrice: Joi.number().positive().required(),
-        stock: Joi.number().integer().default(0),
+        stock: Joi.number().integer().min(0).default(0),
         lowStockAlert: Joi.number().integer().positive().default(10),
-        unit: Joi.string().valid('pcs', 'kg', 'ltr', 'meter', 'box', 'carton').default('pcs'),
+        unit: Joi.string().valid('pcs', 'kg', 'liter', 'ltr', 'dozen', 'pack', 'meter', 'box', 'carton').default('pcs'),
         supplier: Joi.string().optional(),
         description: Joi.string().max(500).optional(),
     }).required(),
@@ -51,7 +51,7 @@ const productSchemas = {
         categoryId: Joi.string().optional(),
         sellingPrice: Joi.number().positive().optional(),
         lowStockAlert: Joi.number().integer().positive().optional(),
-        unit: Joi.string().valid('pcs', 'kg', 'ltr', 'meter', 'box', 'carton').optional(),
+        unit: Joi.string().valid('pcs', 'kg', 'liter', 'ltr', 'dozen', 'pack', 'meter', 'box', 'carton').optional(),
         supplier: Joi.string().optional(),
         description: Joi.string().max(500).optional(),
     }).min(1),
@@ -119,15 +119,15 @@ const customerSchemas = {
         phone: Joi.string().regex(/^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/).optional(),
         email: Joi.string().email().optional(),
         loyaltyCard: Joi.string().max(50).optional(),
-        creditLimit: Joi.number().nonnegative().default(0),
-        walletBalance: Joi.number().nonnegative().default(0),
+        creditLimit: Joi.number().min(0).default(0),
+        walletBalance: Joi.number().min(0).default(0),
     }).required(),
 
     update: Joi.object({
         name: Joi.string().min(2).max(100).optional(),
         phone: Joi.string().regex(/^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/).optional(),
         email: Joi.string().email().optional(),
-        creditLimit: Joi.number().nonnegative().optional(),
+        creditLimit: Joi.number().min(0).optional(),
     }).min(1),
 };
 
@@ -147,7 +147,7 @@ const orderSchemas = {
         customerId: Joi.string().optional(),
         discount: Joi.object({
             type: Joi.string().valid('flat', 'percent').required(),
-            value: Joi.number().positive().required(),
+            value: Joi.number().min(0).required(),
         }).optional(),
         paymentMethod: Joi.string().valid('cash', 'card', 'mobile', 'credit', 'wallet', 'mixed').required(),
         notes: Joi.string().max(500).optional(),
@@ -195,9 +195,9 @@ const purchaseSchemas = {
         ).min(1).required(),
         discount: Joi.object({
             type: Joi.string().valid('flat', 'percent').optional(),
-            value: Joi.number().nonnegative().optional(),
+            value: Joi.number().min(0).optional(),
         }).optional(),
-        taxRate: Joi.number().nonnegative().optional(),
+        taxRate: Joi.number().min(0).optional(),
     }).required(),
 
     markPaid: Joi.object({
@@ -215,19 +215,19 @@ const voucherSchemas = {
     create: Joi.object({
         code: Joi.string().min(3).max(20).uppercase().required(),
         type: Joi.string().valid('flat', 'percent').required(),
-        value: Joi.number().positive().required(),
+        value: Joi.number().min(0).required(),
         usageLimit: Joi.number().integer().positive().optional(),
         validFrom: Joi.date().iso().required(),
         validUntil: Joi.date().iso().required(),
-        minOrderValue: Joi.number().nonnegative().default(0),
-        maxDiscount: Joi.number().nonnegative().optional(),
+        minOrderValue: Joi.number().min(0).default(0),
+        maxDiscount: Joi.number().min(0).optional(),
         customerId: Joi.string().optional(),
     }).required(),
 
     update: Joi.object({
         usageLimit: Joi.number().integer().positive().optional(),
         validUntil: Joi.date().iso().optional(),
-        maxDiscount: Joi.number().nonnegative().optional(),
+        maxDiscount: Joi.number().min(0).optional(),
     }).min(1),
 };
 

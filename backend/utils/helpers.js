@@ -77,9 +77,9 @@ const calculateBilling = (items, discount = 0, discountType = 'flat', taxRate = 
 
     let discountAmount = 0;
     if (discountType === 'flat') {
-        discountAmount = Math.min(discount, subtotal);
+        discountAmount = Math.max(0, Math.min(discount, subtotal));
     } else if (discountType === 'percent') {
-        discountAmount = subtotal * (discount / 100);
+        discountAmount = subtotal * (Math.max(0, Math.min(100, discount)) / 100);
     }
 
     const taxableAmount = subtotal - discountAmount;

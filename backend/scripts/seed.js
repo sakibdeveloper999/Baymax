@@ -62,7 +62,7 @@ async function seedDatabase() {
 
         // ──── 3. Create Users ────
         console.log('\n👤 Creating users...');
-        const adminPassword = await hashPassword('admin123456');
+        const adminPassword = 'admin123456';
         const admin = await User.create({
             name: 'Admin User',
             email: 'admin@omnipo.local',
@@ -72,7 +72,7 @@ async function seedDatabase() {
         });
         console.log(`   ✓ admin@omnipo.local (owner)`);
 
-        const managerPassword = await hashPassword('manager123456');
+        const managerPassword = 'manager123456';
         const manager = await User.create({
             name: 'Manager User',
             email: 'manager@omnipo.local',
@@ -82,7 +82,7 @@ async function seedDatabase() {
         });
         console.log(`   ✓ manager@omnipo.local (manager)`);
 
-        const cashierPassword = await hashPassword('cashier123456');
+        const cashierPassword = 'cashier123456';
         const cashier = await User.create({
             name: 'Cashier User',
             email: 'cashier@omnipo.local',

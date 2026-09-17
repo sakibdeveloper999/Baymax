@@ -29,7 +29,7 @@ const useCartStore = create((set, get) => ({
                     {
                         productId: product.id || product._id,
                         productName: product.name,
-                        unitPrice: product.sellingPrice || product.price,
+                        unitPrice: product.sellingPrice ?? product.price,
                         quantity: product.quantity || 1,
                     },
                 ],

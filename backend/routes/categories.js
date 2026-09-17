@@ -25,7 +25,7 @@ router.get('/',
     checkSubscription,
     asyncHandler(async (req, res) => {
         const categories = await Category.find({
-            tenantId: req.user.tenantId,
+
             storeId: req.storeId,
             isActive: true,
         })
@@ -56,7 +56,7 @@ router.post('/',
         const existing = await Category.findOne({
             name,
             storeId: req.storeId,
-            tenantId: req.user.tenantId,
+
         });
 
         if (existing) {
@@ -66,7 +66,6 @@ router.post('/',
         const category = new Category({
             name,
             description,
-            tenantId: req.user.tenantId,
             storeId: req.storeId,
         });
 
@@ -94,7 +93,6 @@ router.put('/:id',
 
         const category = await Category.findOne({
             _id: req.params.id,
-            tenantId: req.user.tenantId,
             storeId: req.storeId,
         });
 
@@ -107,7 +105,7 @@ router.put('/:id',
             const duplicate = await Category.findOne({
                 name,
                 storeId: req.storeId,
-                tenantId: req.user.tenantId,
+
                 _id: { $ne: req.params.id },
             });
 
@@ -143,7 +141,6 @@ router.delete('/:id',
     asyncHandler(async (req, res) => {
         const category = await Category.findOne({
             _id: req.params.id,
-            tenantId: req.user.tenantId,
             storeId: req.storeId,
         });
 
