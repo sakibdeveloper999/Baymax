@@ -1,3 +1,4 @@
+process.env.QR_SECRET = 'test-only-qr-secret-not-for-production';
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const Order = require('../models/Order');
@@ -34,4 +35,13 @@ test('QR tokens reject tampering and expire after 30 days', (t) => {
     assert.equal(verifyQrToken('invalid').valid, false);
     t.mock.method(Date, 'now', () => now + 31 * 86400000);
     assert.equal(verifyQrToken(token).status, 'expired');
+});
+
+test('QR tokens reject extra segments and future timestamps', (t) => {
+    const now = Date.now();
+    const { token } = generateQrToken('507f1f77bcf86cd799439011');
+    const extra = Buffer.from(Buffer.from(token, 'base64url').toString('utf8') + ':extra').toString('base64url');
+    assert.equal(verifyQrToken(extra).valid, false);
+    t.mock.method(Date, 'now', () => now - 60000);
+    assert.equal(verifyQrToken(token).valid, false);
 });

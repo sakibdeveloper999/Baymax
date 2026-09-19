@@ -23,13 +23,13 @@ export default function ReceiptViewer({ token }) {
         <p>{receipt.store?.address}</p><p>{receipt.store?.phone}</p>
         <p className="mt-4">{receipt.orderNumber}</p><p>{new Date(receipt.timestamp).toLocaleString()}</p>
         <ul className="my-6 divide-y">{receipt.items.map((item, index) => <li key={index} className="py-3 flex justify-between gap-4">
-            <span>{item.productName} ? {item.quantity}</span><strong>{money(item.total)}</strong>
+            <span>{item.productName} x {item.quantity}</span><strong>{money(item.total)}</strong>
         </li>)}</ul>
         <p>Subtotal: {money(receipt.billing.subtotal)}</p>
         <p>Discount: {money(receipt.billing.discount)}</p>
         <p>{receipt.store?.taxLabel || 'Tax'}: {money(receipt.billing.tax)}</p>
         <p className="text-xl font-bold mt-2">Total: {money(receipt.billing.total)}</p>
-        <p>{receipt.paymentMethod} ? {receipt.status}</p>
+        <p>{receipt.paymentMethod} | {receipt.status}</p>
         <p className="mt-6">{receipt.store?.receiptFooter || 'Thank you for shopping with us.'}</p>
         <button className="btn-primary mt-6 no-print" onClick={() => window.print()}>Print receipt</button>
     </main>;

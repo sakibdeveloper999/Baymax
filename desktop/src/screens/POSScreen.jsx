@@ -79,10 +79,10 @@ export default function POSScreen({ store, user, onBusyChange }) {
     };
     const receiptUrl = receipt?.qrToken ? `${window.location.href.split('#')[0]}#receipt/${encodeURIComponent(receipt.qrToken)}` : '';
     return <div className="p-6 space-y-4">
-        <div className="flex justify-between items-center"><h1 className="text-3xl font-bold">Point of Sale</h1><p>{store?.name || 'Select a store'} ? {user?.name || ''}</p></div>
+        <div className="flex justify-between items-center"><h1 className="text-3xl font-bold">Point of Sale</h1><p>{store?.name || 'Select a store'} | {user?.name || ''}</p></div>
         {error && <p role="alert" className="alert-danger p-3 rounded">{error}</p>}
         {receipt && <div role="status" className="alert-success p-3 rounded flex gap-4 items-center">
-            <span>Sale saved: {receipt.orderNumber} ? {money(receipt.billing.total)}</span>
+            <span>Sale saved: {receipt.orderNumber} | {money(receipt.billing.total)}</span>
             <button onClick={() => printOrder(receipt)} className="btn-outline">Print receipt</button>
             {receiptUrl && <a href={receiptUrl} target="_blank" rel="noreferrer" className="underline">View receipt</a>}
         </div>}
@@ -96,7 +96,7 @@ export default function POSScreen({ store, user, onBusyChange }) {
                 {loading ? <p role="status">Loading products...</p> : <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                     {filtered.map(product => <button key={product._id} disabled={busy || product.stock <= 0} onClick={() => addProduct(product)} className="bg-white border rounded-lg p-4 text-left hover:border-blue-500 disabled:opacity-50">
                         <strong className="block">{product.name}</strong><span className="block text-sm">{categoryName(product)}</span>
-                        <span className="block font-bold text-blue-700">{money(product.sellingPrice)}</span><span className="text-xs">{product.barcode} ? Stock: {product.stock}</span>
+                        <span className="block font-bold text-blue-700">{money(product.sellingPrice)}</span><span className="text-xs">{product.barcode} | Stock: {product.stock}</span>
                     </button>)}
                     {!filtered.length && <p>No products found.</p>}
                 </div>}
@@ -107,14 +107,14 @@ export default function POSScreen({ store, user, onBusyChange }) {
                 {!cart.items.length && <p>Cart is empty</p>}
                 {cart.items.map(item => <div key={item.productId} className="border-b pb-3">
                     <strong>{item.productName}</strong><p>{money(item.unitPrice)} x {item.quantity} = {money(item.unitPrice * item.quantity)}</p>
-                    <div className="flex gap-2"><button disabled={busy} aria-label={`Decrease ${item.productName}`} onClick={() => cart.updateQuantity(item.productId, item.quantity - 1)} className="btn-outline">?</button><button disabled={busy} aria-label={`Increase ${item.productName}`} onClick={() => cart.updateQuantity(item.productId, item.quantity + 1)} className="btn-outline">+</button><button disabled={busy} onClick={() => cart.removeItem(item.productId)} className="text-red-700">Remove</button></div>
+                    <div className="flex gap-2"><button disabled={busy} aria-label={`Decrease ${item.productName}`} onClick={() => cart.updateQuantity(item.productId, item.quantity - 1)} className="btn-outline">-</button><button disabled={busy} aria-label={`Increase ${item.productName}`} onClick={() => cart.updateQuantity(item.productId, item.quantity + 1)} className="btn-outline">+</button><button disabled={busy} onClick={() => cart.removeItem(item.productId)} className="text-red-700">Remove</button></div>
                 </div>)}
                 <fieldset disabled={busy} className="space-y-2">
                     <label className="block">Discount<input aria-label="Discount" type="number" min="0" max={cart.discountType === 'percentage' ? 100 : subtotal} value={cart.discount} onChange={event => cart.setDiscount(event.target.value, cart.discountType)} /></label>
                     <select aria-label="Discount type" value={cart.discountType} onChange={event => cart.setDiscount(cart.discount, event.target.value)}><option value="percentage">Percentage</option><option value="fixed">Flat amount</option></select>
                     <select aria-label="Payment method" value={cart.paymentMethod} onChange={event => cart.setPaymentMethod(event.target.value)}><option value="cash">Cash</option><option value="card">Card</option><option value="mobile">Mobile banking</option></select>
                 </fieldset>
-                <div><p>Subtotal: {money(subtotal)}</p><p>Discount: ?{money(discountAmount)}</p><p>{store?.taxLabel || 'Tax'} ({cart.taxRate}%): {money(tax)}</p><p className="text-xl font-bold">Total: {money(cart.getTotal())}</p></div>
+                <div><p>Subtotal: {money(subtotal)}</p><p>Discount: -{money(discountAmount)}</p><p>{store?.taxLabel || 'Tax'} ({cart.taxRate}%): {money(tax)}</p><p className="text-xl font-bold">Total: {money(cart.getTotal())}</p></div>
                 <button disabled={busy || !cart.items.length || !store} onClick={checkout} className="btn-success w-full">{busy ? 'Please wait...' : 'Complete Payment'}</button>
                 <button disabled={busy || !cart.items.length} onClick={() => { cart.holdOrder(); scanRef.current?.focus(); }} className="btn-warning w-full">Hold Order</button>
             </section>

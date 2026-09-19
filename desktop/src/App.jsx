@@ -37,7 +37,7 @@ function App() {
     const receiptToken = window.location.hash.startsWith('#receipt/') ? window.location.hash.slice(9) : '';
     if (receiptToken) return <ReceiptViewer token={receiptToken} />;
 
-    const preview = screen => <><p role="status" className="bg-amber-50 text-amber-900 p-3">Sample preview ? this screen does not yet show your business data.</p>{screen}</>;
+    const preview = screen => <><p role="status" className="bg-amber-50 text-amber-900 p-3">Sample preview: this screen does not yet show your business data.</p>{screen}</>;
 
     const renderScreen = (session) => {
         switch (currentScreen) {
@@ -78,7 +78,7 @@ function App() {
     return (
         <SessionGate>{session => <MainLayout key={session.store._id}
             currentScreen={currentScreen}
-            onScreenChange={setCurrentScreen}
+            onScreenChange={screen => { if (!session.transactionBusy) setCurrentScreen(screen); }}
         >
             {renderScreen(session)}
         </MainLayout>}</SessionGate>

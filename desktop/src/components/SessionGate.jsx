@@ -63,13 +63,13 @@ export default function SessionGate({ children }) {
     };
     if (session?.store) return <>
         <div className="bg-white border-b px-4 py-2 flex items-center gap-3 no-print">
-            <span>{session.tenant.businessName} ? {session.user.name} ({session.user.role})</span>
+            <span>{session.tenant.businessName} | {session.user.name} ({session.user.role})</span>
             <select disabled={busy} aria-label="Active store" className="max-w-xs" value={session.store._id} onChange={event => chooseStore(stores.find(store => store._id === event.target.value))}>
                 {stores.map(store => <option key={store._id} value={store._id}>{store.name}</option>)}
             </select>
             <button disabled={busy} className="ml-auto btn-outline" onClick={logout}>Sign out</button>
         </div>
-        {children({ ...session, setTransactionBusy: setBusy })}
+        {children({ ...session, transactionBusy: busy, setTransactionBusy: setBusy })}
     </>;
     return <main className="min-h-screen flex items-center justify-center bg-gray-50 p-6"><section className="card w-full max-w-md space-y-4">
         <h1 className="text-2xl font-bold">{session ? 'Set up your store' : signup ? 'Create your business account' : 'Sign in to Baymax'}</h1>
