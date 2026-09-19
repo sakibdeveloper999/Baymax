@@ -43,7 +43,10 @@ const checkFeature = (requiredFeature) => {
 
             const plan = await Plan.findOne({ name: req.tenant.plan });
 
-            if (!plan || !plan.features.includes(requiredFeature)) {
+            if (!plan) {
+                return res.status(503).json({ success: false, code: 'PLAN_NOT_CONFIGURED', error: 'Subscription plan configuration is unavailable. Contact the administrator.' });
+            }
+            if (!plan.features.includes(requiredFeature)) {
                 return res.status(403).json({
                     success: false,
                     error: `Feature '${requiredFeature}' not available in your plan`,

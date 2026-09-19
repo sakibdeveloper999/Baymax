@@ -55,7 +55,8 @@ mongoose.connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 })
-    .then(() => {
+    .then(async () => {
+        await require('./utils/ensurePlans').ensurePlans();
         console.log('✅ MongoDB Connected');
 
     })

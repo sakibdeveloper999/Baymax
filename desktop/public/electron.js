@@ -11,6 +11,7 @@ function createWindow() {
         webPreferences: {
             nodeIntegration: false,
             contextIsolation: true,
+            sandbox: true,
             enableRemoteModule: false,
             preload: join(__dirname, 'preload.js'),
         },
@@ -50,7 +51,7 @@ ipcMain.handle('print-receipt', async (event, receiptData) => {
     const printWindow = new BrowserWindow({ show: false, webPreferences: { nodeIntegration: false, contextIsolation: true, sandbox: true } });
     try {
         const text = String(receiptData).replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
-        await printWindow.loadURL('data:text/html;charset=utf-8,' + encodeURIComponent('<pre>' + text + '</pre>'));
+        await printWindow.loadURL('data:text/html;charset=utf-8,' + encodeURIComponent('<meta http-equiv="Content-Security-Policy" content="default-src &#39;none&#39;; style-src &#39;unsafe-inline&#39;"><pre>' + text + '</pre>'));
         return await new Promise((resolve) => {
             printWindow.webContents.print({ silent: false }, (success, failureReason) => {
                 resolve({ success, ...(success ? {} : { error: failureReason }) });

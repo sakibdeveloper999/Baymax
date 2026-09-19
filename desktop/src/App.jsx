@@ -5,6 +5,7 @@ import './App.css';
 // Layouts
 import MainLayout from './layouts/MainLayout';
 import SessionGate from './components/SessionGate';
+import FeatureAccess from './components/FeatureAccess';
 
 // Screens
 import Dashboard from './screens/Dashboard';
@@ -56,7 +57,7 @@ function App() {
                 return <CustomersManager user={session.user} />;
 
             case 'suppliers':
-                return <SuppliersManager user={session.user} />;
+                return <FeatureAccess features={session.features} feature="suppliers" title="Suppliers" plan={session.tenant.plan} planConfigured={session.planConfigured}><SuppliersManager user={session.user} /></FeatureAccess>;
 
             case 'orders':
                 return <OrdersManager store={session.store} />;

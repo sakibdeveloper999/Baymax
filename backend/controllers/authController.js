@@ -185,11 +185,14 @@ exports.refreshToken = async (req, res) => {
 exports.getCurrentUser = async (req, res) => {
     try {
         const user = await User.findById(req.user._id).populate('tenantId');
+        const plan = await Plan.findOne({ name: user.tenantId.plan });
         res.json({
             success: true,
             data: {
                 user: user,
                 tenant: user.tenantId,
+                features: plan?.features || [],
+                planConfigured: Boolean(plan),
             },
         });
     } catch (error) {
