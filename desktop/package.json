@@ -19,17 +19,17 @@
         "zustand": "^4.3.8",
         "i18next": "^23.5.0",
         "react-i18next": "^13.2.3",
-        "axios": "^1.17.0",
+        "axios": "^1.20.0",
         "electron-is-dev": "^2.0.0"
     },
     "devDependencies": {
         "react-scripts": "5.0.1",
         "concurrently": "^8.2.1",
-        "electron": "^39.8.5",
-        "electron-builder": "^26.8.1",
+        "electron": "^39.8.10",
+        "electron-builder": "^26.15.3",
         "wait-on": "^7.0.1",
         "tailwindcss": "^3.4.1",
-        "postcss": "^8.5.11",
+        "postcss": "^8.5.23",
         "autoprefixer": "^10.4.16"
     },
     "build": {
