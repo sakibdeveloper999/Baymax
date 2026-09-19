@@ -1,133 +1,48 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import apiClient from '../config/api';
+import apiError from '../utils/apiError';
 
-export default function OrdersManager() {
-    const [searchQuery, setSearchQuery] = useState('');
-    const [filterStatus, setFilterStatus] = useState('All');
-
-    const [orders, setOrders] = useState([
-        { id: '#ORD-001', customer: 'John Doe', amount: 120.50, status: 'Completed', date: '2024-05-16 10:30 AM', items: 5, paymentMethod: 'Cash' },
-        { id: '#ORD-002', customer: 'Jane Smith', amount: 85.00, status: 'Completed', date: '2024-05-16 10:15 AM', items: 3, paymentMethod: 'Card' },
-        { id: '#ORD-003', customer: 'Bob Johnson', amount: 215.75, status: 'Pending', date: '2024-05-16 10:00 AM', items: 8, paymentMethod: 'Credit' },
-        { id: '#ORD-004', customer: 'Alice Williams', amount: 65.25, status: 'Completed', date: '2024-05-16 09:45 AM', items: 2, paymentMethod: 'Cash' },
-        { id: '#ORD-005', customer: 'Charlie Brown', amount: 340.00, status: 'Completed', date: '2024-05-16 09:30 AM', items: 12, paymentMethod: 'Card' },
-    ]);
-
-    const filteredOrders = orders.filter(o => {
-        const matchSearch = o.id.includes(searchQuery) || o.customer.toLowerCase().includes(searchQuery.toLowerCase());
-        const matchStatus = filterStatus === 'All' || o.status === filterStatus;
-        return matchSearch && matchStatus;
-    });
-
-    const getStatusColor = (status) => {
-        switch (status) {
-            case 'Completed': return 'bg-success-100 text-success-700';
-            case 'Pending': return 'bg-warning-100 text-warning-700';
-            case 'Cancelled': return 'bg-danger-100 text-danger-700';
-            default: return 'bg-gray-100 text-gray-700';
-        }
+export default function OrdersManager({ store }) {
+    const [orders, setOrders] = useState([]);
+    const [page, setPage] = useState(1);
+    const [pages, setPages] = useState(1);
+    const [status, setStatus] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
+    const [detail, setDetail] = useState(null);
+    const [detailLoading, setDetailLoading] = useState(false);
+    const request = useRef(0);
+    useEffect(() => () => { request.current += 1; }, []);
+    useEffect(() => {
+        if (!store?._id) return;
+        let active = true;
+        setLoading(true); setError('');
+        apiClient.get('/api/orders', { params: { page, limit: 25, ...(status ? { status } : {}) } })
+            .then(({ data }) => { if (active) { setOrders(data.data); setPages(Math.max(1, data.pagination?.pages || 1)); } })
+            .catch(error => { if (active) { setError(apiError(error)); setOrders([]); } })
+            .finally(() => { if (active) setLoading(false); });
+        return () => { active = false; };
+    }, [store?._id, page, status]);
+    const openOrder = async id => {
+        const version = ++request.current;
+        setDetailLoading(true); setDetail(null); setError('');
+        try {
+            const { data } = await apiClient.get(`/api/orders/${id}`);
+            if (version === request.current) setDetail(data.data);
+        } catch (error) { if (version === request.current) setError(apiError(error)); }
+        finally { if (version === request.current) setDetailLoading(false); }
     };
-
-    return (
-        <div className="p-6 space-y-6">
-            <div>
-                <h1 className="text-3xl font-bold text-gray-900">Orders</h1>
-                <p className="text-gray-600 mt-1">View and manage all customer orders</p>
-            </div>
-
-            {/* Filters */}
-            <div className="bg-white rounded-lg shadow p-4 space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Search</label>
-                        <input
-                            type="text"
-                            placeholder="Order ID or customer name..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-primary-500"
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
-                        <select
-                            value={filterStatus}
-                            onChange={(e) => setFilterStatus(e.target.value)}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:border-primary-500"
-                        >
-                            <option value="All">All Orders</option>
-                            <option value="Completed">Completed</option>
-                            <option value="Pending">Pending</option>
-                            <option value="Cancelled">Cancelled</option>
-                        </select>
-                    </div>
-                    <div className="flex items-end">
-                        <button className="w-full bg-primary-600 hover:bg-primary-700 text-white py-2 rounded-lg font-medium transition">
-                            📥 Export Orders
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            {/* Orders Table */}
-            <div className="bg-white rounded-lg shadow overflow-hidden">
-                <div className="overflow-x-auto">
-                    <table className="w-full">
-                        <thead className="bg-gray-50 border-b border-gray-200">
-                            <tr>
-                                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Order ID</th>
-                                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Customer</th>
-                                <th className="px-6 py-4 text-center text-sm font-semibold text-gray-700">Items</th>
-                                <th className="px-6 py-4 text-right text-sm font-semibold text-gray-700">Amount</th>
-                                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Payment</th>
-                                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Date & Time</th>
-                                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Status</th>
-                                <th className="px-6 py-4 text-center text-sm font-semibold text-gray-700">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-200">
-                            {filteredOrders.map((order) => (
-                                <tr key={order.id} className="hover:bg-gray-50">
-                                    <td className="px-6 py-4 font-mono font-bold text-primary-600">{order.id}</td>
-                                    <td className="px-6 py-4 font-medium text-gray-900">{order.customer}</td>
-                                    <td className="px-6 py-4 text-center text-gray-700">{order.items}</td>
-                                    <td className="px-6 py-4 text-right font-bold text-gray-900">${order.amount}</td>
-                                    <td className="px-6 py-4 text-sm text-gray-700">{order.paymentMethod}</td>
-                                    <td className="px-6 py-4 text-sm text-gray-600">{order.date}</td>
-                                    <td className="px-6 py-4">
-                                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}>
-                                            {order.status}
-                                        </span>
-                                    </td>
-                                    <td className="px-6 py-4 text-center">
-                                        <button className="text-primary-600 hover:text-primary-700 text-sm font-medium mr-3">👁️</button>
-                                        <button className="text-primary-600 hover:text-primary-700 text-sm font-medium">🧾</button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            {/* Summary */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="bg-white rounded-lg shadow p-4">
-                    <p className="text-gray-600 text-sm">Total Orders Today</p>
-                    <p className="text-3xl font-bold text-gray-900">{orders.length}</p>
-                </div>
-                <div className="bg-white rounded-lg shadow p-4">
-                    <p className="text-gray-600 text-sm">Completed Orders</p>
-                    <p className="text-3xl font-bold text-success-600">{orders.filter(o => o.status === 'Completed').length}</p>
-                </div>
-                <div className="bg-white rounded-lg shadow p-4">
-                    <p className="text-gray-600 text-sm">Total Revenue Today</p>
-                    <p className="text-3xl font-bold text-primary-600">${orders.reduce((sum, o) => sum + o.amount, 0).toFixed(2)}</p>
-                </div>
-                <div className="bg-white rounded-lg shadow p-4">
-                    <p className="text-gray-600 text-sm">Avg Order Value</p>
-                    <p className="text-3xl font-bold text-warning-600">${(orders.reduce((sum, o) => sum + o.amount, 0) / orders.length).toFixed(2)}</p>
-                </div>
-            </div>
-        </div>
-    );
+    const money = amount => new Intl.NumberFormat(undefined, { style: 'currency', currency: store?.currency || 'USD' }).format(amount || 0);
+    return <section className="p-6 space-y-4">
+        <h1 className="text-3xl font-bold">Orders</h1>
+        <label>Status<select value={status} onChange={event => { setStatus(event.target.value); setPage(1); }}><option value="">All statuses</option>{['completed', 'pending', 'cancelled'].map(value => <option key={value}>{value}</option>)}</select></label>
+        {error && <p role="alert" className="text-red-700">{error}</p>}
+        {loading ? <p role="status">Loading orders...</p> : <div className="bg-white overflow-x-auto rounded border"><table><thead><tr><th>Order</th><th>Date</th><th>Customer</th><th>Cashier</th><th>Payment</th><th>Status</th><th>Total</th><th>Details</th></tr></thead><tbody>
+            {orders.map(order => <tr key={order._id}><td>{order.orderNumber}</td><td>{new Date(order.createdAt).toLocaleString()}</td><td>{order.customerId?.name || 'Walk-in'}</td><td>{order.cashierId?.name || '-'}</td><td>{order.paymentMethod}</td><td>{order.status}</td><td>{money(order.total)}</td><td><button className="text-blue-700" onClick={() => openOrder(order._id)}>View</button></td></tr>)}
+            {!orders.length && <tr><td colSpan="8">No orders found.</td></tr>}
+        </tbody></table></div>}
+        <div className="flex gap-3 items-center"><button className="btn-outline" disabled={loading || page <= 1} onClick={() => setPage(page - 1)}>Previous</button><span>Page {page} of {pages}</span><button className="btn-outline" disabled={loading || page >= pages} onClick={() => setPage(page + 1)}>Next</button></div>
+        {detailLoading && <p role="status">Loading order details...</p>}
+        {detail && <article className="card space-y-2"><h2 className="text-xl font-bold">{detail.orderNumber}</h2><ul>{detail.items.map((item, index) => <li key={index}>{item.productName} x {item.quantity}: {money(item.total)}</li>)}</ul><p>Subtotal: {money(detail.subtotal)}</p><p>Discount: {money(detail.discount)}</p><p>Tax: {money(detail.tax)}</p><p className="font-bold">Total: {money(detail.total)}</p><button className="btn-outline" onClick={() => setDetail(null)}>Close details</button></article>}
+    </section>;
 }

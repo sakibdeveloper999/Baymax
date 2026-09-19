@@ -13,4 +13,6 @@ No database migration has been applied. The proposed bulk schema change was reje
 5. Update create operations and queries together, require tenantId only after the backfill, and enforce subscription/plan limits with concurrency tests. Preserve the existing store-ownership check as a second boundary.
 6. Deploy in stages; retain the backup and compatibility release for rollback.
 
-Database connectivity currently fails with ENOTFOUND. Production migration execution remains pending connectivity, preflight results, and approval. No secrets or database contents are included here.
+Read-only preflight on 2026-09-19: MongoDB ping succeeds and the deployment supports transactions. There is one store, one user, and eight products. All eight products have neither storeId nor tenantId, so their owner cannot be derived automatically from a store reference. The eight products have names, unique barcodes, valid nonnegative prices and integer stock quantities, and explicit active flags. No records were changed.
+
+Before migration, the user must identify the intended store for these eight products. Do not assign them merely because there is currently one store. Validate product fields and barcode uniqueness, back up the affected records, and review the exact proposed assignments before writing data. Production migration remains pending ownership confirmation and approval.

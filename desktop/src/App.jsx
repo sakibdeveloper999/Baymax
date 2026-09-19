@@ -59,16 +59,16 @@ function App() {
                 return <SuppliersManager user={session.user} />;
 
             case 'orders':
-                return preview(<OrdersManager />);
+                return <OrdersManager store={session.store} />;
 
             case 'inventory':
-                return preview(<InventoryManager />);
+                return <InventoryManager store={session.store} user={session.user} />;
 
             case 'reports':
                 return preview(<Reports />);
 
             case 'settings':
-                return preview(<Settings />);
+                return <Settings store={session.store} user={session.user} onStoreUpdated={session.updateStore} />;
 
             default:
                 return preview(<Dashboard />);

@@ -24,6 +24,10 @@ export default function SessionGate({ children }) {
         activateCartScope(account.tenant._id, account.user._id, store._id);
         setSession({ ...account, store });
     };
+    const updateStore = store => {
+        setStores(current => current.map(item => item._id === store._id ? store : item));
+        setSession(current => current?.store?._id === store._id ? { ...current, store } : current);
+    };
     const loadSession = async () => {
         const { data: profile } = await apiClient.get('/api/auth/me');
         const account = profile.data;
@@ -69,7 +73,7 @@ export default function SessionGate({ children }) {
             </select>
             <button disabled={busy} className="ml-auto btn-outline" onClick={logout}>Sign out</button>
         </div>
-        {children({ ...session, transactionBusy: busy, setTransactionBusy: setBusy })}
+        {children({ ...session, transactionBusy: busy, setTransactionBusy: setBusy, updateStore })}
     </>;
     return <main className="min-h-screen flex items-center justify-center bg-gray-50 p-6"><section className="card w-full max-w-md space-y-4">
         <h1 className="text-2xl font-bold">{session ? 'Set up your store' : signup ? 'Create your business account' : 'Sign in to Baymax'}</h1>

@@ -17,7 +17,7 @@ apiClient.interceptors.request.use((config) => {
         config.headers.Authorization = `Bearer ${token}`;
     }
     const storeId = localStorage.getItem('storeId');
-    if (storeId) config.headers['X-Store-ID'] = storeId;
+    if (storeId && !config.headers['X-Store-ID']) config.headers['X-Store-ID'] = storeId;
     return config;
 });
 
