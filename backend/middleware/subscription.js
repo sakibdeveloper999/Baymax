@@ -1,4 +1,4 @@
-const Tenant = require('../models/Tenant');
+const { tenantAccessError } = require('../utils/tenantAccess');
 const Plan = require('../models/Plan');
 
 // Check subscription status and feature access
@@ -8,24 +8,8 @@ const checkSubscription = async (req, res, next) => {
             return res.status(401).json({ success: false, error: 'Tenant not found' });
         }
 
-        // Check if tenant is active
-        if (!req.tenant.isActive) {
-            return res.status(403).json({
-                success: false,
-                error: 'Tenant account is suspended',
-                code: 'ACCOUNT_SUSPENDED'
-            });
-        }
-
-        // Check if subscription is expired
-        if (new Date() > req.tenant.expireAt) {
-            return res.status(403).json({
-                success: false,
-                error: 'Subscription expired. Please renew to continue.',
-                code: 'SUBSCRIPTION_EXPIRED',
-                renewalDate: req.tenant.expireAt
-            });
-        }
+        const denied = tenantAccessError(req.tenant);
+        if (denied) return res.status(403).json(denied);
 
         next();
     } catch (error) {

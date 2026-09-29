@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-const Tenant = require('../models/Tenant');
+const { tenantAccessError } = require('../utils/tenantAccess');
 
 // Verify JWT Token and load user from DB
 const verifyToken = async (req, res, next) => {
@@ -20,6 +20,12 @@ const verifyToken = async (req, res, next) => {
         if (!user || !user.isActive || !user.tenantId) {
             return res.status(403).json({ success: false, error: 'User account is deactivated' });
         }
+
+        if (!decoded.tenantId || String(decoded.tenantId) !== String(user.tenantId._id)) {
+            return res.status(403).json({ success: false, error: 'Invalid token' });
+        }
+        const denied = tenantAccessError(user.tenantId);
+        if (denied) return res.status(403).json(denied);
 
         // Attach user and tenant to request
         req.user = user;

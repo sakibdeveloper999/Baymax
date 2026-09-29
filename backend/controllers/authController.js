@@ -1,3 +1,4 @@
+const { tenantAccessError } = require('../utils/tenantAccess');
 const User = require('../models/User');
 const Tenant = require('../models/Tenant');
 const Plan = require('../models/Plan');
@@ -109,26 +110,14 @@ exports.login = async (req, res) => {
             return res.status(401).json({ success: false, error: 'Invalid email or password' });
         }
 
-        // Check tenant
-        if (!user.tenantId || !user.tenantId.isActive) {
-            return res.status(403).json({ success: false, error: 'Tenant account is suspended' });
-        }
-
         // Compare password
         const isValidPassword = await comparePassword(value.password, user.password);
         if (!isValidPassword) {
             return res.status(401).json({ success: false, error: 'Invalid email or password' });
         }
 
-        // Check subscription status
-        if (new Date() > user.tenantId.expireAt) {
-            return res.status(403).json({
-                success: false,
-                error: 'Subscription expired',
-                code: 'SUBSCRIPTION_EXPIRED',
-                renewalLink: '/billing/renew',
-            });
-        }
+        const denied = tenantAccessError(user.tenantId);
+        if (denied) return res.status(403).json(denied);
 
         // Generate tokens
         const accessToken = generateAccessToken(user._id, user.tenantId._id, user.role);
@@ -165,9 +154,12 @@ exports.refreshToken = async (req, res) => {
         const decoded = require('jsonwebtoken').verify(refreshToken, process.env.JWT_REFRESH_SECRET);
 
         const user = await User.findById(decoded.userId).populate('tenantId');
-        if (!user || !user.isActive || !user.tenantId?.isActive) {
+        if (!user || !user.isActive || !user.tenantId || !decoded.tenantId || String(decoded.tenantId) !== String(user.tenantId._id)) {
             return res.status(403).json({ success: false, error: 'Invalid refresh token' });
         }
+
+        const denied = tenantAccessError(user.tenantId);
+        if (denied) return res.status(403).json(denied);
 
         const newAccessToken = generateAccessToken(user._id, user.tenantId._id, user.role);
         const newRefreshToken = generateRefreshToken(user._id, user.tenantId._id);
