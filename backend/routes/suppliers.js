@@ -1,3 +1,4 @@
+const { parseListQuery } = require('../utils/listQuery');
 /**
  * Supplier Routes
  * CRUD operations for suppliers with payables tracking
@@ -53,14 +54,7 @@ router.get('/',
 
     asyncHandler(async (req, res) => {
 
-        const {
-            page = 1,
-            limit = 10,
-            search = '',
-        } = req.query;
-
-        const pageNumber = Math.max(parseInt(page) || 1, 1);
-        const limitNumber = Math.max(parseInt(limit) || 10, 1);
+        const { page: pageNumber, limit: limitNumber, search } = parseListQuery(req.query, ['name', 'company', 'phone', 'createdAt', 'updatedAt']);
 
         const skip = (pageNumber - 1) * limitNumber;
 

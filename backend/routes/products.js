@@ -1,3 +1,4 @@
+const { parseListQuery } = require('../utils/listQuery');
 /**
  * Product Routes
  * CRUD operations for products with inventory management
@@ -32,7 +33,7 @@ router.get('/',
     verifyToken,
     checkSubscription,
     handler(async (req, res) => {
-        const { page = 1, limit = 10, search = '', category = '', sortBy = 'name', sortOrder = 'asc' } = req.query;
+        const { page, limit, search, category, sortBy, sortOrder } = parseListQuery(req.query, ['name', 'barcode', 'sellingPrice', 'costPrice', 'stock', 'createdAt', 'updatedAt']);
 
         const skip = (page - 1) * limit;
         const query = {

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import apiClient from '../config/api';
 
 export default function ResourceManager({ title, resource, fields, user, categoryOptions = false }) {
@@ -14,16 +14,19 @@ export default function ResourceManager({ title, resource, fields, user, categor
     const [saving, setSaving] = useState(false);
     const canEdit = ['owner', 'manager'].includes(user?.role);
     const describeError = error => typeof error.response?.data?.error === 'string' ? error.response.data.error : error.response?.data?.error?.message || error.message;
+    const requestVersion = useRef(0);
     const load = useCallback(async () => {
+        const version = ++requestVersion.current;
         setLoading(true); setError('');
         try {
             const { data } = await apiClient.get(`/api/${resource}`, { params: { page, limit: 25, search } });
+            if (version !== requestVersion.current) return;
             setRows(resource === 'categories' && search ? data.data.filter(row => row.name.toLowerCase().includes(search.toLowerCase())) : data.data);
             setPages(Math.max(1, data.pagination?.pages || 1));
-        } catch (error) { setError(describeError(error)); setRows([]); }
-        finally { setLoading(false); }
+        } catch (error) { if (version === requestVersion.current) { setError(describeError(error)); setRows([]); } }
+        finally { if (version === requestVersion.current) setLoading(false); }
     }, [resource, page, search]);
-    useEffect(() => { const timer = setTimeout(load, 200); return () => clearTimeout(timer); }, [load]);
+    useEffect(() => { const timer = setTimeout(load, 200); return () => { clearTimeout(timer); requestVersion.current++; }; }, [load]);
     useEffect(() => {
         if (categoryOptions) apiClient.get('/api/categories').then(({ data }) => setCategories(data.data)).catch(error => setError(describeError(error)));
     }, [categoryOptions]);

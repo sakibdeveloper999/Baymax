@@ -162,3 +162,23 @@ test('settings saves numeric tax and updates the active store only after success
         expect(container.textContent).toContain('Store settings saved.');
     } finally { act(() => root.unmount()); delete global.IS_REACT_ACT_ENVIRONMENT; }
 });
+
+test('a slow previous search cannot overwrite newer category results', async () => {
+    global.IS_REACT_ACT_ENVIRONMENT = true;
+    jest.useFakeTimers();
+    let resolveOld;
+    apiClient.get.mockImplementationOnce(() => new Promise(resolve => { resolveOld = resolve; }));
+    apiClient.get.mockResolvedValue({ data: { data: [{ _id: 'new', name: 'New category' }] } });
+    const container = document.createElement('div');
+    const root = createRoot(container);
+    try {
+        await act(async () => root.render(<CategoriesManager user={{ role: 'owner' }} />));
+        await act(async () => jest.runOnlyPendingTimers());
+        act(() => Simulate.change(container.querySelector('input[aria-label="Search Categories"]'), { target: { value: 'New' } }));
+        await act(async () => jest.runOnlyPendingTimers());
+        expect(container.textContent).toContain('New category');
+        await act(async () => resolveOld({ data: { data: [{ _id: 'old', name: 'Old category' }] } }));
+        expect(container.textContent).toContain('New category');
+        expect(container.textContent).not.toContain('Old category');
+    } finally { act(() => root.unmount()); jest.useRealTimers(); delete global.IS_REACT_ACT_ENVIRONMENT; }
+});

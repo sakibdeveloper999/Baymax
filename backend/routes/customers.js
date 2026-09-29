@@ -1,3 +1,4 @@
+const { parseListQuery } = require('../utils/listQuery');
 /**
  * Customer Routes
  * CRUD operations for customers with credit/wallet/loyalty management
@@ -26,7 +27,7 @@ router.get('/',
     verifyToken,
     checkSubscription,
     asyncHandler(async (req, res) => {
-        const { page = 1, limit = 10, search = '', sortBy = 'name', sortOrder = 'asc' } = req.query;
+        const { page, limit, search, sortBy, sortOrder } = parseListQuery(req.query, ['name', 'phone', 'email', 'createdAt', 'updatedAt']);
 
         const skip = (page - 1) * limit;
         const query = {
