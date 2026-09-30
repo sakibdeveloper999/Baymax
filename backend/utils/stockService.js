@@ -1,5 +1,6 @@
 const Product = require('../models/Product');
 const StockLog = require('../models/StockLog');
+const database = require('../db/pool');
 
 /**
  * SINGLE FUNCTION that handles ALL stock mutations
@@ -17,9 +18,12 @@ async function adjustStock(
     note = '',
     session = null
 ) {
+    if (!session && !database.currentSession()) {
+        return database.transaction(tx => adjustStock(productId, delta, reason, userId, storeId, orderId, purchaseId, note, tx));
+    }
     try {
-        // Fetch current product
-        const product = await Product.findById(productId).session(session);
+        // Lock the product in this store for the duration of the transaction
+        const product = await Product.findOne({ _id: productId, storeId }).session(session);
         if (!product) {
             throw new Error(`Product ${productId} not found`);
         }

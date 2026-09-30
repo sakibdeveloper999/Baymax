@@ -1,6 +1,7 @@
-require('dotenv').config();
+require('dotenv').config({ path: require('node:path').join(__dirname, '.env') });
 const express = require('express');
-const mongoose = require('mongoose');
+const database = require('./db/pool');
+const connectDB = require('./config/db');
 const cors = require('cors');
 const helmet = require('helmet');
 const { Server } = require('socket.io');
@@ -48,22 +49,10 @@ const { requireStore } = require('./middleware/store');
 const { checkSubscription } = require('./middleware/subscription');
 
 // ══════════════════════════════════
-// MONGODB CONNECTION
+// POSTGRESQL CONNECTION
 // ══════════════════════════════════
 
-mongoose.connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-})
-    .then(async () => {
-        await require('./utils/ensurePlans').ensurePlans();
-        console.log('✅ MongoDB Connected');
-
-    })
-    .catch((err) => {
-        console.error('❌ MongoDB Connection Error:', err.message);
-        process.exit(1);
-    });
+// Database readiness is awaited before the HTTP listener starts.
 
 // ══════════════════════════════════
 // ROUTES
@@ -165,7 +154,10 @@ app.use(errorHandler);
 // ══════════════════════════════════
 
 const PORT = process.env.PORT || 5000;
-server.listen(PORT, () => {
+async function start() {
+    await connectDB();
+    await require('./utils/ensurePlans').ensurePlans();
+    return server.listen(PORT, () => {
     console.log(`\n🚀 OmniPOS Backend v4.0 SaaS`);
     console.log(`   API running on port ${PORT}`);
     console.log(`   Base URL: ${process.env.API_BASE_URL}`);
@@ -201,7 +193,7 @@ server.listen(PORT, () => {
     console.log(`   PATCH  /api/customers/:id/wallet  - Add funds to wallet`);
     console.log(`   PATCH  /api/customers/:id/loyalty/redeem - Redeem loyalty points`);
     console.log(`\n💡 Next Steps:`);
-    console.log(`   npm run seed              - Populate with test data`);
+    console.log(`   npm run seed              - Initialize subscription plans only`);
     console.log(`   npm run dev               - Watch mode with auto-reload`);
     console.log(`\n`);
 
@@ -212,12 +204,21 @@ server.listen(PORT, () => {
     process.on('SIGTERM', async () => {
         console.log('\n⏸️  SIGTERM received, shutting down gracefully...');
         server.close(async () => {
-            await mongoose.connection.close();
+            await database.close();
             console.log('✅ Graceful shutdown complete');
             process.exit(0);
         });
     });
 
-    module.exports = app;
-});
+    });
+}
+
+if (require.main === module) {
+    start().catch(async error => {
+        console.error('PostgreSQL startup failed:', error.code || error.message);
+        await database.close();
+        process.exitCode = 1;
+    });
+}
+module.exports = { app, server, start };
 

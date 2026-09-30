@@ -1,11 +1,11 @@
-const mongoose = require('mongoose');
+const { isValidId } = require('../db/ids');
 const Store = require('../models/Store');
 
 // Resolve only stores owned by the authenticated tenant. Never trust a client ID alone.
 async function requireStore(req, res, next) {
     try {
         const storeId = req.headers['x-store-id'];
-        if (storeId && !mongoose.isValidObjectId(storeId)) {
+        if (storeId && !isValidId(storeId)) {
             return res.status(400).json({ success: false, error: 'Invalid store ID' });
         }
         const query = { tenantId: req.tenant._id, isActive: true };

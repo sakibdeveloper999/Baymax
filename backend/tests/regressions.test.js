@@ -2,7 +2,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
-const mongoose = require('mongoose');
+const { newId } = require('../db/ids');
 const { requireRole } = require('../middleware/auth');
 const { requireStore } = require('../middleware/store');
 const Store = require('../models/Store');
@@ -31,8 +31,8 @@ test('role checks accept both call styles and deny unauthorized users', () => {
     }
 });
 test('store selection enforces tenant ownership and rejects unknown stores', async (t) => {
-    const tenantId = new mongoose.Types.ObjectId();
-    const storeId = new mongoose.Types.ObjectId().toString();
+    const tenantId = newId();
+    const storeId = newId().toString();
     t.mock.method(Store, 'findOne', (query) => {
         assert.equal(query.tenantId, tenantId);
         assert.equal(query._id, storeId);
@@ -51,8 +51,8 @@ test('store selection rejects malformed IDs', async () => {
     assert.equal(res.statusCode, 400);
 });
 test('new orders generate numbers before required-field validation', async () => {
-    const order = new Order({ storeId: new mongoose.Types.ObjectId(), cashierId: new mongoose.Types.ObjectId(),
-        items: [{ productId: new mongoose.Types.ObjectId(), quantity: 1, unitPrice: 10, total: 10 }],
+    const order = new Order({ storeId: newId(), cashierId: newId(),
+        items: [{ productId: newId(), quantity: 1, unitPrice: 10, total: 10 }],
         subtotal: 10, discount: 2, discountType: 'flat', tax: 0, total: 8, profit: 3 });
     await order.validate();
     assert.match(order.orderNumber, /^ORD-/);

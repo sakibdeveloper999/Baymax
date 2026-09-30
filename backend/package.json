@@ -1,35 +1,40 @@
 {
-    "name": "baymax-backend",
-    "version": "1.0.0",
-    "description": "OmniPOS Backend - MERN Stack Grocery POS System",
-    "main": "server.js",
-    "scripts": {
-        "start": "node server.js",
-        "dev": "nodemon server.js",
-        "seed": "node scripts/seed.js",
-        "test": "node --test",
-        "setup:plans": "node scripts/setupPlans.js"
-    },
-    "keywords": [
-        "POS",
-        "MERN",
-        "Grocery"
-    ],
-    "author": "",
-    "license": "MIT",
-    "dependencies": {
-        "bcryptjs": "^2.4.3",
-        "cors": "^2.8.5",
-        "dotenv": "^16.0.3",
-        "express": "^4.18.2",
-        "express-rate-limit": "^6.7.0",
-        "joi": "^17.9.2",
-        "jsonwebtoken": "^9.0.0",
-        "mongoose": "^7.0.0",
-        "socket.io": "^4.5.4",
-        "helmet": "^7.0.0"
-    },
-    "devDependencies": {
-        "nodemon": "^3.1.14"
-    }
+  "name": "baymax-backend",
+  "version": "1.0.0",
+  "description": "OmniPOS Backend - PostgreSQL/Neon Grocery POS System",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "seed": "node scripts/seed.js",
+    "test": "node --test",
+    "setup:plans": "node scripts/setupPlans.js",
+    "db:migrate": "node scripts/migrate.js",
+    "db:check": "node scripts/checkDatabase.js",
+    "db:smoke": "node scripts/smokeDatabase.js"
+  },
+  "keywords": [
+    "POS",
+    "PostgreSQL",
+    "Neon",
+    "Grocery"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "express-rate-limit": "^6.7.0",
+    "helmet": "^7.0.0",
+    "joi": "^17.9.2",
+    "jsonwebtoken": "^9.0.0",
+    "pg": "^8.23.0",
+    "socket.io": "^4.5.4"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.5.8",
+    "nodemon": "^3.1.14"
+  }
 }

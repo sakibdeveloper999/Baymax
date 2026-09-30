@@ -5,7 +5,7 @@ const { parseListQuery } = require('../utils/listQuery');
  */
 
 const express = require('express');
-const mongoose = require('mongoose');
+const { isValidId } = require('../db/ids');
 
 const router = express.Router();
 
@@ -38,7 +38,7 @@ const {
 // ═══════════════════════════════════════════════════════════════
 
 const validateObjectId = (id) => {
-    if (!mongoose.Types.ObjectId.isValid(id)) {
+    if (!isValidId(id)) {
         throw new ValidationError('Invalid supplier ID');
     }
 };

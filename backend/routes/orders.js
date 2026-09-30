@@ -6,7 +6,7 @@
 
 const express = require('express');
 const router = express.Router();
-const mongoose = require('mongoose');
+const database = require('../db/pool');
 const { verifyToken, requireRole } = require('../middleware/auth');
 const { checkSubscription, checkFeature } = require('../middleware/subscription');
 const { validate } = require('../middleware/validation');
@@ -41,11 +41,10 @@ router.post(['/', '/checkout'],
             throw new ValidationError('Customer required for credit or wallet payments');
         }
 
-        // Start MongoDB transaction
-        const session = await mongoose.startSession();
-        session.startTransaction();
-
+        // Start PostgreSQL transaction
+        const session = await database.startSession();
         try {
+            await session.startTransaction();
             // 1. Validate and fetch products with prices
             const productIds = items.map(i => i.productId);
             const products = await Product.find({
@@ -196,7 +195,7 @@ router.post(['/', '/checkout'],
             if (session.inTransaction()) await session.abortTransaction();
             throw error;
         } finally {
-            session.endSession();
+            await session.endSession();
         }
     })
 );

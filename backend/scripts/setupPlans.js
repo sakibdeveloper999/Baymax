@@ -1,11 +1,10 @@
-require('dotenv').config();
-const mongoose = require('mongoose');
-const { ensurePlans } = require('../utils/ensurePlans');
+﻿require('dotenv').config({ path: require('node:path').join(__dirname, '../.env') });
+const database = require('../db/pool');
 (async () => {
     try {
-        await mongoose.connect(process.env.MONGO_URI, { autoIndex: false, autoCreate: false, serverSelectionTimeoutMS: 5000 });
-        await ensurePlans();
-        console.log('Plan definitions ready. Existing plans and tenant subscriptions were not changed.');
-    } catch (error) { console.error('Plan setup failed:', error.code || error.name); process.exitCode = 1; }
-    finally { await mongoose.disconnect(); }
+        await require('../config/db')();
+        await require('../utils/ensurePlans').ensurePlans();
+        console.log('Plan definitions ready. Existing plans preserved.');
+    } catch (error) { console.error('Plan setup failed:', error.code || error.message); process.exitCode = 1; }
+    finally { await database.close(); }
 })();

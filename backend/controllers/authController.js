@@ -3,18 +3,19 @@ const User = require('../models/User');
 const Tenant = require('../models/Tenant');
 const Plan = require('../models/Plan');
 const SubscriptionLog = require('../models/SubscriptionLog');
-const { hashPassword, comparePassword, generateAccessToken, generateRefreshToken } = require('../utils/helpers');
+const { comparePassword, generateAccessToken, generateRefreshToken } = require('../utils/helpers');
 const Joi = require('joi');
+const database = require('../db/pool');
 
 // ──── SIGN UP ────
 exports.signup = async (req, res) => {
     try {
-        const { businessName, ownerEmail, password, language = 'en', currency = 'USD' } = req.body;
+        const { businessName } = req.body;
 
         // Validate
         const schema = Joi.object({
             businessName: Joi.string().required().min(3),
-            ownerEmail: Joi.string().email().required(),
+            ownerEmail: Joi.string().email().lowercase().required(),
             password: Joi.string().required().min(8),
             language: Joi.string().valid('en', 'ar', 'bn').default('en'),
             currency: Joi.string().default('USD'),
@@ -29,43 +30,46 @@ exports.signup = async (req, res) => {
             return res.status(409).json({ success: false, error: 'Email already registered' });
         }
 
-        // Create tenant with basic plan and 7-day trial
-        const trialEnd = new Date();
-        trialEnd.setDate(trialEnd.getDate() + 7);
+        const { tenant, user, trialEnd } = await database.transaction(async () => {
+            // Create tenant with basic plan and 7-day trial
+            const trialEnd = new Date();
+            trialEnd.setDate(trialEnd.getDate() + 7);
 
-        const tenant = new Tenant({
-            businessName: value.businessName,
-            ownerEmail: value.ownerEmail,
-            plan: 'basic',
-            subscriptionStatus: 'active',
-            expireAt: trialEnd,
-            language: value.language,
-            currency: value.currency,
-        });
-        await tenant.save();
+            const tenant = new Tenant({
+                businessName: value.businessName,
+                ownerEmail: value.ownerEmail,
+                plan: 'basic',
+                subscriptionStatus: 'active',
+                expireAt: trialEnd,
+                language: value.language,
+                currency: value.currency,
+            });
+            await tenant.save();
 
-        // Create owner user
-        const user = new User({
-            name: value.businessName + ' Owner',
-            email: value.ownerEmail,
-            password: value.password,
-            role: 'owner',
-            tenantId: tenant._id,
-        });
-        await user.save();
+            // Create owner user
+            const user = new User({
+                name: value.businessName + ' Owner',
+                email: value.ownerEmail,
+                password: value.password,
+                role: 'owner',
+                tenantId: tenant._id,
+            });
+            await user.save();
 
-        // Log subscription (trial start)
-        const plan = await Plan.findOne({ name: 'basic' });
-        await SubscriptionLog.create({
-            tenantId: tenant._id,
-            plan: 'basic',
-            amount: 0,
-            currency: value.currency,
-            paidAt: new Date(),
-            periodStart: new Date(),
-            periodEnd: trialEnd,
-            method: 'trial',
-            status: 'paid',
+            // Log subscription (trial start)
+            await SubscriptionLog.create({
+                tenantId: tenant._id,
+                plan: 'basic',
+                amount: 0,
+                currency: value.currency,
+                paidAt: new Date(),
+                periodStart: new Date(),
+                periodEnd: trialEnd,
+                method: 'trial',
+                status: 'paid',
+            });
+
+            return { tenant, user, trialEnd };
         });
 
         // Generate tokens
@@ -84,6 +88,7 @@ exports.signup = async (req, res) => {
             },
         });
     } catch (error) {
+        if (error.code === '23505') return res.status(409).json({ success: false, error: 'Email already registered' });
         res.status(500).json({ success: false, error: error.message });
     }
 };
@@ -91,11 +96,9 @@ exports.signup = async (req, res) => {
 // ──── LOGIN ────
 exports.login = async (req, res) => {
     try {
-        const { email, password } = req.body;
-
         // Validate
         const schema = Joi.object({
-            email: Joi.string().email().required(),
+            email: Joi.string().email().lowercase().required(),
             password: Joi.string().required(),
         });
         const { error, value } = schema.validate(req.body);

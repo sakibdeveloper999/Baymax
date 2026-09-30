@@ -98,8 +98,8 @@ baymax/
 ## 🚀 Quick Start
 
 ### Prerequisites
-- **Node.js** v16+ (LTS recommended)
-- **MongoDB Atlas** account (free tier available at mongodb.com)
+- **Node.js** v20+
+- **Neon PostgreSQL** project
 - **npm** or **yarn**
 
 ### 1️⃣ Setup Backend
@@ -108,10 +108,12 @@ baymax/
 cd backend
 cp .env.example .env
 
-# Edit .env with your MongoDB connection string
-# MONGO_URI=mongodb+srv://user:password@cluster.mongodb.net/baymax
+# Edit .env with your Neon PostgreSQL connection string
+# DATABASE_URL=postgresql://USER:PASSWORD@HOST/neondb?sslmode=verify-full
 
 npm install
+npm run db:migrate
+npm run setup:plans
 npm run dev      # Starts at http://localhost:5000
 ```
 
@@ -824,7 +826,7 @@ POST   /admin/backups                → Manual backup trigger
 
 ### Backend (.env)
 ```env
-MONGO_URI=mongodb+srv://user:pass@cluster.mongodb.net/baymax
+DATABASE_URL=postgresql://USER:PASSWORD@HOST/neondb?sslmode=verify-full
 JWT_SECRET=your-super-secret-key
 PORT=5000
 NODE_ENV=development
@@ -844,8 +846,8 @@ REACT_APP_DEFAULT_LANGUAGE=en
 
 ### Backend won't start
 ```bash
-# Check MongoDB connection
-# Verify MONGO_URI in .env
+# Check PostgreSQL connection: npm run db:check
+# Verify DATABASE_URL in .env and run npm run db:migrate
 # Check if port 5000 is in use
 
 npm run dev -- --port 5001  # Use different port

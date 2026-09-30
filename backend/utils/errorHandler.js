@@ -78,6 +78,9 @@ class DatabaseError extends AppError {
 // ═══════════════════════════════════════════════════════════════
 
 const errorHandler = (err, req, res, next) => {
+    if (err.code === '23505') err = new ConflictError('A record with these unique values already exists');
+    else if (['23503', '23514', '23502', '22P02', '22007'].includes(err.code)) err = new ValidationError('Invalid database value or related record');
+    else if (['40001', '40P01'].includes(err.code)) err = new ConflictError('Concurrent update; please retry');
     // Default to 500 if no status code
     const statusCode = err.statusCode || 500;
     const code = err.code || 'INTERNAL_ERROR';

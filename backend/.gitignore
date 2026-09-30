@@ -7,7 +7,6 @@ yarn-error.log*
 # Environment variables
 .env
 .env.local
-.env.example
 .env.*.local
 
 # Build directories
@@ -39,3 +38,5 @@ logs/
 .cache/
 .next/
 [Dd]esktop.ini
+
+!.env.example
