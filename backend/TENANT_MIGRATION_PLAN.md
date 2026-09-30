@@ -1,18 +1,41 @@
-# Tenant migration required by the v4 app map
+﻿# Tenant scope and migration status
 
-The current active routes isolate records through `requireStore`, which selects an active store belonging to the authenticated tenant. Most store-owned models do not yet persist their own tenantId. The v4 map additionally requires explicit tenantId fields and query filters.
+Updated: 2026-09-30. This file retains its historical migration-plan name but reflects the current PostgreSQL application.
 
-No database migration has been applied. The proposed bulk schema change was rejected by automatic approval review because making tenantId required immediately would invalidate legacy records.
+## Database transition
 
-## Staged change for approval
+The chosen transition was a fresh Neon PostgreSQL database. The initial SQL migration is implemented and was applied during the conversion. No MongoDB records were imported, backfilled, assigned to a tenant, or deleted. The former plan to backfill ambiguous legacy MongoDB ownership is not a prerequisite for this fresh installation.
 
-1. Restore MongoDB connectivity and run `node scripts/auditTenantScope.js` from backend. This tool is read-only, disables automatic indexes/collection creation, and prints counts rather than customer data.
-2. Take a database backup. Add optional, indexed tenantId fields to store-owned models without changing existing query behavior.
-3. Backfill tenantId from each record's store owner. Handle stock transfers using both source and destination stores; stop and report missing stores or different tenant owners. Never accept tenantId from request bodies. Do not delete or overwrite conflicting records.
-4. Verify zero missing/conflicting tenant IDs. Test two tenants with overlapping barcodes and identifiers: reads, writes, receipts, stock logs, and aggregates must not cross the boundary.
-5. Update create operations and queries together, require tenantId only after the backfill, and enforce subscription/plan limits with concurrency tests. Preserve the existing store-ownership check as a second boundary.
-6. Deploy in stages; retain the backup and compatibility release for rollback.
+Old observations about unowned MongoDB products are historical and do not describe current Neon records. A future legacy import would be a separate task requiring a verified ownership mapping and backup; never infer ownership merely because only one store exists.
 
-Read-only preflight on 2026-09-19: MongoDB ping succeeds and the deployment supports transactions. There is one store, one user, and eight products. All eight products have neither storeId nor tenantId, so their owner cannot be derived automatically from a store reference. The eight products have names, unique barcodes, valid nonnegative prices and integer stock quantities, and explicit active flags. No records were changed.
+## Current authorization boundary
 
-Before migration, the user must identify the intended store for these eight products. Do not assign them merely because there is currently one store. Validate product fields and barcode uniqueness, back up the affected records, and review the exact proposed assignments before writing data. Production migration remains pending ownership confirmation and approval.
+- Tenant and User records carry tenant identity; Store references its Tenant.
+- HTTP authentication reloads the current user/tenant, checks the token's tenant claim, and applies subscription policy.
+- `requireStore` validates `X-Store-ID` or selects the oldest active store belonging to the authenticated tenant.
+- Most business records use `storeId`, and route queries scope access to the resolved store.
+- The SQL schema uses required store references and applicable composite foreign keys, such as a product's category belonging to the same store.
+- Frontend cart keys include tenant, user, and store, but localStorage keys are not server authorization.
+
+The v4 map's explicit `tenantId` field on every business record is not implemented. Store-based scoping and relational integrity do not replace the need to design that additional layer if the map requires it. No PostgreSQL row-level security policies are currently defined.
+
+## Audit command and limits
+
+```powershell
+node backend/scripts/auditTenantScope.js
+```
+
+The script reads `backend/.env` and performs a read-only query counting stores whose tenant reference has no matching tenant. It does not audit every model, prove complete tenant isolation, detect every cross-tenant relationship, or backfill records. On the constrained current schema, the store foreign key should normally prevent such orphans.
+
+Backend integration tests exercise unauthorized store selection and applicable cross-store reference failures. Real concurrent clients, offline queues, future route groups, and Socket.io authorization require additional coverage.
+
+## Future scope changes
+
+1. Define the intended tenant/store invariant for every entity, including stock transfers and embedded snapshots.
+2. Add a new versioned SQL migration; do not edit an already-applied migration.
+3. Update model metadata, create paths, filters, and constraints together.
+4. If data already exists, inspect ownership and validate a non-destructive backfill before making fields required.
+5. Test two tenants with overlapping identifiers, invalid references, signed receipts, and concurrent mutations.
+6. Keep socket authentication, feature gates, and platform-admin authorization in the review scope.
+
+See [PostgreSQL setup](POSTGRESQL_SETUP.md), [security policy](../SECURITY.md), and [app-map progress](../APP_MAP_PROGRESS.md).
