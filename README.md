@@ -1,6 +1,6 @@
 ﻿# Baymax OmniPOS
 
-Updated: 2026-09-30.
+Updated: 2026-10-03.
 
 Baymax is a React web and Electron desktop point-of-sale application backed by Express and Neon PostgreSQL. The active application supports account and store setup, catalog management, online checkout, stock adjustments, order history, and signed receipts. The full SaaS app map is still in progress.
 
@@ -63,7 +63,7 @@ Dashboard and Reports are labeled sample previews. They are not connected to liv
 
 Offline helpers exist in IndexedDB-related files, but the active POS loads products and submits sales through the API. SQLite is a deprecated stub. Full offline replay, idempotent sync, and mobile delivery remain pending.
 
-Socket.io is initialized, but connections and store-room joins are not authenticated. Plan definitions include usage limits; the existing `checkLimit` middleware exposes a limit to handlers and does not implement complete usage counting/enforcement. See [app-map progress](APP_MAP_PROGRESS.md) and [security notes](SECURITY.md).
+Socket.io now authenticates access tokens, authorizes tenant/store rooms, and disconnects expired or revoked sessions. Idle access is rechecked every 30 seconds with a 5-second lookup timeout. The active UI and business-event publishers are not yet connected; see the [Socket.IO contract](backend/SOCKET_IO.md). Plan definitions include usage limits; the existing `checkLimit` middleware exposes a limit to handlers and does not implement complete usage counting/enforcement. See [app-map progress](APP_MAP_PROGRESS.md) and [security notes](SECURITY.md).
 
 ## Backend layout
 

@@ -1,6 +1,6 @@
 ﻿# Security policy and current controls
 
-Updated: 2026-09-30.
+Updated: 2026-10-03.
 
 ## Reporting a vulnerability
 
@@ -20,9 +20,11 @@ Include the affected revision, affected flow, prerequisites, sanitized reproduct
 - Neon connections enforce certificate verification. Secrets belong in the ignored backend environment file, not frontend bundles.
 - Electron uses `nodeIntegration: false`, `contextIsolation: true`, and `sandbox: true`. The preload exposes receipt printing rather than general Node access. Print output is escaped/inserted as text.
 
+- Socket.IO requires access JWTs and current tenant/user authorization, validates store ownership, isolates tenant/store rooms, enforces expiry timers, and fails closed on lookup errors. Disconnect clears membership and timers.
+
 ## Known gaps and deployment considerations
 
-- Socket.io currently permits unauthenticated connections and unchecked store-room joins. Do not treat realtime store rooms as an authorization boundary.
+- Socket.IO revocation for database changes is periodic (30-second rechecks plus a 5-second lookup timeout), not instantaneous. Future publishers must use tenant/store room names and implement event-specific feature permissions; frontend realtime consumption is not implemented. See [Socket.IO access](backend/SOCKET_IO.md).
 - Tenant owners are application users, not global platform administrators. Separate platform-admin authorization remains undesigned.
 - Plan usage-limit enforcement is incomplete, and feature checks are not uniformly applied to all related operations/screens.
 - Browser tokens are stored in localStorage; a successful script injection could expose them. Automatic refresh-token retry, refresh-token rotation/revocation storage, and a complete session lifecycle are not implemented.

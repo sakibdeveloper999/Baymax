@@ -1,6 +1,6 @@
 ﻿# App map implementation progress
 
-Updated: 2026-09-30. The local `omnipos_app_map_v4_saas.html` is a design reference, not proof of implementation. It is ignored by Git and may not exist in another checkout.
+Updated: 2026-10-03. The local `omnipos_app_map_v4_saas.html` is a dated source-based map, not proof of production readiness. It is ignored by Git and may not exist in another checkout.
 
 ## Implemented foundation
 
@@ -17,9 +17,11 @@ Updated: 2026-09-30. The local `omnipos_app_map_v4_saas.html` is a design refere
 - [x] Account/store onboarding and API-backed POS, catalog, customers, suppliers, orders, inventory, and settings screens.
 - [x] Scoped cart/held-order persistence and a frontend Suppliers plan gate.
 
+- [x] Socket.IO access-token authentication, tenant/store room authorization, single-store switching, expiry timers and periodic user/tenant/store revocation (30-second checks, 5-second timeout). See [contract and validation](backend/SOCKET_IO.md).
+
 ## Remaining work
 
-- [ ] Authenticate Socket.io connections, authorize room joins, and revoke expired/suspended access.
+- [ ] Connect frontend realtime consumers and authorized business-event publishers; the access-control foundation is implemented.
 - [ ] Replace Dashboard and Reports sample previews with tenant/store-scoped analytics APIs.
 - [ ] Implement route groups and UI for purchases, transfers, returns, shifts, quotations, expenses, payroll, banking, vouchers, and other map modules.
 - [ ] Implement actual plan usage counting/enforcement, including concurrent creates. `checkLimit` currently only supplies configuration.
@@ -34,6 +36,6 @@ The map's request for explicit `tenantId` on each business record is still separ
 
 ## Evidence and scope
 
-See [system verification](SYSTEM_TEST_REPORT.md) for dated test/build results. Automated tests include both mocked policy checks and isolated PostgreSQL integration; they do not establish production readiness, real multi-client concurrency, hardware compatibility, or complete app-map delivery.
+On 2026-10-03, the full backend suite passed 52 tests, including 22 Socket.IO tests/subtests using real local transports with mocked database records. No live Neon or frontend realtime verification was performed. The older [system report](SYSTEM_TEST_REPORT.md) contains historical claims and must not be treated as current validation. Automated tests include both mocked policy checks and isolated PostgreSQL integration; they do not establish production readiness, real multi-client concurrency, hardware compatibility, or complete app-map delivery.
 
 The Neon schema was applied during the database conversion. No MongoDB ownership backfill was performed. Business-record counts are time-specific observations, not a permanent invariant of the running app.

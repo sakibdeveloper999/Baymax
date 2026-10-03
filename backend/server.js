@@ -112,20 +112,7 @@ app.use('/api/suppliers', verifyToken, checkSubscription, requireStore, supplier
 // SOCKET.IO REAL-TIME EVENTS
 // ══════════════════════════════════
 
-io.on('connection', (socket) => {
-    console.log(`📡 Client connected: ${socket.id}`);
-
-    // Client joins store room
-    socket.on('join:store', (storeId) => {
-        socket.join(`store:${storeId}`);
-        console.log(`  └─ Joined store room: store:${storeId}`);
-    });
-
-    // Broadcast handlers (called by controllers)
-    socket.on('disconnect', () => {
-        console.log(`📡 Client disconnected: ${socket.id}`);
-    });
-});
+require('./middleware/socketAccess').installSocketAccess(io);
 
 // ══════════════════════════════════
 // ERROR HANDLING
@@ -203,7 +190,7 @@ async function start() {
 
     process.on('SIGTERM', async () => {
         console.log('\n⏸️  SIGTERM received, shutting down gracefully...');
-        server.close(async () => {
+        io.close(async () => {
             await database.close();
             console.log('✅ Graceful shutdown complete');
             process.exit(0);
