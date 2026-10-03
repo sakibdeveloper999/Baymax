@@ -6,7 +6,7 @@
 const express = require('express');
 const router = express.Router();
 const { verifyToken, requireRole } = require('../middleware/auth');
-const { checkSubscription, checkLimit } = require('../middleware/subscription');
+const { checkSubscription } = require('../middleware/subscription');
 const { validate } = require('../middleware/validation');
 const { storeSchemas } = require('../utils/validationSchemas');
 const Store = require('../models/Store');
@@ -46,7 +46,6 @@ router.get('/',
 router.post('/',
     verifyToken,
     checkSubscription,
-    checkLimit('branches'),
     requireRole(['owner']),
     validate(storeSchemas.create),
     asyncHandler(async (req, res) => {

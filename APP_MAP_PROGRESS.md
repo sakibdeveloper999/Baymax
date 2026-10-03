@@ -19,12 +19,13 @@ Updated: 2026-10-03. The local `omnipos_app_map_v4_saas.html` is a dated source-
 
 - [x] Socket.IO access-token authentication, tenant/store room authorization, single-store switching, expiry timers and periodic user/tenant/store revocation (30-second checks, 5-second timeout). See [contract and validation](backend/SOCKET_IO.md).
 
+- [x] Active product/branch/user limits and reactivation checks in model saves, with tenant-row locks and transactional writes. Product creation and initial stock logs commit together. See [limit rules and validation scope](backend/PLAN_LIMITS.md); real multi-connection validation is configured in CI but not run locally.
+
 ## Remaining work
 
 - [ ] Connect frontend realtime consumers and authorized business-event publishers; the access-control foundation is implemented.
 - [ ] Replace Dashboard and Reports sample previews with tenant/store-scoped analytics APIs.
 - [ ] Implement route groups and UI for purchases, transfers, returns, shifts, quotations, expenses, payroll, banking, vouchers, and other map modules.
-- [ ] Implement actual plan usage counting/enforcement, including concurrent creates. `checkLimit` currently only supplies configuration.
 - [ ] Apply consistent feature gates across all relevant API operations and screens.
 - [ ] Define separate platform-administrator authorization. Tenant owners are not platform administrators.
 - [ ] Implement payment-provider integration, refund/return accounting, and complete mixed-payment behavior.
@@ -36,6 +37,6 @@ The map's request for explicit `tenantId` on each business record is still separ
 
 ## Evidence and scope
 
-On 2026-10-03, the full backend suite passed 52 tests, including 22 Socket.IO tests/subtests using real local transports with mocked database records. No live Neon or frontend realtime verification was performed. The older [system report](SYSTEM_TEST_REPORT.md) contains historical claims and must not be treated as current validation. Automated tests include both mocked policy checks and isolated PostgreSQL integration; they do not establish production readiness, real multi-client concurrency, hardware compatibility, or complete app-map delivery.
+On 2026-10-03, the full backend suite passed 60 tests with zero failures; one optional real-PostgreSQL concurrency test group was skipped because local Docker was unavailable. Coverage includes 22 Socket.IO tests/subtests and new PGlite capacity/API checks. CI now provisions PostgreSQL for multi-connection quota tests; no CI result is claimed. No live Neon or frontend realtime verification was performed. The older [system report](SYSTEM_TEST_REPORT.md) contains historical claims and must not be treated as current validation. Automated tests include both mocked policy checks and isolated PostgreSQL integration; they do not establish production readiness, real multi-client concurrency, hardware compatibility, or complete app-map delivery.
 
 The Neon schema was applied during the database conversion. No MongoDB ownership backfill was performed. Business-record counts are time-specific observations, not a permanent invariant of the running app.

@@ -89,6 +89,8 @@ exports.signup = async (req, res) => {
         });
     } catch (error) {
         if (error.code === '23505') return res.status(409).json({ success: false, error: 'Email already registered' });
+        if (error.statusCode) return res.status(error.statusCode).json({ success: false,
+            error: { code: error.code, message: error.message, details: error.details } });
         res.status(500).json({ success: false, error: error.message });
     }
 };

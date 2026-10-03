@@ -12,6 +12,7 @@ const { checkSubscription, checkFeature } = require('../middleware/subscription'
 const { validate } = require('../middleware/validation');
 const { productSchemas } = require('../utils/validationSchemas');
 const Product = require('../models/Product');
+const database = require('../db/pool');
 const Category = require('../models/Category');
 const StockLog = require('../models/StockLog');
 const stockService = require('../utils/stockService');
@@ -162,37 +163,42 @@ router.post('/',
             throw new ConflictError('Product with this barcode already exists in your store');
         }
 
-        // Create product
-        const product = new Product({
-            barcode,
-            name,
-            categoryId,
-            category: category.name,
-            costPrice,
-            sellingPrice,
-            stock: stock || 0,
-            lowStockAlert,
-            unit,
-            supplierId: supplier || null,
-            description,
-            storeId: req.storeId,
-        });
-
-        await product.save();
-
-        // Create initial stock log
-        if (stock > 0) {
-            await StockLog.create({
-                productId: product._id,
+        // Keep product capacity, creation and initial stock history in one commit.
+        const product = await database.transaction(async () => {
+            // Create product
+            const product = new Product({
+                barcode,
+                name,
+                categoryId,
+                category: category.name,
+                costPrice,
+                sellingPrice,
+                stock: stock || 0,
+                lowStockAlert,
+                unit,
+                supplierId: supplier || null,
+                description,
                 storeId: req.storeId,
-
-                delta: stock,
-                reason: 'restock',
-                changedBy: req.user.id,
-                newBalance: stock,
-                note: 'Product created with initial stock',
             });
-        }
+
+            await product.save();
+
+            // Create initial stock log
+            if (stock > 0) {
+                await StockLog.create({
+                    productId: product._id,
+                    storeId: req.storeId,
+
+                    delta: stock,
+                    reason: 'restock',
+                    changedBy: req.user.id,
+                    newBalance: stock,
+                    note: 'Product created with initial stock',
+                });
+            }
+
+            return product;
+        });
 
         res.status(201).json({
             success: true,

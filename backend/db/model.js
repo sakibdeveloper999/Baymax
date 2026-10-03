@@ -1,5 +1,6 @@
 ﻿const db = require('./pool');
 const schemas = require('./schema');
+const capacity = require('./capacity');
 const { newId, isValidId } = require('./ids');
 const { hash, compare } = require('bcryptjs');
 const { ValidationError, ConflictError } = require('../utils/errorHandler');
@@ -185,6 +186,7 @@ function createModel(name) {
         static insertMany(data, options) { return Model.create(data, options); }
         // Only insert-on-conflict is needed by the plan bootstrap; never overwrites existing plans.
         static async updateOne(filter, update, options) {
+            if (capacity.resources[name]) throw new Error('Use save() or create() for capacity-limited records');
             if (!options?.upsert || !update.$setOnInsert || Object.keys(update).length !== 1) throw new Error('Unsupported update; use save()');
             const doc = new Model({ ...filter, ...update.$setOnInsert });
             await doc.validate();
@@ -213,6 +215,13 @@ function createModel(name) {
             return this;
         }
         async save({ session } = {}) {
+            await this.validate();
+            if (capacity.needsCapacity(name, this._values(), this._state)) {
+                return capacity.withCapacity(name, this._values(), tx => this._persist({ session: tx }), session);
+            }
+            return this._persist({ session });
+        }
+        async _persist({ session } = {}) {
             await this.validate();
             if (name === 'User' && this.password !== undefined && !same(this.password, this._state.original.password)) {
                 this.password = await hash(this.password, 12);

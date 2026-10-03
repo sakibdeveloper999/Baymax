@@ -23,7 +23,7 @@ async function startSession() {
     let released = false;
     return {
         query: (text, values) => client.query(text, values),
-        async startTransaction() { await client.query('BEGIN'); active = true; },
+        async startTransaction() { await client.query('BEGIN ISOLATION LEVEL READ COMMITTED'); active = true; },
         async commitTransaction() { await client.query('COMMIT'); active = false; },
         async abortTransaction() { await client.query('ROLLBACK'); active = false; },
         inTransaction: () => active,

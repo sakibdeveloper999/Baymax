@@ -22,11 +22,13 @@ Include the affected revision, affected flow, prerequisites, sanitized reproduct
 
 - Socket.IO requires access JWTs and current tenant/user authorization, validates store ownership, isolates tenant/store rooms, enforces expiry timers, and fails closed on lookup errors. Disconnect clears membership and timers.
 
+- Active product, branch and user capacity is checked under a PostgreSQL tenant-row lock in the same transaction as the write. Missing or invalid limit configuration fails closed; reactivation is checked too.
+
 ## Known gaps and deployment considerations
 
 - Socket.IO revocation for database changes is periodic (30-second rechecks plus a 5-second lookup timeout), not instantaneous. Future publishers must use tenant/store room names and implement event-specific feature permissions; frontend realtime consumption is not implemented. See [Socket.IO access](backend/SOCKET_IO.md).
 - Tenant owners are application users, not global platform administrators. Separate platform-admin authorization remains undesigned.
-- Plan usage-limit enforcement is incomplete, and feature checks are not uniformly applied to all related operations/screens.
+- Product/branch/user limits are enforced in application model saves, not as database triggers. Direct SQL and future import/migration paths must preserve that guard. Multi-connection tests are configured in CI but were not run locally; see [subscription limits](backend/PLAN_LIMITS.md). Feature checks remain uneven across operations/screens.
 - Browser tokens are stored in localStorage; a successful script injection could expose them. Automatic refresh-token retry, refresh-token rotation/revocation storage, and a complete session lifecycle are not implemented.
 - Offline replay/idempotency and cross-session local queue isolation are incomplete. The active POS requires the API.
 - Payment-method labels do not constitute gateway integration, payment verification, or refund processing.

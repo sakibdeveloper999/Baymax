@@ -10,6 +10,20 @@ jobs:
     strategy:
       matrix:
         node-version: [20.x, 22.x]
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: capacity_test
+          POSTGRES_PASSWORD: isolated_ci_password
+          POSTGRES_DB: baymax_capacity_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U capacity_test -d baymax_capacity_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -23,6 +37,8 @@ jobs:
         working-directory: backend
       - run: npm test
         working-directory: backend
+        env:
+          CAPACITY_TEST_DATABASE_URL: postgresql://capacity_test:isolated_ci_password@127.0.0.1:5432/baymax_capacity_test
       - run: npm ci
         working-directory: desktop
       - run: npm test -- --runInBand
