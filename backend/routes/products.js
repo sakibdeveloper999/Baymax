@@ -86,7 +86,7 @@ router.get('/',
 // GET /api/products/:id — Get single product with stock log
 // ═══════════════════════════════════════════════════════════════
 
-router.get('/barcode/:code', verifyToken, checkSubscription, handler(async (req, res) => {
+router.get('/barcode/:code', verifyToken, checkSubscription, checkFeature('barcodes'), handler(async (req, res) => {
     const product = await Product.findOne({ barcode: req.params.code, storeId: req.storeId, isActive: true }).select('+costPrice');
     if (!product) throw new NotFoundError('Product not found');
     res.json({ success: true, data: sanitizeProduct(product, req.user.role) });
@@ -136,7 +136,6 @@ router.get('/:id',
 router.post('/',
     verifyToken,
     checkSubscription,
-    checkFeature('pos'),
     requireRole(['owner', 'manager']),
     validate(productSchemas.create),
     handler(async (req, res) => {

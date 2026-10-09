@@ -1,6 +1,6 @@
 ﻿# Baymax OmniPOS
 
-Updated: 2026-10-03.
+Updated: 2026-10-09.
 
 Baymax is a React web and Electron desktop point-of-sale application backed by Express and Neon PostgreSQL. The active application supports account and store setup, catalog management, online checkout, stock adjustments, order history, and signed receipts. The full SaaS app map is still in progress.
 
@@ -57,7 +57,7 @@ There are no built-in demo accounts or sample products. `seed` initializes subsc
 
 ## Implemented and pending behavior
 
-The active UI includes POS, Products, Categories, Customers, Suppliers, Orders, Inventory, and store Settings. Features and mutations remain subject to backend roles and subscription checks. Suppliers has an explicit frontend plan gate. Some customer operations also require plan features; the UI does not gate every feature consistently yet.
+The active UI includes POS, Products, Categories, Customers, Suppliers, Orders, Inventory, and store Settings. Features and mutations remain subject to backend roles and subscription checks. Configured plan features now gate the mounted business APIs and corresponding screens, including barcode lookup and customer wallet/loyalty operations. Custom plans are respected. See [feature access rules](backend/FEATURE_ACCESS.md).
 
 Dashboard and Reports are labeled sample previews. They are not connected to live analytics APIs. Purchases, transfers, returns, shifts, payroll, accounting, banking, vouchers, and other planned modules have database models but no mounted route groups. The POS UI offers cash, card, and mobile payment labels; it does not process card or mobile payments through a gateway. The checkout API additionally understands credit, wallet, and mixed labels, but these do not imply complete payment-provider or split-tender workflows.
 

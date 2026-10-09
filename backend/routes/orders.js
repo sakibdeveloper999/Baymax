@@ -8,7 +8,7 @@ const express = require('express');
 const router = express.Router();
 const database = require('../db/pool');
 const { verifyToken, requireRole } = require('../middleware/auth');
-const { checkSubscription, checkFeature } = require('../middleware/subscription');
+const { checkSubscription, checkFeature, checkRequestedFeatures } = require('../middleware/subscription');
 const { validate } = require('../middleware/validation');
 const { orderSchemas, paginationSchema } = require('../utils/validationSchemas');
 const Order = require('../models/Order');
@@ -34,6 +34,10 @@ router.post(['/', '/checkout'],
     checkFeature('pos'),
     requireRole(['owner', 'manager', 'cashier']),
     validate(orderSchemas.checkout),
+    checkRequestedFeatures(req => [
+        ...(req.body.customerId || ['wallet', 'credit'].includes(req.body.paymentMethod) ? ['customers'] : []),
+        ...(req.body.paymentMethod === 'wallet' ? ['wallet'] : []),
+    ]),
     asyncHandler(async (req, res) => {
         const { items, customerId, discount, paymentMethod, notes } = req.body;
 
@@ -159,7 +163,7 @@ router.post(['/', '/checkout'],
 
                     // Earn loyalty points
                     const pointsEarned = Math.floor(billing.total / 100); // 1 point per 100 currency units
-                    customer.loyaltyPoints += pointsEarned;
+                    if (req.planFeatures.includes('loyalty')) customer.loyaltyPoints += pointsEarned;
 
                     await customer.save({ session });
                 }

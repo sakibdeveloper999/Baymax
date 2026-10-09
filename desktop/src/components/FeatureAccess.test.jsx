@@ -19,3 +19,23 @@ test('missing plan configuration blocks supplier requests with a distinct messag
     expect(html).toContain('configuration is unavailable');
     expect(mount).not.toHaveBeenCalled();
 });
+
+
+test("generic restriction copy describes reports without supplier-specific tier claims", () => {
+    const html = renderToStaticMarkup(<FeatureAccess features={["pos"]} feature="reports" title="Reports" plan="custom"><SupplierScreen /></FeatureAccess>);
+    expect(html).toContain("Reports is not included");
+    expect(html).not.toContain("Suppliers are available");
+    expect(mount).not.toHaveBeenCalled();
+});
+
+test("all requested features must be present before mounting", () => {
+    renderToStaticMarkup(<FeatureAccess features={["pos"]} feature={["pos", "products"]} title="POS"><SupplierScreen /></FeatureAccess>);
+    expect(mount).not.toHaveBeenCalled();
+});
+
+test("malformed feature entries and unloaded access block child mounting", () => {
+    for (const features of [undefined, ["suppliers", 1]]) {
+        renderToStaticMarkup(<FeatureAccess features={features} feature="suppliers" title="Suppliers"><SupplierScreen /></FeatureAccess>);
+        expect(mount).not.toHaveBeenCalled();
+    }
+});

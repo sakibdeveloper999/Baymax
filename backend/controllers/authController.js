@@ -1,3 +1,4 @@
+const { isFeatureList } = require('../utils/planFeatures');
 const { tenantAccessError } = require('../utils/tenantAccess');
 const User = require('../models/User');
 const Tenant = require('../models/Tenant');
@@ -188,8 +189,8 @@ exports.getCurrentUser = async (req, res) => {
             data: {
                 user: user,
                 tenant: user.tenantId,
-                features: plan?.features || [],
-                planConfigured: Boolean(plan),
+                features: plan && isFeatureList(plan.features) ? plan.features : [],
+                planConfigured: Boolean(plan && isFeatureList(plan.features)),
             },
         });
     } catch (error) {

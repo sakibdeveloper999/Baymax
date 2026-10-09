@@ -4,8 +4,9 @@ import apiClient from '../config/api';
 import generateReceipt from '../utils/receipt';
 import printReceipt from '../utils/printer';
 
-export default function POSScreen({ store, user, onBusyChange }) {
+export default function POSScreen({ store, user, onBusyChange, features }) {
     const scanRef = useRef(null);
+    const canScan = Array.isArray(features) && features.includes('barcodes');
     const [search, setSearch] = useState('');
     const [category, setCategory] = useState('All');
     const [products, setProducts] = useState([]);
@@ -40,10 +41,10 @@ export default function POSScreen({ store, user, onBusyChange }) {
     const categoryName = product => product.categoryId?.name || product.category || 'General';
     const categories = ['All', ...new Set(products.map(categoryName))];
     const filtered = products.filter(product => (category === 'All' || categoryName(product) === category)
-        && (product.name.toLowerCase().includes(search.toLowerCase()) || product.barcode.includes(search)));
+        && (product.name.toLowerCase().includes(search.toLowerCase()) || (canScan && product.barcode.includes(search))));
     const addProduct = product => { cart.addItem(product); scanRef.current?.focus(); };
     const scanProduct = async event => {
-        if (event.key !== 'Enter' || busy || !search.trim()) return;
+        if (!canScan || event.key !== 'Enter' || busy || !search.trim()) return;
         event.preventDefault(); setError(''); setBusy(true);
         try {
             const { data } = await apiClient.get(`/api/products/barcode/${encodeURIComponent(search.trim())}`);
@@ -91,7 +92,7 @@ export default function POSScreen({ store, user, onBusyChange }) {
         </div>}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <section className="lg:col-span-2 space-y-4">
-                <input ref={scanRef} aria-label="Scan barcode or search products" placeholder="Scan barcode and press Enter, or search this page..." value={search} onChange={event => setSearch(event.target.value)} onKeyDown={scanProduct} autoFocus disabled={busy} />
+                <input ref={scanRef} aria-label={canScan ? "Scan barcode or search products" : "Search products"} placeholder={canScan ? "Scan barcode and press Enter, or search this page..." : "Search products on this page..."} value={search} onChange={event => setSearch(event.target.value)} onKeyDown={scanProduct} autoFocus disabled={busy} />
                 <div className="flex gap-2 flex-wrap">{categories.map(value => <button key={value} className={category === value ? 'btn-primary' : 'btn-outline'} onClick={() => setCategory(value)}>{value}</button>)}</div>
                 {loading ? <p role="status">Loading products...</p> : <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                     {filtered.map(product => <button key={product._id} disabled={busy || product.stock <= 0} onClick={() => addProduct(product)} className="bg-white border rounded-lg p-4 text-left hover:border-blue-500 disabled:opacity-50">

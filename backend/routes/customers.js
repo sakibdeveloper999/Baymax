@@ -8,7 +8,7 @@ const express = require('express');
 const Joi = require('joi');
 const router = express.Router();
 const { verifyToken, requireRole } = require('../middleware/auth');
-const { checkSubscription, checkFeature } = require('../middleware/subscription');
+const { checkSubscription, checkFeature, checkRequestedFeatures } = require('../middleware/subscription');
 const { validate } = require('../middleware/validation');
 const { customerSchemas, paginationSchema } = require('../utils/validationSchemas');
 const Customer = require('../models/Customer');
@@ -22,6 +22,17 @@ const {
 // ═══════════════════════════════════════════════════════════════
 // GET /api/customers — List customers with pagination/search
 // ═══════════════════════════════════════════════════════════════
+
+function sanitizeCustomer(customer, features) {
+    const data = customer.toObject ? customer.toObject() : { ...customer };
+    if (!features.includes('wallet')) delete data.walletBalance;
+    if (!features.includes('loyalty')) {
+        delete data.loyaltyCard;
+        delete data.loyaltyPoints;
+        delete data.loyaltyHistory;
+    }
+    return data;
+}
 
 router.get('/',
     verifyToken,
@@ -56,7 +67,7 @@ router.get('/',
 
         res.json({
             success: true,
-            data: customers,
+            data: customers.map(customer => sanitizeCustomer(customer, req.planFeatures)),
             pagination: {
                 page: parseInt(page),
                 limit: parseInt(limit),
@@ -77,6 +88,10 @@ router.post('/',
     checkFeature('customers'),
     requireRole(['owner', 'manager', 'cashier']),
     validate(customerSchemas.create),
+    checkRequestedFeatures(req => [
+        ...(req.body.walletBalance > 0 ? ['wallet'] : []),
+        ...(req.body.loyaltyCard ? ['loyalty'] : []),
+    ]),
     asyncHandler(async (req, res) => {
         const { name, phone, email, loyaltyCard, creditLimit, walletBalance } = req.body;
 
@@ -97,7 +112,7 @@ router.post('/',
         res.status(201).json({
             success: true,
             message: 'Customer created successfully',
-            data: customer,
+            data: sanitizeCustomer(customer, req.planFeatures),
         });
     })
 );
@@ -120,18 +135,18 @@ router.get('/:id',
         }
 
         // Get recent loyalty transactions
-        const loyaltyHistory = await LoyaltyTransaction.find({
+        const loyaltyHistory = req.planFeatures.includes('loyalty') ? await LoyaltyTransaction.find({
             customerId: req.params.id,
         })
             .sort({ createdAt: -1 })
             .limit(10)
-            .lean();
+            .lean() : undefined;
 
         res.json({
             success: true,
             data: {
-                ...customer.toObject(),
-                loyaltyHistory,
+                ...sanitizeCustomer(customer, req.planFeatures),
+                ...(loyaltyHistory ? { loyaltyHistory } : {}),
             },
         });
     })
@@ -168,7 +183,7 @@ router.put('/:id',
         res.json({
             success: true,
             message: 'Customer updated successfully',
-            data: customer,
+            data: sanitizeCustomer(customer, req.planFeatures),
         });
     })
 );
@@ -208,6 +223,7 @@ router.delete('/:id',
 router.get('/:id/wallet',
     verifyToken,
     checkSubscription,
+    checkFeature('wallet'),
     asyncHandler(async (req, res) => {
         const customer = await Customer.findOne({
             _id: req.params.id,
@@ -223,7 +239,7 @@ router.get('/:id/wallet',
             data: {
                 customerId: customer._id,
                 walletBalance: customer.walletBalance,
-                loyaltyPoints: customer.loyaltyPoints,
+                ...(req.planFeatures.includes('loyalty') ? { loyaltyPoints: customer.loyaltyPoints } : {}),
                 creditBalance: customer.creditBalance,
                 creditLimit: customer.creditLimit,
             },
@@ -238,6 +254,7 @@ router.get('/:id/wallet',
 router.patch('/:id/wallet',
     verifyToken,
     checkSubscription,
+    checkFeature('wallet'),
     requireRole(['owner', 'manager']),
     validate(Joi.object({ amount: Joi.number().positive().required() })),
     asyncHandler(async (req, res) => {

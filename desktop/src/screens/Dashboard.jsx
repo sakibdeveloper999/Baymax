@@ -12,15 +12,15 @@ export default function Dashboard() {
     ];
 
     const recentOrders = [
-        { id: '#ORD-001', customer: 'John Doe', amount: '$120.50', status: 'Completed', time: '10:30 AM' },
-        { id: '#ORD-002', customer: 'Jane Smith', amount: '$85.00', status: 'Completed', time: '10:15 AM' },
+        { id: '#ORD-001', customer: 'Md. Sakib', amount: '$120.50', status: 'Completed', time: '10:30 AM' },
+        { id: '#ORD-002', customer: 'Ahadul Islam', amount: '$85.00', status: 'Completed', time: '10:15 AM' },
         { id: '#ORD-003', customer: 'Bob Johnson', amount: '$215.75', status: 'Pending', time: '10:00 AM' },
         { id: '#ORD-004', customer: 'Alice Williams', amount: '$65.25', status: 'Completed', time: '09:45 AM' },
         { id: '#ORD-005', customer: 'Charlie Brown', amount: '$340.00', status: 'Completed', time: '09:30 AM' },
     ];
 
     const topProducts = [
-        { name: 'Rice 5kg', sales: 45, revenue: '$900' },
+        { name: 'Rice 10kg', sales: 45, revenue: '$900' },
         { name: 'Oil 1L', sales: 32, revenue: '$480' },
         { name: 'Sugar 2kg', sales: 28, revenue: '$420' },
         { name: 'Flour 1kg', sales: 24, revenue: '$360' },

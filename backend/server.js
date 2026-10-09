@@ -46,7 +46,7 @@ app.use('/api/', apiLimiter);
 // Authentication & authorization (injected into protected routes)
 const { verifyToken } = require('./middleware/auth');
 const { requireStore } = require('./middleware/store');
-const { checkSubscription } = require('./middleware/subscription');
+const { checkSubscription, checkFeature } = require('./middleware/subscription');
 
 // ══════════════════════════════════
 // POSTGRESQL CONNECTION
@@ -86,12 +86,12 @@ const { asyncHandler } = require('./utils/errorHandler');
 app.get('/api/orders/receipt/:token', asyncHandler(getPublicReceipt));
 
 // Protected routes (require verifyToken + checkSubscription)
-app.use('/api/products', verifyToken, checkSubscription, requireStore, productRoutes);
-app.use('/api/categories', verifyToken, checkSubscription, requireStore, categoryRoutes);
+app.use('/api/products', verifyToken, checkSubscription, requireStore, checkFeature('products'), productRoutes);
+app.use('/api/categories', verifyToken, checkSubscription, requireStore, checkFeature('categories'), categoryRoutes);
 app.use('/api/stores', verifyToken, checkSubscription, storeRoutes);
-app.use('/api/orders', verifyToken, checkSubscription, requireStore, orderRoutes);
-app.use('/api/customers', verifyToken, checkSubscription, requireStore, customerRoutes);
-app.use('/api/suppliers', verifyToken, checkSubscription, requireStore, supplierRoutes);
+app.use('/api/orders', verifyToken, checkSubscription, requireStore, checkFeature('pos'), orderRoutes);
+app.use('/api/customers', verifyToken, checkSubscription, requireStore, checkFeature('customers'), customerRoutes);
+app.use('/api/suppliers', verifyToken, checkSubscription, requireStore, checkFeature('suppliers'), supplierRoutes);
 
 // ──── ROUTES TO CREATE IN NEXT PHASE ────
 // app.use('/api/suppliers', verifyToken, checkSubscription, requireStore, supplierRoutes);

@@ -182,3 +182,21 @@ test('a slow previous search cannot overwrite newer category results', async () 
         expect(container.textContent).not.toContain('Old category');
     } finally { act(() => root.unmount()); jest.useRealTimers(); delete global.IS_REACT_ACT_ENVIRONMENT; }
 });
+
+
+test("POS barcode lookup requires entitlement while product browsing remains available", async () => {
+    global.IS_REACT_ACT_ENVIRONMENT = true;
+    const container = document.createElement("div"), root = createRoot(container);
+    try {
+        await act(async () => root.render(<POSScreen store={testStore} features={["pos", "products"]} />));
+        act(() => Simulate.change(container.querySelector("input"), { target: { value: "111001" } }));
+        await act(async () => Simulate.keyDown(container.querySelector("input"), { key: "Enter" }));
+        expect(apiClient.get).toHaveBeenCalledTimes(1);
+        expect(container.querySelector("input").getAttribute("aria-label")).toBe("Search products");
+        apiClient.get.mockResolvedValueOnce({ data: { data: testProduct } });
+        await act(async () => root.render(<POSScreen store={testStore} features={["pos", "products", "barcodes"]} />));
+        await act(async () => Simulate.keyDown(container.querySelector("input"), { key: "Enter" }));
+        expect(apiClient.get).toHaveBeenLastCalledWith("/api/products/barcode/111001");
+        expect(useCartStore.getState().items).toHaveLength(1);
+    } finally { act(() => root.unmount()); delete global.IS_REACT_ACT_ENVIRONMENT; }
+});

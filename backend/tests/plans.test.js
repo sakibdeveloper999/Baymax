@@ -28,3 +28,22 @@ for (const [name, expected] of [['basic', 403], ['standard', 200], ['pro', 200],
         if (expected === 503) assert.equal(res.body.code, 'PLAN_NOT_CONFIGURED');
     });
 }
+
+
+test("malformed feature configuration denies access instead of throwing or matching strings", async t => {
+    for (const features of [null, "suppliers", {}, [123], [""]]) {
+        t.mock.method(Plan, "findOne", async () => ({ features }));
+        const res = { status(code) { this.statusCode = code; return this; }, json(body) { this.body = body; return this; } };
+        await checkFeature("suppliers")({ tenant: { plan: "basic" } }, res, () => assert.fail("malformed features allowed access"));
+        assert.equal(res.statusCode, 503);
+        assert.equal(res.body.code, "PLAN_NOT_CONFIGURED");
+    }
+});
+
+test("feature lookup failures reach error handling without allowing the operation", async t => {
+    const failure = new Error("database unavailable");
+    t.mock.method(Plan, "findOne", async () => { throw failure; });
+    let seen;
+    await checkFeature("suppliers")({ tenant: { plan: "basic" } }, {}, error => { seen = error; });
+    assert.equal(seen, failure);
+});

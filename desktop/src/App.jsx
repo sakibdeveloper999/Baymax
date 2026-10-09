@@ -6,6 +6,7 @@ import './App.css';
 import MainLayout from './layouts/MainLayout';
 import SessionGate from './components/SessionGate';
 import FeatureAccess from './components/FeatureAccess';
+import { screenFeatures } from './config/featurePolicy';
 
 // Screens
 import Dashboard from './screens/Dashboard';
@@ -46,7 +47,7 @@ function App() {
                 return preview(<Dashboard />);
 
             case 'pos':
-                return <POSScreen key={session.store._id} store={session.store} user={session.user} onBusyChange={session.setTransactionBusy} />;
+                return <POSScreen key={session.store._id} store={session.store} user={session.user} onBusyChange={session.setTransactionBusy} features={session.features} />;
 
             case 'products':
                 return <ProductsManager user={session.user} />;
@@ -57,7 +58,7 @@ function App() {
                 return <CustomersManager user={session.user} />;
 
             case 'suppliers':
-                return <FeatureAccess features={session.features} feature="suppliers" title="Suppliers" plan={session.tenant.plan} planConfigured={session.planConfigured}><SuppliersManager user={session.user} /></FeatureAccess>;
+                return <SuppliersManager user={session.user} />;
 
             case 'orders':
                 return <OrdersManager store={session.store} />;
@@ -76,12 +77,21 @@ function App() {
         }
     };
 
+    const renderWithAccess = session => {
+        const required = screenFeatures[currentScreen];
+        const screen = renderScreen(session);
+        if (!required) return screen;
+        const title = currentScreen === 'pos' ? 'POS' : currentScreen.charAt(0).toUpperCase() + currentScreen.slice(1);
+        return <FeatureAccess features={session.features} feature={required} title={title}
+            plan={session.tenant.plan} planConfigured={session.planConfigured}>{screen}</FeatureAccess>;
+    };
+
     return (
         <SessionGate>{session => <MainLayout key={session.store._id}
             currentScreen={currentScreen}
             onScreenChange={screen => { if (!session.transactionBusy) setCurrentScreen(screen); }}
         >
-            {renderScreen(session)}
+            {renderWithAccess(session)}
         </MainLayout>}</SessionGate>
     );
 }
